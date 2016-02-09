@@ -29,3 +29,12 @@ To run carebot the bot:
 ```
 python carebot.py
 ```
+
+## Analytics setup
+
+Requires a client ID and secret in client_secrets.json.
+Instructions on getting those are available here:
+https://developers.google.com/analytics/devguides/reporting/core/v3/quickstart/service-py#clientId
+
+Sample code:
+https://github.com/google/google-api-python-client/tree/master/samples/analytics

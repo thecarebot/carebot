@@ -1,2 +1,2 @@
 google-api-python-client==1.4.2
-slackbot
+slackbot==0.3.0

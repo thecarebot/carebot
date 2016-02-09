@@ -1,113 +1,186 @@
-# From https://developers.google.com/analytics/devguides/reporting/core/v3/quickstart/service-py
-"""A simple example of how to access the Google Analytics API."""
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+#
+# Copyright 2014 Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+# Query constructor: https://ga-dev-tools.appspot.com/query-explorer/
+#
+
+"""Simple intro to using the Google Analytics API v3.
+
+This application demonstrates how to use the python client library to access
+Google Analytics data. The sample traverses the Management API to obtain the
+authorized user's first profile ID. Then the sample uses this ID to
+contstruct a Core Reporting API query to return the top 25 organic search
+terms.
+
+Before you begin, you must sigup for a new project in the Google APIs console:
+https://code.google.com/apis/console
+
+Then register the project to use OAuth2.0 for installed applications.
+
+Finally you will need to add the client id, client secret, and redirect URL
+into the client_secrets.json file that is in the same directory as this sample.
+
+Sample Usage:
+
+  $ python hello_analytics_api_v3.py
+
+Also you can also get help on all the command-line flags the program
+understands by running:
+
+  $ python hello_analytics_api_v3.py --help
+"""
+from __future__ import print_function
+
+__author__ = 'api.nickm@gmail.com (Nick Mihailovski)'
 
 import argparse
+import sys
 
-from apiclient.discovery import build
-from oauth2client.client import SignedJwtAssertionCredentials
+from googleapiclient.errors import HttpError
+from googleapiclient import sample_tools
+from oauth2client.client import AccessTokenRefreshError
 
-import httplib2
-from oauth2client import client
-from oauth2client import file
-from oauth2client import tools
+class Analytics:
+  def __init__(self):
+    # Authenticate and construct service.
+    argv = []
+    self.service, flags = sample_tools.init(
+        argv, 'analytics', 'v3', __doc__, __file__,
+        scope='https://www.googleapis.com/auth/analytics.readonly')
 
+    """
+    # Try to make a request to the API. Print the results or handle errors.
+    try:
+      results = get_event_data(service)
+      print_results(results)
 
+    except TypeError as error:
+      # Handle errors in constructing a query.
+      print(('There was an error in constructing your query : %s' % error))
 
-def get_service(api_name, api_version, scope, key_file_location,
-                service_account_email):
-  """Get a service that communicates to a Google API.
+    except HttpError as error:
+      # Handle API errors.
+      print(('Arg, there was an API error : %s : %s' %
+             (error.resp.status, error._get_reason())))
 
-  Args:
-    api_name: The name of the api to connect to.
-    api_version: The api version to connect to.
-    scope: A list auth scopes to authorize for the application.
-    key_file_location: The path to a valid service account p12 key file.
-    service_account_email: The service account email address.
+    except AccessTokenRefreshError:
+      # Handle Auth errors.
+      print ('The credentials have been revoked or expired, please re-run '
+             'the application to re-authorize')
+    """
 
-  Returns:
-    A service that is connected to the specified API.
-  """
+  def donation_data(self, category):
+    """Executes and returns data from the Core Reporting API.
 
-  f = open(key_file_location, 'rb')
-  key = f.read()
-  f.close()
+    This queries the API for XXX
 
-  credentials = SignedJwtAssertionCredentials(service_account_email, key,
-    scope=scope)
+    Args:
+      service: The service object built by the Google API Python client library.
+      profile_id: String The profile ID from which to retrieve analytics data.
 
-  http = credentials.authorize(httplib2.Http())
+    Returns:
+      The response returned from the Core Reporting API.
+    """
 
-  # Build the service object.
-  service = build(api_name, api_version, http=http)
+    self.results = self.service.data().ga().get(
+        ids='ga:100688391', #'ga:' + profile_id,
+        start_date='90daysAgo',
+        end_date='today',
+        metrics='ga:totalEvents',
+        # dimensions='ga:date',
+        sort='-ga:totalEvents',
+        filters='ga:eventCategory==%s;ga:eventLabel==donate' % category,
+        start_index='1',
+        max_results='25').execute()
 
-  return service
+    return self.results
+    # ga:eventCategory==carebot
+    # ga:eventLabel==10m
+    # dimensions: eventCategory, eventLabel, eventAction
 
-
-def get_first_profile_id(service):
-  # Use the Analytics service object to get the first profile id.
-
-  # Get a list of all Google Analytics accounts for this user
-  accounts = service.management().accounts().list().execute()
-
-  if accounts.get('items'):
-    # Get the first Google Analytics account.
-    account = accounts.get('items')[0].get('id')
-
-    # Get a list of all the properties for the first account.
-    properties = service.management().webproperties().list(
-        accountId=account).execute()
-
-    if properties.get('items'):
-      # Get the first property id.
-      property = properties.get('items')[0].get('id')
-
-      # Get a list of all views (profiles) for the first property.
-      profiles = service.management().profiles().list(
-          accountId=account,
-          webPropertyId=property).execute()
-
-      if profiles.get('items'):
-        # return the first view (profile) id.
-        return profiles.get('items')[0].get('id')
-
-  return None
+    #TODO
+    #        sampling_level='HIGHER_PRECISION',
 
 
-def get_results(service, profile_id):
-  # Use the Analytics Service Object to query the Core Reporting API
-  # for the number of sessions within the past seven days.
-  return service.data().ga().get(
-      ids='ga:' + profile_id,
-      start_date='7daysAgo',
-      end_date='today',
-      metrics='ga:sessions').execute()
+  def get_event_data(self):
+    """Executes and returns data from the Core Reporting API.
 
+    This queries the API for XXX
 
-def print_results(results):
-  # Print data nicely for the user.
-  if results:
-    print 'View (Profile): %s' % results.get('profileInfo').get('profileName')
-    print 'Total Sessions: %s' % results.get('rows')[0][0]
+    Args:
+      service: The service object built by the Google API Python client library.
+      profile_id: String The profile ID from which to retrieve analytics data.
 
-  else:
-    print 'No results found'
+    Returns:
+      The response returned from the Core Reporting API.
+    """
 
+    self.results = self.service.data().ga().get(
+        ids='ga:100693289', #'ga:' + profile_id,
+        start_date='30daysAgo',
+        end_date='today',
+        metrics='ga:totalEvents',
+        dimensions='ga:eventLabel,ga:eventAction',
+        sort='-ga:totalEvents',
+        filters='ga:eventCategory==carebot',
+        start_index='1',
+        max_results='25').execute()
 
-def main():
-  # Define the auth scopes to request.
-  scope = ['https://www.googleapis.com/auth/analytics.readonly']
+    # ga:eventCategory==carebot
+    # ga:eventLabel==10m
+    # dimensions: eventCategory, eventLabel, eventAction
 
-  # Use the developer console and replace the values with your
-  # service account email and relative location of your key file.
-  service_account_email = '<Replace with your service account email address.>'
-  key_file_location = '<Replace with /path/to/generated/client_secrets.p12>'
+  def print_results(self):
+    """Prints out the results.
 
-  # Authenticate and construct service.
-  service = get_service('analytics', 'v3', scope, key_file_location,
-    service_account_email)
-  profile = get_first_profile_id(service)
-  print_results(get_results(service, profile))
+    This prints out the profile name, the column headers, and all the rows of
+    data.
 
+    Args:
+      results: The response returned from the Core Reporting API.
+    """
 
-if __name__ == '__main__':
-  main()
+    print()
+    print('Profile Name: %s' % self.results.get('profileInfo').get('profileName'))
+    print()
+
+    # Print header.
+    output = []
+    for header in self.results.get('columnHeaders'):
+      output.append('%30s' % header.get('name'))
+    print(''.join(output))
+
+    # Print data table.
+    if self.results.get('rows', []):
+      for row in self.results.get('rows'):
+        output = []
+        for cell in row:
+          output.append('%30s' % cell)
+        print(''.join(output))
+
+    else:
+      print('No Rows Found')
+
+a = Analytics()
+data = a.donation_data('elections16')
+if data.get('rows', []):
+  row = data.get('rows')[0]
+  cell = row[0]
+  print(cell)
+
+# a.print_results()
