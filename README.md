@@ -5,7 +5,7 @@ Carebot: The Slackbot
 * [Assumptions](#assumptions)
 * [Bootstrap the project](#bootstrap-the-project)
 * [Run the project](#run-the-project)
-* [Setup Analytics](#set-analytics)
+* [Setup analytics](#setup-analytics)
 
 What is this?
 -------------
