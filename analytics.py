@@ -19,7 +19,8 @@
 # Query constructor: https://ga-dev-tools.appspot.com/query-explorer/
 #
 
-"""Simple intro to using the Google Analytics API v3.
+"""
+Simple intro to using the Google Analytics API v3.
 
 This application demonstrates how to use the python client library to access
 Google Analytics data. The sample traverses the Management API to obtain the
@@ -37,16 +38,9 @@ into the client_secrets.json file that is in the same directory as this sample.
 
 Sample Usage:
 
-  $ python hello_analytics_api_v3.py
-
-Also you can also get help on all the command-line flags the program
-understands by running:
-
-  $ python hello_analytics_api_v3.py --help
+  $ python analytics.py
 """
 from __future__ import print_function
-
-__author__ = 'api.nickm@gmail.com (Nick Mihailovski)'
 
 import argparse
 import sys
@@ -117,7 +111,7 @@ class Analytics:
     #        sampling_level='HIGHER_PRECISION',
 
 
-  def get_event_data(self):
+  def get_time_visible(self, category):
     """Executes and returns data from the Core Reporting API.
 
     This queries the API for XXX
@@ -137,7 +131,7 @@ class Analytics:
         metrics='ga:totalEvents',
         dimensions='ga:eventLabel,ga:eventAction',
         sort='-ga:totalEvents',
-        filters='ga:eventCategory==carebot',
+        filters='ga:eventCategory==%s;ga:eventLabel==on-screen',
         start_index='1',
         max_results='25').execute()
 

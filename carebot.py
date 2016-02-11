@@ -12,7 +12,6 @@ a = Analytics()
 Get information on how many people clicked the donate button on a story
 """
 def get_donation_data(message, category):
-    print(category)
     data = a.donation_data(category)
 
     if data.get('rows', []):
