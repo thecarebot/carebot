@@ -49,7 +49,7 @@ export SLACKBOT_API_TOKEN=foo
 
 ### Add Google Analytics credentials
 
-Using analytics requires a client ID and secret in a `client_secrets.json` file in the project root. Follow the [Google Analytics python setup instructions](https://developers.google.com/analytics/devguides/reporting/core/v3/quickstart/service-py#clientId) to get that file.
+Using analytics requires a client ID and secret in a `client_secrets.json` file in the project root. Follow the [Google Analytics python setup instructions](https://developers.google.com/analytics/devguides/reporting/core/v3/quickstart/installed-py#enable) to get that file.
 
 ```
 Dev notes for Matt:
