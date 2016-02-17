@@ -10,10 +10,14 @@ Seeking more meaningful ways to assess success in journalism has led us to explo
 
 ## Measures and Indicators
 
-First, let's be clear about what we mean by metrics. Metrics are a catch-all term used to represent the different methods we employ to understand change over time across a number of dimensions. They are made um of explicit measures and can be combined to produce indicators, which hint us to specific outcomes and trends.
+First, let's be clear about what we mean by metrics. Metrics are a catch-all term used to represent the different methods we employ to understand change over time across a number of dimensions. They are made up of explicit measures and can be combined to produce indicators, which hint us to specific outcomes and trends.
 
 ### Measures
-A **measure** is a number or a quantity that records a directly observable value or performance. All measures are composed of a number and a unit of measure. The number provides magnitude (how much) for the measure, while the unit gives number a meaning (what).
+A **measure** is a number or a quantity that records a directly observable value or performance. All measures are composed of a value (a number) and a unit of measure. The number provides magnitude for the measure (how much), while the unit gives number a meaning (what is measured).
+
+Examples:
+
+
 
 ## From Google Analytics
 
