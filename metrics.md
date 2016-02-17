@@ -24,6 +24,10 @@ Examples:
 
 ```
 
+**Tip:** Not all systems used to track measures have the same definition for units with the same name, so be sure to check the system's definition of the unit before comparing the same measure across different tracking mechanisms.
+
+Note: All measures are counts of a particular unit over a period of time. For a measure to be meaningful, it should always be contextualized with the period of time that it relates to. 
+
 ## From Google Analytics
 
 ### Session
