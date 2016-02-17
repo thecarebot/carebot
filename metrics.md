@@ -6,8 +6,12 @@
 
 ## Introduction
 
+Seeking more meaningful ways to assess success in journalism has led us to explore different metrics and approaches to understanding how people come to care about stories told. This document captures what these metrics are, why we chose them and how we are using them.
 
 ## Measures and Indicators
+
+First, let's be clear about what we are referring to.
+
 
 # Measures
 A number or a quantity that records a directly observable value or performance. All measures are composed of a number and a unit of measure. The number provides magnitude (how much) for the measure, while the unit gives number a meaning (what).
