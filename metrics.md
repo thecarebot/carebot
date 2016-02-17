@@ -3,6 +3,7 @@
 * [Introduction](#introduction)
 * [Measures and Indicators](#measures-and-indicators)
 * [Linger Rate](#linger-rate)
+* [Shares Per 1k Users](#shars-per-1k-users)
 
 ## Introduction
 
@@ -56,5 +57,6 @@ Examples:
 ## Linger Rate
 Number of seconds a graphic (chart/data table) is displayed in the user's viewport.
 
-## Shares per 1k
+
+## Shares Per 1000 Users
 Number of Facebook shares per 1000 (GA) user sessions.
