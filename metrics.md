@@ -17,7 +17,12 @@ A **measure** is a number or a quantity that records a directly observable value
 
 Examples:
 
+```
+1,234,567 pageviews
+8,901,234 sessions
+567,890 Facebook likes
 
+```
 
 ## From Google Analytics
 
