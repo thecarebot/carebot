@@ -6,7 +6,7 @@
 
 ## Introduction
 
-Seeking more meaningful ways to assess success in journalism has led us to explore different metrics and approaches to understanding how people come to care about stories told. This document captures what these metrics are, why we chose them and how we are using them.
+Seeking more meaningful ways to assess success in journalism has led us to explore different metrics and approaches to understanding how people come to care about stories they encounter. This document captures what these metrics are, why we chose them, and how we are using them.
 
 ## Measures and Indicators
 
