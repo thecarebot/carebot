@@ -29,13 +29,15 @@ Examples:
 Examples:
 
 ```
-Pageview: An instance of a user visiting a particular page on a website
+Pageview: An instance of a user visiting a particular page on a website.
 
 Sessions: A group of interactions that take place on a site within a given time frame. In Google Analytics, a sessions is set to 30 minutes by default, but this can be changed)
 
+Facebook Likes: Number of times the Like link was cliked on in a Facebook post
+
 ```
 
-Note: All measures are counts of a particular unit over a period of time. For a measure to be meaningful, it should always be contextualized with the period of time that it relates to. 
+All measures are counts of a particular unit over a period of time. For a measure to be meaningful, it should always be contextualized with the period of time that it relates to. 
 
 
 ### Indicators
@@ -44,36 +46,15 @@ An **indicator** is a qualitative or quantitative factor or variable that provid
 Examples:
 
 ```
-1,234,567 pageviews
-8,901,234 sessions
-567,890 Facebook likes
+33% Bounce Rate (In Google Analytics, the percentage of single-page sessions)
+
+75% Completion Rate (Defined differently based on the presentation of story - in a video or audio piece it is the aggregation of total time played over video duration whereas for an interactive graphic it could be time spent viewing the graphic relative to an arbitrary ideal period of time)
+
 
 ```
 
-
-## From Google Analytics
-
-### Session
-A group of interactions that take place on a site within a given time frame (Google Analytics sessions are set to 30 minutes for npr.org)
-
-### Pageview
-An instance of a user visiting a particular page on a website
-
-### Bounce Rate
-The percentage of single-page sessions
-
-## From Facebook
-
-### Shares
-Number of ...
-
-
-### Completion rate
-Number of unique users who...
-Example:
-
-### Linger Rate
+## Linger Rate
 Number of seconds a graphic (chart/data table) is displayed in the user's viewport.
 
-### Shares per 1k
+## Shares per 1k
 Number of Facebook shares per 1000 (GA) user sessions.
