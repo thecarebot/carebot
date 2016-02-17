@@ -18,13 +18,22 @@ A **measure** is a number or a quantity that records a directly observable value
 Examples:
 
 ```
-1,234,567 pageviews
-8,901,234 sessions
-567,890 Facebook likes
+1,234,567 Pageviews
+8,901,234 Sessions
+567,890 Facebook Likes
 
 ```
 
 **Tip:** Not all systems used to track measures have the same definition for units with the same name, so be sure to check the system's definition of the unit before comparing the same measure across different tracking mechanisms.
+
+Examples:
+
+```
+Pageview: An instance of a user visiting a particular page on a website
+
+Sessions: A group of interactions that take place on a site within a given time frame. In Google Analytics, a sessions is set to 30 minutes by default, but this can be changed)
+
+```
 
 Note: All measures are counts of a particular unit over a period of time. For a measure to be meaningful, it should always be contextualized with the period of time that it relates to. 
 
@@ -32,6 +41,14 @@ Note: All measures are counts of a particular unit over a period of time. For a 
 ### Indicators
 An **indicator** is a qualitative or quantitative factor or variable that provides a simple and reliable means to measure achievement, to assess the performance of the entity taking action or changes resulting from a specific intervention. It aggregates or combines multiple measures in an explicit formula.
 
+Examples:
+
+```
+1,234,567 pageviews
+8,901,234 sessions
+567,890 Facebook likes
+
+```
 
 
 ## From Google Analytics
