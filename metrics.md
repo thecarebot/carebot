@@ -1,10 +1,13 @@
 # Carebot Metrics
 
 * [Introduction](#introduction)
+* [Measures and Indicators](#measures-and-indicators)
 * [Linger Rate](#linger-rate)
 
 ## Introduction
 
+
+## Measures and Indicators
 
 # Measures
 A number or a quantity that records a directly observable value or performance. All measures are composed of a number and a unit of measure. The number provides magnitude (how much) for the measure, while the unit gives number a meaning (what).
