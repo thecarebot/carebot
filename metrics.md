@@ -28,6 +28,12 @@ Examples:
 
 Note: All measures are counts of a particular unit over a period of time. For a measure to be meaningful, it should always be contextualized with the period of time that it relates to. 
 
+
+### Indicators
+An **indicator** is a qualitative or quantitative factor or variable that provides a simple and reliable means to measure achievement, to assess the performance of the entity taking action or changes resulting from a specific intervention. It aggregates or combines multiple measures in an explicit formula.
+
+
+
 ## From Google Analytics
 
 ### Session
@@ -44,9 +50,6 @@ The percentage of single-page sessions
 ### Shares
 Number of ...
 
-
-# Indicators
-A qualitative or quantitative factor or variable that provides a simple and reliable means to measure achievement, changes connected to an intervention, or to assess the performance of the entity taking action.
 
 ### Completion rate
 Number of unique users who...
