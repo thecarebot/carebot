@@ -30,3 +30,4 @@ pip-log.txt
 # Google Analytics
 client_secrets.json
 analytics.dat
+.env

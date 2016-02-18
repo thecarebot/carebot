@@ -68,3 +68,20 @@ python carebot.py
 ```
 
 
+## Deploying the project
+
+To deploy carebot to production:
+
+```
+fab production deploy
+```
+
+### First deploy
+
+You will need to manually set the `SLACKBOT_API_TOKEN` environment variable on the server.
+
+Then, run:
+
+```
+fab production setup
+```
