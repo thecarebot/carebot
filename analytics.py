@@ -1,33 +1,7 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-#
-# Copyright 2014 Google Inc. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-
 # Query constructor: https://ga-dev-tools.appspot.com/query-explorer/
 #
 
 """
-Simple intro to using the Google Analytics API v3.
-
-This application demonstrates how to use the python client library to access
-Google Analytics data. The sample traverses the Management API to obtain the
-authorized user's first profile ID. Then the sample uses this ID to
-contstruct a Core Reporting API query to return the top 25 organic search
-terms.
-
 Before you begin, you must sigup for a new project in the Google APIs console:
 https://code.google.com/apis/console
 
@@ -57,40 +31,7 @@ class Analytics:
         argv, 'analytics', 'v3', __doc__, __file__,
         scope='https://www.googleapis.com/auth/analytics.readonly')
 
-    """
-    # Try to make a request to the API. Print the results or handle errors.
-    try:
-      results = get_event_data(service)
-      print_results(results)
-
-    except TypeError as error:
-      # Handle errors in constructing a query.
-      print(('There was an error in constructing your query : %s' % error))
-
-    except HttpError as error:
-      # Handle API errors.
-      print(('Arg, there was an API error : %s : %s' %
-             (error.resp.status, error._get_reason())))
-
-    except AccessTokenRefreshError:
-      # Handle Auth errors.
-      print ('The credentials have been revoked or expired, please re-run '
-             'the application to re-authorize')
-    """
-
-  def donation_data(self, category):
-    """Executes and returns data from the Core Reporting API.
-
-    This queries the API for XXX
-
-    Args:
-      service: The service object built by the Google API Python client library.
-      profile_id: String The profile ID from which to retrieve analytics data.
-
-    Returns:
-      The response returned from the Core Reporting API.
-    """
-
+  def donation_data(self, slug):
     self.results = self.service.data().ga().get(
         ids='ga:100688391', #'ga:' + profile_id,
         start_date='90daysAgo',
@@ -98,7 +39,7 @@ class Analytics:
         metrics='ga:totalEvents',
         # dimensions='ga:date',
         sort='-ga:totalEvents',
-        filters='ga:eventCategory==%s;ga:eventLabel==donate' % category,
+        filters='ga:eventCategory==%s;ga:eventLabel==donate' % slug,
         start_index='1',
         max_results='25').execute()
 
@@ -107,74 +48,94 @@ class Analytics:
     # ga:eventLabel==10m
     # dimensions: eventCategory, eventLabel, eventAction
 
-    #TODO
-    #        sampling_level='HIGHER_PRECISION',
-
-
-  def get_time_visible(self, category):
-    """Executes and returns data from the Core Reporting API.
-
-    This queries the API for XXX
-
-    Args:
-      service: The service object built by the Google API Python client library.
-      profile_id: String The profile ID from which to retrieve analytics data.
-
-    Returns:
-      The response returned from the Core Reporting API.
-    """
-
+  def get_linger_rate(self, slug):
+    print ("Getting linger rate for " + slug)
     self.results = self.service.data().ga().get(
-        ids='ga:100693289', #'ga:' + profile_id,
-        start_date='30daysAgo',
+        ids='ga:100688391', #'ga:' + profile_id,
+        start_date='90daysAgo',
         end_date='today',
         metrics='ga:totalEvents',
-        dimensions='ga:eventLabel,ga:eventAction',
+        dimensions='ga:eventLabel',
         sort='-ga:totalEvents',
-        filters='ga:eventCategory==%s;ga:eventLabel==on-screen',
+        filters='ga:eventCategory==%s;ga:eventAction==on-screen;ga:eventLabel==10s,ga:eventLabel==20s,ga:eventLabel==30s,ga:eventLabel==40s,ga:eventLabel==50s,ga:eventLabel==1m,ga:eventLabel==2m,ga:eventLabel==3m,ga:eventLabel==4m,ga:eventLabel==5m,ga:eventLabel==10m' % slug,
         start_index='1',
         max_results='25').execute()
 
-    # ga:eventCategory==carebot
-    # ga:eventLabel==10m
-    # dimensions: eventCategory, eventLabel, eventAction
+    if self.results.get('rows', []):
+        data = []
+
+        for row in self.results.get('rows'):
+            time = row[0]
+            seconds = 0
+            if 'm' in time:
+                time = time[:-1] # remove 'm' from the end
+                seconds = int(time) * 60
+            else:
+                time = time[:-1] # remove 's'
+                seconds = int(time)
+
+            row[0] = seconds
+            row[1] = int(row[1])
+            data.append(row)
+
+        # Calculate the number of visitors in each bucket
+        for index, row in enumerate(data):
+            if index == len(data) - 1:
+                continue
+
+            next_row = data[index + 1]
+            row[1] = row[1] - next_row[-1]
+
+        # Exclude everybody in the last bucket
+        # (they've been lingering for way too long -- 10+ minutes)
+        data = data [:-1]
+
+        # Get the average number of seconds
+        total_seconds = 0
+        total_people = 0
+        for row in data:
+            total_seconds = total_seconds + (row[0] * row[1])
+            total_people = total_people + row[1]
+
+        average_seconds = total_seconds/total_people
+        minutes = average_seconds / 60
+        seconds = average_seconds % 60
+        return (total_people, minutes, seconds)
+
+
 
   def print_results(self):
-    """Prints out the results.
+        print()
+        print('Profile Name: %s' % self.results.get('profileInfo').get('profileName'))
+        print()
 
-    This prints out the profile name, the column headers, and all the rows of
-    data.
-
-    Args:
-      results: The response returned from the Core Reporting API.
-    """
-
-    print()
-    print('Profile Name: %s' % self.results.get('profileInfo').get('profileName'))
-    print()
-
-    # Print header.
-    output = []
-    for header in self.results.get('columnHeaders'):
-      output.append('%30s' % header.get('name'))
-    print(''.join(output))
-
-    # Print data table.
-    if self.results.get('rows', []):
-      for row in self.results.get('rows'):
+        # Print header.
         output = []
-        for cell in row:
-          output.append('%30s' % cell)
+        for header in self.results.get('columnHeaders'):
+            output.append('%30s' % header.get('name'))
         print(''.join(output))
 
-    else:
-      print('No Rows Found')
+        # Print data table.
+        if self.results.get('rows', []):
+            for row in self.results.get('rows'):
+                output = []
+                for cell in row:
+                    output.append('%30s' % cell)
+                print(''.join(output))
 
-a = Analytics()
-data = a.donation_data('elections16')
-if data.get('rows', []):
-  row = data.get('rows')[0]
-  cell = row[0]
-  print(cell)
+        else:
+            print('No Rows Found')
+
+
+# Testing -- move to a separate folder
+# slugs: elections16
+# a = Analytics()
+# data = a.get_linger_rate('space-time-stepper-20160208')
+# a.print_results()
+
+# if data.get('rows', []):
+#   row = data.get('rows')[0]
+#   cell = row[0]
+#   print(cell)
 
 # a.print_results()

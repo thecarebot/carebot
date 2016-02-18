@@ -213,6 +213,7 @@ def deploy():
     install_requirements()
     render_confs()
     deploy_confs()
+    start_service('bot')
 
 """
 Deaths, destroyers of worlds

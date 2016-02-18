@@ -26,6 +26,7 @@ pip-log.txt
 *.mo
 
 .DS_store
+*.db
 
 # Google Analytics
 client_secrets.json
