@@ -208,7 +208,10 @@ def reboot():
 @task
 def deploy():
     require('settings', provided_by=['production', 'staging'])
-    stop_service('bot')
+
+    with settings(warn_only=True):
+        stop_service('bot')
+
     checkout_latest()
     install_requirements()
     render_confs()
