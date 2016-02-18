@@ -118,7 +118,7 @@ def response_dispatcher(message, text=None):
     if message_type == 'track':
         start_tracking(message)
 
-    if message_type == 'donation':
+    elif message_type == 'donation':
         handle_donation_question(message)
 
     elif message_type == 'help':
