@@ -94,7 +94,7 @@ def checkout_latest():
     """
     Get the updated code
     """
-    run('cd %s; git fetch' % (app_config.SERVER_REPOSITORY_PATH))
+    run('cd %s; git pull origin master' % (app_config.SERVER_REPOSITORY_PATH))
 
 
 @task
