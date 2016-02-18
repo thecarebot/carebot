@@ -31,3 +31,6 @@ pip-log.txt
 client_secrets.json
 analytics.dat
 .env
+
+# Deploy
+confs/rendered/*

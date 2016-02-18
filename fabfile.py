@@ -195,9 +195,7 @@ def setup():
     install_requirements()
     deploy_analytics_conf()
 
-    render_confs()
     deploy_confs()
-    start_service('bot')
 
 @task
 def reboot():
