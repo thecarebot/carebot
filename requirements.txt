@@ -1,4 +1,6 @@
+copytext==0.1.8
 google-api-python-client==1.4.2
+gspread==0.3.0
 Jinja2==2.7.3
 peewee==2.8.0
 slackbot==0.3.0

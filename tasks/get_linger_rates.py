@@ -10,6 +10,9 @@ MINUTES_BETWEEN_REPORTS = [
 
 a = Analytics()
 
+"""
+Get updated linger rate stats for every story we track
+"""
 def get_stats():
     stories = Story.select()
     for story in stories:
@@ -17,6 +20,5 @@ def get_stats():
         print story.tracking_started
         print (a.get_linger_rate(story.slug))
         # TODO: get message
-
 
 get_stats()

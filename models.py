@@ -9,7 +9,7 @@ class Story(Model):
     last_checked = DateTimeField(null = True)
 
     class Meta:
-        database = db # This model uses the "people.db" database.
+        database = db
 
 db.connect()
 

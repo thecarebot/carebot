@@ -94,7 +94,7 @@ def checkout_latest():
     """
     Get the updated code
     """
-    run('cd %s; git pull origin master' % (app_config.SERVER_REPOSITORY_PATH))
+    run('cd %s; git pull origin master' % (app_config.SERVER_PROJECT_PATH))
 
 
 @task
@@ -216,7 +216,6 @@ def deploy():
     install_requirements()
     render_confs()
     deploy_confs()
-    start_service('bot')
 
 """
 Deaths, destroyers of worlds

@@ -32,6 +32,7 @@ pip-log.txt
 client_secrets.json
 analytics.dat
 .env
+*.env
 +sample.env
 
 # Deploy
