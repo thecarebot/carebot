@@ -33,7 +33,7 @@ class Analytics:
 
   def donation_data(self, slug):
     self.results = self.service.data().ga().get(
-        ids='ga:100688391', #'ga:' + profile_id,
+        ids='ga:100688391',
         start_date='90daysAgo',
         end_date='today',
         metrics='ga:totalEvents',
