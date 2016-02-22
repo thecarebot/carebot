@@ -4,3 +4,6 @@ gspread==0.3.0
 Jinja2==2.7.3
 peewee==2.8.0
 slackbot==0.3.0
+slacker==0.9.0
+slimit==0.7.4
+smartypants==1.8.6
