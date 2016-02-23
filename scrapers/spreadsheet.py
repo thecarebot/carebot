@@ -3,9 +3,6 @@ import logging
 from peewee import IntegrityError
 import time
 
-import app_config
-from oauth import get_document
-
 from util.models import Story
 
 logging.basicConfig()
@@ -40,10 +37,3 @@ class SpreadsheetScraper:
             except IntegrityError:
                 # Story probably already exists.
                 pass
-
-get_document(app_config.STORIES_GOOGLE_DOC_KEY, app_config.STORIES_PATH)
-scraper = SpreadsheetScraper()
-stories = scraper.scrape_spreadsheet(app_config.STORIES_PATH)
-scraper.write(stories)
-
-# scraper.write(db, stories)

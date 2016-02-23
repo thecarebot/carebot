@@ -1,9 +1,12 @@
-
 import app_config
 import copy
 from fabric.api import *
 from jinja2 import Template
 
+import app_config
+from oauth import get_document
+from util.models import Story
+from scrapers.spreadsheet import SpreadsheetScraper
 
 env.user = app_config.SERVER_USER
 env.hosts = app_config.SERVERS
@@ -38,10 +41,20 @@ def _get_installed_service_name(service):
     """
     return '%s.%s' % (app_config.PROJECT_FILENAME, service)
 
+"""
+Data tasks
+"""
+@task
+def get_story_spreadsheet():
+    get_document(app_config.STORIES_GOOGLE_DOC_KEY, app_config.STORIES_PATH)
+    scraper = SpreadsheetScraper()
+    stories = scraper.scrape_spreadsheet(app_config.STORIES_PATH)
+    scraper.write(stories)
+
 
 
 """
-Tasks
+Deploy tasks
 """
 
 @task
