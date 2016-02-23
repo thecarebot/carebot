@@ -29,6 +29,11 @@ GITHUB_USERNAME = 'thecarebot'
 REPOSITORY_URL = 'https://github.com/%s/%s.git' % (GITHUB_USERNAME, REPOSITORY_NAME)
 REPOSITORY_ALT_URL = None # 'git@bitbucket.org:nprapps/%s.git' % REPOSITORY_NAME'
 
+
+# Dailygraphics archive
+COPY_GOOGLE_DOC_KEY = '0Ak3IIavLYTovdGdpcXlFS1lBaVE5aEJqcG1nMUFTVWc'
+COPY_PATH = 'data/copy.xlsx'
+
 STORIES_GOOGLE_DOC_KEY = '1Gcumd0uOl3eSUvc0y5CWmmHVOKwX609-js5EnE8i3lI'
 STORIES_PATH = 'data/stories.xlsx'
 
