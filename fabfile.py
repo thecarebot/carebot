@@ -1,17 +1,28 @@
 import app_config
 import copy
 from fabric.api import *
+from fabric.state import env
 from jinja2 import Template
 
 import app_config
 from oauth import get_document
 from util.models import Story
 from scrapers.spreadsheet import SpreadsheetScraper
+from scrapers.analytics import GoogleAnalyticsScraper
 
 env.user = app_config.SERVER_USER
 env.hosts = app_config.SERVERS
 env.slug = app_config.PROJECT_SLUG
 
+
+"""
+Base configuration
+"""
+env.user = app_config.SERVER_USER
+env.forward_agent = True
+
+env.hosts = []
+env.settings = None
 
 """
 Configuration
@@ -41,6 +52,21 @@ def _get_installed_service_name(service):
     """
     return '%s.%s' % (app_config.PROJECT_FILENAME, service)
 
+
+"""
+Running the app
+Probably only neded the first time, to set up oauth creds
+"""
+@task
+def app(port='8000'):
+    """
+    Serve app.py.
+    """
+    if env.settings:
+        local("DEPLOYMENT_TARGET=%s bash -c 'gunicorn -b 0.0.0.0:%s --timeout 3600 --debug --reload app:wsgi_app'" % (env.settings, port))
+    else:
+        local('gunicorn -b 0.0.0.0:%s --timeout 3600 --debug --reload app:wsgi_app' % port)
+
 """
 Data tasks
 """
@@ -51,7 +77,11 @@ def load_new_stories():
     stories = scraper.scrape_spreadsheet(app_config.STORIES_PATH)
     scraper.write(stories)
 
-
+@task
+def get_analytics():
+    scraper = GoogleAnalyticsScraper()
+    stats = scraper.scrape_google_analytics()
+    print(stats)
 
 """
 Deploy tasks

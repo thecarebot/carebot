@@ -3,9 +3,12 @@ copytext==0.1.8
 Flask==0.9
 google-api-python-client==1.4.2
 gspread==0.3.0
+gunicorn==19.1.1
 Jinja2==2.7.3
 peewee==2.8.0
 slackbot==0.3.0
 slacker==0.9.0
 slimit==0.7.4
 smartypants==1.8.6
+Werkzeug==0.8.3
+

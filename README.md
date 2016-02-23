@@ -49,18 +49,30 @@ the `.env` file are copied to the server on deploy.
 
 ### Add Google Analytics credentials
 
-Using analytics requires a client ID and secret in a `client_secrets.json` file in the project root. Follow the [Google Analytics python setup instructions](https://developers.google.com/analytics/devguides/reporting/core/v3/quickstart/installed-py#enable) to get that file.
-The first time you run the project locally, a browser window will open and you
-will be asked to authorize you account. This will create an `analytics.dat` file
-in your project directory.
+The first time you run Carebot, you'll need to authorize the app with your
+Google account. To do that, run
 
-### Run the project
+```
+fab app
+```
 
-To run the bot:
+And follow the on-screen instructions. If you have already set up an app using
+the NPR Apps template, you may not have to do this.
+
+## Using Carebot
+
+### Run the bot
 
 ```
 python carebot.py
 ```
+
+### Get new stories from the story spreadsheet
+
+```
+fab load_new_stories
+```
+
 
 ## Deploying the project
 
