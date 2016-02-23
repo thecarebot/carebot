@@ -10,8 +10,8 @@ See get_secrets() below for a fast way to access them.
 
 import os
 
-# from authomatic.providers import oauth2
-# from authomatic import Authomatic
+from authomatic.providers import oauth2
+from authomatic import Authomatic
 
 """
 NAMES
@@ -28,6 +28,42 @@ REPOSITORY_NAME = 'carebot'
 GITHUB_USERNAME = 'thecarebot'
 REPOSITORY_URL = 'https://github.com/%s/%s.git' % (GITHUB_USERNAME, REPOSITORY_NAME)
 REPOSITORY_ALT_URL = None # 'git@bitbucket.org:nprapps/%s.git' % REPOSITORY_NAME'
+
+
+# Dailygraphics archive
+COPY_GOOGLE_DOC_KEY = '0Ak3IIavLYTovdGdpcXlFS1lBaVE5aEJqcG1nMUFTVWc'
+COPY_PATH = 'data/copy.xlsx'
+
+STORIES_GOOGLE_DOC_KEY = '1Gcumd0uOl3eSUvc0y5CWmmHVOKwX609-js5EnE8i3lI'
+STORIES_PATH = 'data/stories.xlsx'
+
+"""
+Google analytics
+"""
+GA_ORGANIZATION_ID = '53470309'
+GA_SAMPLING_LEVEL = 'HIGHER_PRECISION'
+GA_RESULT_SIZE = 10000
+GA_METRICS = ['sessions', 'pageviews']
+GA_DIMENSIONS = ['pagePath', 'source', 'deviceCategory']
+
+"""
+OAUTH
+"""
+
+GOOGLE_OAUTH_CREDENTIALS_PATH = '~/.google_oauth_credentials'
+
+authomatic_config = {
+    'google': {
+        'id': 1,
+        'class_': oauth2.Google,
+        'consumer_key': os.environ.get('GOOGLE_OAUTH_CLIENT_ID'),
+        'consumer_secret': os.environ.get('GOOGLE_OAUTH_CONSUMER_SECRET'),
+        'scope': ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/analytics.readonly'],
+        'offline': True,
+    },
+}
+
+authomatic = Authomatic(authomatic_config, os.environ.get('AUTHOMATIC_SALT'))
 
 """
 DEPLOYMENT

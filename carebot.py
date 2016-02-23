@@ -117,17 +117,13 @@ def response_dispatcher(message, text=None):
 
     if message_type == 'track':
         start_tracking(message)
-
     elif message_type == 'donation':
         handle_donation_question(message)
-
     elif message_type == 'help':
         pass
-
     elif message_type == 'linger':
         print("handling linger")
         handle_linger_question(message)
-
     else:
         message.reply("Hi! I got your message, but I don't know enough yet to respond to it.")
 

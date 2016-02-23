@@ -29,10 +29,14 @@ pip-log.txt
 *.db
 
 # Google Analytics
-client_secrets.json
-analytics.dat
+client_secrets*.json
+
+*.dat
 .env
+*.env
 +sample.env
+
+*.xlsx
 
 # Deploy
 confs/rendered/*

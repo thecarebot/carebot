@@ -31,6 +31,22 @@ class Analytics:
         argv, 'analytics', 'v3', __doc__, __file__,
         scope='https://www.googleapis.com/auth/analytics.readonly')
 
+  def autodiscover_stories(self,):
+    self.results = self.service.data().ga().get(
+        ids='ga:100688391',
+        start_date='5daysAgo',
+        end_date='today',
+        metrics='ga:totalEvents',
+        dimensions='ga:eventCategory',
+        filters='ga:eventAction==on-screen',
+        start_index='1',
+        max_results='500').execute()
+
+    if self.results.get('rows', []):
+        data = []
+        for row in self.results.get('rows'):
+            print(row[0])
+
   def donation_data(self, slug):
     self.results = self.service.data().ga().get(
         ids='ga:100688391',
@@ -49,7 +65,6 @@ class Analytics:
     # dimensions: eventCategory, eventLabel, eventAction
 
   def get_linger_rate(self, slug):
-    print ("Getting linger rate for " + slug)
     self.results = self.service.data().ga().get(
         ids='ga:100688391', #'ga:' + profile_id,
         start_date='90daysAgo',
@@ -102,8 +117,6 @@ class Analytics:
         seconds = average_seconds % 60
         return (total_people, minutes, seconds)
 
-
-
   def print_results(self):
         print()
         print('Profile Name: %s' % self.results.get('profileInfo').get('profileName'))
@@ -126,10 +139,11 @@ class Analytics:
         else:
             print('No Rows Found')
 
-
 # Testing -- move to a separate folder
 # slugs: elections16
-# a = Analytics()
+a = Analytics()
+a.autodiscover_stories()
+
 # data = a.get_linger_rate('space-time-stepper-20160208')
 # a.print_results()
 
