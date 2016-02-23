@@ -45,7 +45,7 @@ def _get_installed_service_name(service):
 Data tasks
 """
 @task
-def get_story_spreadsheet():
+def load_new_stories():
     get_document(app_config.STORIES_GOOGLE_DOC_KEY, app_config.STORIES_PATH)
     scraper = SpreadsheetScraper()
     stories = scraper.scrape_spreadsheet(app_config.STORIES_PATH)
