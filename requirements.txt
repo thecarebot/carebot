@@ -1,4 +1,4 @@
--e git+git@github.com:nprapps/authomatic.git@94abc06bbb163c1aac8b69ea65305918f1c937dd#egg=Authomatic-master
+-e https://github.com/nprapps/authomatic.git@94abc06bbb163c1aac8b69ea65305918f1c937dd#egg=Authomatic-master
 copytext==0.1.8
 Fabric==1.4.3
 Flask==0.9
