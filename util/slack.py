@@ -32,7 +32,7 @@ class SlackTools:
         if linger['minutes'] > 0:
             time += str(linger['minutes'])
             if linger['minutes'] == 1:
-                time = ' minute'
+                time += ' minute'
             else:
                 time += ' minutes'
 
