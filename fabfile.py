@@ -1,12 +1,15 @@
 import app_config
 import copy
+import datetime
 from fabric.api import *
 from fabric.state import env
 from jinja2 import Template
+from slacker import Slacker
 
 import app_config
 from oauth import get_document
 from util.models import Story
+from util.slack import SlackTools
 from scrapers.spreadsheet import SpreadsheetScraper
 from scrapers.analytics import GoogleAnalyticsScraper
 
@@ -14,6 +17,7 @@ env.user = app_config.SERVER_USER
 env.hosts = app_config.SERVERS
 env.slug = app_config.PROJECT_SLUG
 
+slackTools = SlackTools()
 
 """
 Base configuration
@@ -24,10 +28,22 @@ env.forward_agent = True
 env.hosts = []
 env.settings = None
 
+slack = Slacker(app_config.slack_key)
+
+SECONDS_BETWEEN_CHECKS = 4 * 60 * 60 # 4 hours
+MAX_SECONDS_SINCE_POSTING = 2 * 24 * 60 * 60 # 2 days
+
+"""
+MINUTES_BETWEEN_CHECKS = 15
+MINUTES_BETWEEN_REPORTS = [
+    240,  # 4 hours
+    480   # 8 hours
+]
+"""
+
 """
 Configuration
 """
-
 def _get_template_conf_path(service, extension):
     """
     Derive the path for a conf template file.
@@ -78,10 +94,58 @@ def load_new_stories():
     scraper.write(stories)
 
 @task
-def get_analytics():
+def get_linger_rate():
     scraper = GoogleAnalyticsScraper()
-    stats = scraper.scrape_google_analytics()
+    stats = scraper.get_linger_rate('space-time-stepper-20160208')
     print(stats)
+
+def time_since(a):
+    now = datetime.datetime.now()
+
+    # Convert any dates to datetime
+    # (yes yes imprecise & hacky)
+    if type(a) is datetime.date:
+        a = datetime.datetime.combine(a, datetime.datetime.min.time())
+
+    print (now - a).total_seconds()
+    return (now - a).total_seconds()
+
+@task
+def get_story_stats():
+    analytics = GoogleAnalyticsScraper()
+
+    for story in Story.select():
+        # Check when the story was last reported on
+        if story.last_checked:
+            seconds_since_publishing = time_since(story.date)
+            seconds_since_check = time_since(story.last_checked)
+
+            # Skip stories that have been checked recently
+            # And stories that are too old.
+            if (seconds_since_check < SECONDS_BETWEEN_CHECKS) or (seconds_since_publishing < MAX_SECONDS_SINCE_POSTING):
+                print "Checked recently, not sending"
+                # continue
+
+        # Some stories have multiple slugs
+        story_slugs = story.slug.split(',')
+        story_slugs = [slug.strip() for slug in story_slugs]
+
+        for slug in story_slugs:
+            stats = analytics.get_linger_rate(slug)
+            if stats:
+                print(story.name, slug, stats)
+                slackTools.send_linger_time_update(story, stats)
+
+        # Mark the story as checked
+        story.last_checked = datetime.datetime.now()
+        story.save()
+
+@task
+def send_message():
+    # Send a message to #general channel
+    slack.chat.post_message('#broadway-carebot', 'Hi @livlab!', as_user=True)
+
+
 
 """
 Deploy tasks
@@ -96,6 +160,14 @@ def production():
     app_config.configure_targets(env.settings)
     env.hosts = app_config.SERVERS
 
+@task
+def staging():
+    """
+    Run as though on staging.
+    """
+    env.settings = 'staging'
+    app_config.configure_targets(env.settings)
+    env.hosts = app_config.SERVERS
 
 @task
 def create_directories():
@@ -208,8 +280,17 @@ def deploy_confs():
 def deploy_analytics_conf():
     put('client_secrets.json', '%(SERVER_PROJECT_PATH)s/client_secrets.json' % app_config.__dict__)
     put('analytics.dat', '%(SERVER_PROJECT_PATH)s/analytics.dat' % app_config.__dict__)
-    put('.env', '%(SERVER_PROJECT_PATH)s/.env' % app_config.__dict__)
+    put('%s.env' % env.settings, '%(SERVER_PROJECT_PATH)s/.env' % app_config.__dict__)
     # run('mkdir -p %(SERVER_PROJECT_PATH)s' % app_config.__dict__)
+
+@task
+def install_crontab():
+    """
+    Install cron jobs script into cron.d.
+    """
+    require('settings', provided_by=['production', 'staging'])
+
+    sudo('cp %(SERVER_REPOSITORY_PATH)s/crontab /etc/cron.d/%(PROJECT_FILENAME)s' % app_config.__dict__)
 
 @task
 def start_service(service):
@@ -237,8 +318,8 @@ def setup():
     checkout_latest()
     install_requirements()
     deploy_analytics_conf()
-
     deploy_confs()
+    install_crontab()
 
 @task
 def reboot():
@@ -259,6 +340,7 @@ def deploy():
     install_requirements()
     render_confs()
     deploy_confs()
+    install_crontab()
 
 """
 Deaths, destroyers of worlds

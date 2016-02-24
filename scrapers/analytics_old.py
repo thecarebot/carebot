@@ -142,10 +142,10 @@ class Analytics:
 # Testing -- move to a separate folder
 # slugs: elections16
 a = Analytics()
-a.autodiscover_stories()
+# a.autodiscover_stories()
 
-# data = a.get_linger_rate('space-time-stepper-20160208')
-# a.print_results()
+data = a.get_linger_rate('gas-miles-driven-20160223')
+print(data)
 
 # if data.get('rows', []):
 #   row = data.get('rows')[0]

@@ -1,0 +1,2 @@
+0,15,30,45 * * * * ubuntu /bin/bash /home/ubuntu/apps/carebot/repository/run_on_server.sh fab $DEPLOYMENT_TARGET load_new_stories >> /var/log/carebot/load_new_stories.log 2>&1
+5,20,35,50 * * * * ubuntu /bin/bash /home/ubuntu/apps/carebot/repository/run_on_server.sh fab $DEPLOYMENT_TARGET get_story_stats >> /var/log/carebot/get_story_stats.log 2>&1

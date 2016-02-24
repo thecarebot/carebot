@@ -7,7 +7,7 @@ from slackbot.bot import respond_to
 from slackbot.bot import listen_to
 
 # Set up analytics to handle inquiries
-a = Analytics()
+# a = Analytics()
 
 LINGER_RATE_REGEX = '[Ww]hat is the linger rate on ((\w*-*)+)?'
 START_TRACKING_REGEX = '[Tt]rack ((\w*-*)+)'

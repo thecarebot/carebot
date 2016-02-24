@@ -1,4 +1,5 @@
 import copytext
+import datetime
 import logging
 from peewee import IntegrityError
 import time
@@ -9,7 +10,21 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+
+# Right now, we don't care about stories before this time
+MAGIC_DATE_CUTOFF = datetime.date(2016, 02, 01)
+
 class SpreadsheetScraper:
+    """
+    Don't read this.
+    From https://github.com/tarbell-project/tarbell/blob/1.0.5/tarbell/app.py#L251
+    """
+    def parse_date(self, value):
+        value = float(value)
+        seconds = (value - 25569) * 86400.0
+        parsed = datetime.datetime.utcfromtimestamp(seconds).date()
+        return parsed
+
     """
     Scrape the NPR Visuals 'did we touch it?' spreadsheet
     """
@@ -18,10 +33,9 @@ class SpreadsheetScraper:
         spreadsheet = copytext.Copy(filename)
         data = spreadsheet['published']
         for row in data:
-            print row['date'], row['graphic_slug']
-            # story = Story(row)
-            # stories.append(story)
-        return data
+            if self.parse_date(row['date']) > MAGIC_DATE_CUTOFF:
+                stories.append(row)
+        return stories
 
     def write(self, stories):
         for story in stories:
@@ -29,8 +43,7 @@ class SpreadsheetScraper:
                 Story.create(
                     name = story['story_headline'],
                     slug = story['graphic_slug'],
-                    # Dates aren't pulled right from the spreadsheet
-                    # date = time.strptime(story['date'], '%m/%d/%Y'),
+                    date = self.parse_date(story['date']),
                     story_type = story['graphic_type'],
                     url = story['story_url']
                 )

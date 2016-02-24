@@ -10,6 +10,7 @@ class Story(Model):
     url = CharField(null=True)
     date = DateField(null=True)
 
+    article_posted = DateTimeField(null = True)
     tracking_started = DateTimeField(default=datetime.datetime.now)
     last_checked = DateTimeField(null = True)
 
