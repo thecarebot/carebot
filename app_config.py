@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 Project-wide application configuration.
 
