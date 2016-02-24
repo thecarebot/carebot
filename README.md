@@ -44,8 +44,7 @@ The bot requires several API credentials available as environment variables.
 An easy way to add them is to use a `.env` file. Copy `sample.env` to `dev.env`.
 Fill in the values. Then, run `source dev.env` to make them availabe.
 
-Copy `sample.env` to `.env` to store production keys. The values in
-the `.env` file are copied to the server on deploy.
+Copy `sample.env` to `production.env` to store production keys. The `.env` file is copied to the server on deploy.
 
 ### Add Google Analytics credentials
 

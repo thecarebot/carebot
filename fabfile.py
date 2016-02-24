@@ -280,8 +280,17 @@ def deploy_confs():
 def deploy_analytics_conf():
     put('client_secrets.json', '%(SERVER_PROJECT_PATH)s/client_secrets.json' % app_config.__dict__)
     put('analytics.dat', '%(SERVER_PROJECT_PATH)s/analytics.dat' % app_config.__dict__)
-    put('.env', '%(SERVER_PROJECT_PATH)s/.env' % app_config.__dict__)
+    put('%s.env' % env.settings, '%(SERVER_PROJECT_PATH)s/.env' % app_config.__dict__)
     # run('mkdir -p %(SERVER_PROJECT_PATH)s' % app_config.__dict__)
+
+@task
+def install_crontab():
+    """
+    Install cron jobs script into cron.d.
+    """
+    require('settings', provided_by=['production', 'staging'])
+
+    sudo('cp %(SERVER_REPOSITORY_PATH)s/crontab /etc/cron.d/%(PROJECT_FILENAME)s' % app_config.__dict__)
 
 @task
 def start_service(service):
@@ -309,8 +318,8 @@ def setup():
     checkout_latest()
     install_requirements()
     deploy_analytics_conf()
-
     deploy_confs()
+    install_crontab()
 
 @task
 def reboot():
@@ -331,6 +340,7 @@ def deploy():
     install_requirements()
     render_confs()
     deploy_confs()
+    install_crontab()
 
 """
 Deaths, destroyers of worlds
