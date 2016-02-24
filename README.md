@@ -103,6 +103,8 @@ We use `upstart` to keep carebot running on deploys. Sometimes carebot doesn't s
 
 * Logs should be available in `/var/log/upstart/carebot.log`
 * Not all errors go there :-/. You might want to try outputting each command in `confs/bot.conf`, eg `...command >> {{ SERVER_PROJECT_PATH }}/log.txt
+* Cron errors might end up in `/var/log/syslog`; check `tail -100 /var/log/syslog`
+* By defauly, cron errors will be in `/var/log/carebot/`
 
 ## Developing Carebot
 

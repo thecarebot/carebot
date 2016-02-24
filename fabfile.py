@@ -179,6 +179,15 @@ def create_directories():
     run('mkdir -p %(SERVER_PROJECT_PATH)s' % app_config.__dict__)
     run('git clone %(REPOSITORY_URL)s %(SERVER_PROJECT_PATH)s' % app_config.__dict__)
 
+@task
+def setup_logs():
+    """
+    Create log directories.
+    """
+    require('settings', provided_by=['production', 'staging'])
+
+    sudo('mkdir %(SERVER_LOG_PATH)s' % app_config.__dict__)
+    sudo('chown ubuntu:ubuntu %(SERVER_LOG_PATH)s' % app_config.__dict__)
 
 @task
 def create_virtualenv():
@@ -313,6 +322,7 @@ def stop_service(service):
 def setup():
     require('settings', provided_by=['production', 'staging'])
 
+    setup_logs()
     create_directories()
     create_virtualenv()
     clone_repo()
