@@ -1,6 +1,6 @@
 # from analytics import Analytics
 import datetime
-from models import Story
+from util.models import Story
 import re
 from slackbot.bot import Bot
 from slackbot.bot import respond_to
