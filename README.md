@@ -97,6 +97,13 @@ fab production setup
 fab production deploy
 ```
 
+### Debugging deploy
+
+We use `upstart` to keep carebot running on deploys. Sometimes carebot doesn't start. The debug process is fairly annoying, but here are some things that might help.
+
+* Logs should be available in `/var/log/upstart/carebot.log`
+* Not all errors go there :-/. You might want to try outputting each command in `confs/bot.conf`, eg `...command >> {{ SERVER_PROJECT_PATH }}/log.txt
+
 ## Developing Carebot
 
 ### Migrations

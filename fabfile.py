@@ -257,6 +257,8 @@ def deploy_confs():
     """
     require('settings', provided_by=['production', 'staging'])
 
+    put('%s.env' % env.settings, '%(SERVER_PROJECT_PATH)s/.env' % app_config.__dict__)
+
     render_confs()
 
     with settings(warn_only=True):
@@ -280,7 +282,6 @@ def deploy_confs():
 def deploy_analytics_conf():
     put('client_secrets.json', '%(SERVER_PROJECT_PATH)s/client_secrets.json' % app_config.__dict__)
     put('analytics.dat', '%(SERVER_PROJECT_PATH)s/analytics.dat' % app_config.__dict__)
-    put('%s.env' % env.settings, '%(SERVER_PROJECT_PATH)s/.env' % app_config.__dict__)
     # run('mkdir -p %(SERVER_PROJECT_PATH)s' % app_config.__dict__)
 
 @task
@@ -317,7 +318,7 @@ def setup():
     clone_repo()
     checkout_latest()
     install_requirements()
-    deploy_analytics_conf()
+    # deploy_analytics_conf()
     deploy_confs()
     install_crontab()
 
@@ -338,6 +339,7 @@ def deploy():
 
     checkout_latest()
     install_requirements()
+    # deploy_analytics_conf()
     render_confs()
     deploy_confs()
     install_crontab()
