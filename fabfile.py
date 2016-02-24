@@ -290,7 +290,7 @@ def install_crontab():
     """
     require('settings', provided_by=['production', 'staging'])
 
-    sudo('cp %(SERVER_REPOSITORY_PATH)s/crontab /etc/cron.d/%(PROJECT_FILENAME)s' % app_config.__dict__)
+    sudo('cp %(SERVER_PROJECT_PATH)s/crontab /etc/cron.d/%(PROJECT_FILENAME)s' % app_config.__dict__)
 
 @task
 def start_service(service):
