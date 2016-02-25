@@ -128,7 +128,15 @@ def get_story_stats():
             # And stories that are too old.
             if (seconds_since_check < SECONDS_BETWEEN_CHECKS) or (seconds_since_publishing < MAX_SECONDS_SINCE_POSTING):
                 print "Checked recently, not sending"
-                # continue
+                continue
+
+        else:
+            # We've never checked this story
+            # See if it's been at least an hour since we first added it.
+            seconds_since_tracking_started = time_since(story.tracking_started)
+            if (seconds_since_tracking_started < SECONDS_BETWEEN_CHECKS)
+                print "We started tracking this very recently, not checking"
+                continue
 
         # Some stories have multiple slugs
         story_slugs = story.slug.split(',')
