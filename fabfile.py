@@ -31,7 +31,7 @@ env.settings = None
 slack = Slacker(app_config.slack_key)
 
 SECONDS_BETWEEN_CHECKS = 1 * 60 * 60 # 1 hour
-MAX_SECONDS_SINCE_POSTING = 2 * 24 * 60 * 60 # 2 days
+MAX_SECONDS_SINCE_POSTING = 3 * 24 * 60 * 60 # 2 days
 
 """
 MINUTES_BETWEEN_CHECKS = 15
