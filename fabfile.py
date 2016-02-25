@@ -122,15 +122,20 @@ def get_story_stats():
         seconds_since_publishing = time_since(story.date)
         too_old = (seconds_since_publishing > MAX_SECONDS_SINCE_POSTING)
 
+        print "Looking at " + story.name
+
         # Check when the story was last reported on
         if story.last_checked:
             seconds_since_check = time_since(story.last_checked)
 
             # Skip stories that have been checked recently
             # And stories that are too old.
-            if (seconds_since_check < SECONDS_BETWEEN_CHECKS) or too_old:
-                print "Checked recently or too old, not checking"
+            if (seconds_since_check < SECONDS_BETWEEN_CHECKS):
+                print "Checked recently. Seconds: " + str(seconds_since_check)
                 continue
+
+            if too_old:
+                print "Story is too old, not checking"
 
         else:
             # We've never checked this story
