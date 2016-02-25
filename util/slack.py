@@ -27,6 +27,17 @@ class SlackTools:
     def send_message(self, channel, message):
         self.slack.chat.post_message(channel, message, as_user=True, parse='full')
 
+    def send_tracking_started_message(self, story):
+        message = ("I've just started tracking %s. The first update should appear in an hour. %s") % (
+            story.name,
+            story.url
+        )
+
+        print message
+
+        self.send_message(app_config.LINGER_UPDATE_CHANNEL, message)
+
+
     def send_linger_time_update(self, story, linger):
         time = ''
         if linger['minutes'] > 0:
@@ -46,12 +57,16 @@ class SlackTools:
             else:
                 time += ' seconds'
 
+        hours_since = self.hours_since(story.date)
+        hours_since_message = str(hours_since) + ' hour'
+        if hours_since > 1:
+            hours_since_message += 's'
+
         message = ("It's been %s hours since I started tracking _%s_ and users have "
-            "spent on average *%s* studying the graphic: %s") % (
-            self.hours_since(story.date),
+            "spent on average *%s* studying the graphic") % (
+            hours_since_message,
             story.name,
-            time,
-            story.url
+            time
         )
 
         print message

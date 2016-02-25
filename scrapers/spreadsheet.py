@@ -38,15 +38,19 @@ class SpreadsheetScraper:
         return stories
 
     def write(self, stories):
+        new_stories = []
         for story in stories:
             try:
-                Story.create(
+                story = Story.create(
                     name = story['story_headline'],
                     slug = story['graphic_slug'],
                     date = self.parse_date(story['date']),
                     story_type = story['graphic_type'],
                     url = story['story_url']
                 )
+                new_stories.append(story)
             except IntegrityError:
                 # Story probably already exists.
                 pass
+
+        return new_stories

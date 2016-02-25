@@ -30,7 +30,7 @@ env.settings = None
 
 slack = Slacker(app_config.slack_key)
 
-SECONDS_BETWEEN_CHECKS = 4 * 60 * 60 # 4 hours
+SECONDS_BETWEEN_CHECKS = 1 * 60 * 60 # 1 hour
 MAX_SECONDS_SINCE_POSTING = 2 * 24 * 60 * 60 # 2 days
 
 """
@@ -91,7 +91,11 @@ def load_new_stories():
     get_document(app_config.STORIES_GOOGLE_DOC_KEY, app_config.STORIES_PATH)
     scraper = SpreadsheetScraper()
     stories = scraper.scrape_spreadsheet(app_config.STORIES_PATH)
-    scraper.write(stories)
+    new_stories = scraper.write(stories)
+    print new_stories
+
+    for story in new_stories:
+        slackTools.send_tracking_started_message(story)
 
 @task
 def get_linger_rate():
