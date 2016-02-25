@@ -119,22 +119,31 @@ def get_story_stats():
     analytics = GoogleAnalyticsScraper()
 
     for story in Story.select():
+        seconds_since_publishing = time_since(story.date)
+        too_old = (seconds_since_publishing > MAX_SECONDS_SINCE_POSTING)
+
         # Check when the story was last reported on
         if story.last_checked:
-            seconds_since_publishing = time_since(story.date)
             seconds_since_check = time_since(story.last_checked)
 
             # Skip stories that have been checked recently
             # And stories that are too old.
-            if (seconds_since_check < SECONDS_BETWEEN_CHECKS) or (seconds_since_publishing < MAX_SECONDS_SINCE_POSTING):
-                print "Checked recently, not sending"
+            if (seconds_since_check < SECONDS_BETWEEN_CHECKS) or too_old:
+                print "Checked recently or too old, not checking"
                 continue
 
         else:
             # We've never checked this story
             # See if it's been at least an hour since we first added it.
             seconds_since_tracking_started = time_since(story.tracking_started)
-            if seconds_since_tracking_started < SECONDS_BETWEEN_CHECKS:
+
+            if too_old:
+                print "Story too old, not checking"
+                continue
+
+            # TODO -- switch to time published
+            time_since_published = time_since(story.date)
+            if (seconds_since_tracking_started < SECONDS_BETWEEN_CHECKS) and (time_since_published < SECONDS_BETWEEN_CHECKS):
                 print "We started tracking this very recently, not checking"
                 continue
 
@@ -142,6 +151,7 @@ def get_story_stats():
         story_slugs = story.slug.split(',')
         story_slugs = [slug.strip() for slug in story_slugs]
 
+        # Get the linger rate for each
         for slug in story_slugs:
             stats = analytics.get_linger_rate(slug)
             if stats:
@@ -392,7 +402,8 @@ def shiva_the_destroyer():
     """
     with settings(warn_only=True):
         run('rm -Rf %(SERVER_PROJECT_PATH)s' % app_config.__dict__)
-        # run('rm -Rf %(SERVER_VIRTUALENV_PATH)s' % app_config.__dict__)
+        run('rm -Rf %(SERVER_VIRTUALENV_PATH)s' % app_config.__dict__)
+        run('rm -Rf %(SERVER_LOG_PATH)s' % app_config.__dict__)
 
         # Remove any installed services
         stop_service('bot')

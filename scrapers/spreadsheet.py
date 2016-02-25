@@ -12,7 +12,7 @@ logger.setLevel(logging.INFO)
 
 
 # Right now, we don't care about stories before this time
-MAGIC_DATE_CUTOFF = datetime.date(2016, 02, 01)
+MAGIC_DATE_CUTOFF = datetime.date(2016, 02, 22)
 
 class SpreadsheetScraper:
     """

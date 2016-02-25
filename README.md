@@ -44,7 +44,8 @@ The bot requires several API credentials available as environment variables.
 An easy way to add them is to use a `.env` file. Copy `sample.env` to `dev.env`.
 Fill in the values. Then, run `source dev.env` to make them availabe.
 
-Copy `sample.env` to `production.env` to store production keys. The `.env` file is copied to the server on deploy.
+Copy `sample.env` to `production.env` to store production keys. The `.env` file
+is copied to the server on deploy.
 
 ### Add Google Analytics credentials
 
@@ -72,7 +73,6 @@ python carebot.py
 fab load_new_stories
 ```
 
-
 ## Deploying the project
 
 To deploy carebot to production:
@@ -86,11 +86,14 @@ fab production deploy
 You'll need a couple packages:
 
 * SQLite: `sudo apt-get install sqlite3 libsqlite3-dev`
+* `sudo apt-get install python-dev` for pycrypto
 * Any other basics: python, pip.
 
 ### First deploy
 
-Make sure you have a `.env` file with your production keys (see "add creditials"). Also, ensure you have an `analytics.dat` file (see "Add Google Analytics Credentials" above).
+Make sure you have a `.env` file with your production keys (see "add
+creditials"). Also, ensure you have an `analytics.dat` file (see "Add Google
+Analytics Credentials" above).
 
 Then, run:
 
@@ -106,7 +109,9 @@ fab production deploy
 
 ### Debugging deploy
 
-We use `upstart` to keep carebot running on deploys. Sometimes carebot doesn't start. The debug process is fairly annoying, but here are some things that might help.
+We use `upstart` to keep carebot running on deploys. Sometimes carebot doesn't
+start. The debug process is fairly annoying, but here are some things that might
+help.
 
 * Logs should be available in `/var/log/upstart/carebot.log`
 * Not all errors go there :-/. You might want to try outputting each command in `confs/bot.conf`, eg `...command >> {{ SERVER_PROJECT_PATH }}/log.txt
@@ -117,9 +122,11 @@ We use `upstart` to keep carebot running on deploys. Sometimes carebot doesn't s
 ## Developing Carebot
 
 ### Migrations
-If you make changes to existing models in `models.py`, you will need to [write a migration](http://docs.peewee-orm.com/en/latest/peewee/playhouse.html#migrate).
+If you make changes to existing models in `models.py`, you will need to [write
+a migration](http://docs.peewee-orm.com/en/latest/peewee/playhouse.html#migrate).
 
-For now, migrations are not automatically run on deploy and may need to be run manually. Inside the environment, run `python MIGRATION_NAME.py`
+For now, migrations are not automatically run on deploy and may need to be run
+manually. Inside the environment, run `python MIGRATION_NAME.py`
 
 ### Misc
 ```
