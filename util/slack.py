@@ -69,7 +69,7 @@ class SlackTools:
                 hours_since_message = 'just ' + hours_since_message
 
             message = ("It's been %s since I started tracking _%s_ and users have "
-                "spent on average *%s* studying the graphic") % (
+                "spent, on average, *%s* studying the graphic.") % (
                 hours_since_message,
                 story.name,
                 time

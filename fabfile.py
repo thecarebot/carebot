@@ -289,6 +289,7 @@ def deploy_confs():
     require('settings', provided_by=['production', 'staging'])
 
     put('%s.env' % env.settings, '%(SERVER_PROJECT_PATH)s/.env' % app_config.__dict__)
+    # TODO -- we might want to run `source .env`?
 
     render_confs()
 
