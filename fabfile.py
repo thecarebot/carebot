@@ -134,7 +134,7 @@ def get_story_stats():
             # We've never checked this story
             # See if it's been at least an hour since we first added it.
             seconds_since_tracking_started = time_since(story.tracking_started)
-            if (seconds_since_tracking_started < SECONDS_BETWEEN_CHECKS)
+            if seconds_since_tracking_started < SECONDS_BETWEEN_CHECKS:
                 print "We started tracking this very recently, not checking"
                 continue
 
