@@ -162,6 +162,8 @@ def get_story_stats():
             if stats:
                 print(story.name, slug, stats)
                 slackTools.send_linger_time_update(story, stats)
+            else
+                print "No stats"
 
         # Mark the story as checked
         story.last_checked = datetime.datetime.now()
