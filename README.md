@@ -81,6 +81,13 @@ To deploy carebot to production:
 fab production deploy
 ```
 
+### Server setup
+
+You'll need a couple packages:
+
+* SQLite: `sudo apt-get install sqlite3 libsqlite3-dev`
+* Any other basics: python, pip.
+
 ### First deploy
 
 Make sure you have a `.env` file with your production keys (see "add creditials"). Also, ensure you have an `analytics.dat` file (see "Add Google Analytics Credentials" above).

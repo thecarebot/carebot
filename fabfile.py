@@ -289,8 +289,13 @@ def deploy_confs():
 
 @task
 def deploy_analytics_conf():
-    put('client_secrets.json', '%(SERVER_PROJECT_PATH)s/client_secrets.json' % app_config.__dict__)
+    # put('client_secrets.json', '%(SERVER_PROJECT_PATH)s/client_secrets.json' % app_config.__dict__)
     put('analytics.dat', '%(SERVER_PROJECT_PATH)s/analytics.dat' % app_config.__dict__)
+
+    # Move google ouath credentials
+    local('cp ~/.google_oauth_credentials ./.google_oauth_credentials')
+    put('.google_oauth_credentials', '~/.google_oauth_credentials')
+
     # run('mkdir -p %(SERVER_PROJECT_PATH)s' % app_config.__dict__)
 
 @task
@@ -301,6 +306,16 @@ def install_crontab():
     require('settings', provided_by=['production', 'staging'])
 
     sudo('cp %(SERVER_PROJECT_PATH)s/crontab /etc/cron.d/%(PROJECT_FILENAME)s' % app_config.__dict__)
+
+@task
+def setup_database():
+    """
+    Manually create an empty sqlite DB.
+    Otherwise it gets created by root on first run, and regular
+    users can't write to it.
+    """
+    sudo('sqlite3 %(SERVER_PROJECT_PATH)s/%(PROJECT_FILENAME)s.db ".databases"' % app_config.__dict__)
+    sudo('chown ubuntu:ubuntu %(SERVER_PROJECT_PATH)s/%(PROJECT_FILENAME)s.db' % app_config.__dict__)
 
 @task
 def start_service(service):
@@ -327,8 +342,9 @@ def setup():
     create_virtualenv()
     clone_repo()
     checkout_latest()
+    setup_database()
     install_requirements()
-    # deploy_analytics_conf()
+    deploy_analytics_conf()
     deploy_confs()
     install_crontab()
 
@@ -349,7 +365,7 @@ def deploy():
 
     checkout_latest()
     install_requirements()
-    # deploy_analytics_conf()
+    deploy_analytics_conf()
     render_confs()
     deploy_confs()
     install_crontab()

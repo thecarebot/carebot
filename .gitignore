@@ -35,6 +35,7 @@ client_secrets*.json
 .env
 *.env
 +sample.env
+.google*
 
 *.xlsx
 
