@@ -42,7 +42,7 @@ class SlackTools:
 
         self.slack.chat.post_message(app_config.LINGER_UPDATE_CHANNEL, "", as_user=True, attachments=attachments)
 
-    def send_linger_time_update(self, story, linger, time_bucket):
+    def humanist_time_bucket(self, linger):
         time = ''
         if linger['minutes'] > 0:
             time += str(linger['minutes'])
@@ -61,6 +61,13 @@ class SlackTools:
             else:
                 time += ' seconds'
 
+        return time
+
+    def send_linger_time_update(self, story, stats_per_slug, time_bucket):
+        if not stats_per_slug[0]:
+            return
+
+        time = self.humanist_time_bucket(stats_per_slug[0]['stats'])
         hours_since = self.hours_since(story.article_posted)
 
         if time_bucket == 'hour 4':
@@ -123,5 +130,33 @@ class SlackTools:
                 story.name
             )
 
+
+        attachments = None
+        if len(stats_per_slug) > 1:
+            # Use a generic message for now
+            message = ("%s hours in and here's what I know about the graphics on _%s_:") % (
+                hours_since,
+                story.name
+            )
+
+            fields = []
+            for stat in stats_per_slug:
+                time = self.humanist_time_bucket(stat['stats'])
+                fields.append({
+                    "title": stat['slug'],
+                    "value": time,
+                    "short": True
+                })
+
+            attachments = [
+                {
+                    "fallback": story.name + " update",
+                    "color": "#eeeeee",
+                    "title": story.name,
+                    "title_link": story.url,
+                    "fields": fields
+                }
+            ]
+
         logger.info(message)
-        self.send_message(app_config.LINGER_UPDATE_CHANNEL, message)
+        self.slack.chat.post_message(app_config.LINGER_UPDATE_CHANNEL, message, as_user=True, parse='full', attachments=attachments)
