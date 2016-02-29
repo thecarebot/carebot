@@ -192,7 +192,7 @@ def get_story_stats():
 
         # Mark the story as checked
         story.last_checked = datetime.datetime.now()
-        story.save() # TODO
+        # story.save() # TODO
 
 @task
 def send_message():
