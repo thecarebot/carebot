@@ -14,14 +14,9 @@ class SlackTools:
 
     def hours_since(self, a):
         now = datetime.datetime.now()
+        seconds = (now - a).total_seconds()
 
-        # Convert any dates to datetime
-        # (yes yes imprecise & hacky)
-        if type(a) is datetime.date:
-            a = datetime.datetime.combine(a, datetime.datetime.min.time())
-
-        hours = int((now - a).total_seconds() % 60)
-        print hours
+        hours = int(seconds / 60 / 60)
         return hours
 
     def send_message(self, channel, message):
@@ -33,12 +28,12 @@ class SlackTools:
             story.url
         )
 
-        print message
+        logger.info(message)
 
         self.send_message(app_config.LINGER_UPDATE_CHANNEL, message)
 
 
-    def send_linger_time_update(self, story, linger):
+    def send_linger_time_update(self, story, linger, time_bucket):
         time = ''
         if linger['minutes'] > 0:
             time += str(linger['minutes'])
@@ -57,16 +52,14 @@ class SlackTools:
             else:
                 time += ' seconds'
 
-        hours_since = self.hours_since(story.date)
+        hours_since = self.hours_since(story.article_posted)
 
-        if hours_since < 5:
+        if time_bucket == 'hour 4':
             hours_since_message = str(hours_since) + ' hour'
             if hours_since > 1:
                 hours_since_message += 's'
 
-            # "It's been just..."
-            if hours_since < 5:
-                hours_since_message = 'just ' + hours_since_message
+            hours_since_message = 'just ' + hours_since_message
 
             message = ("It's been %s since I started tracking _%s_ and users have "
                 "spent, on average, *%s* studying the graphic.") % (
@@ -75,7 +68,7 @@ class SlackTools:
                 time
             )
 
-        if hours_since >= 5 and hours_since <= 8:
+        if time_bucket == 'hour 8':
             message = ("%s hours in and _%s_ had users spending about *%s* "
                 "interacting with the graphic.") % (
                 hours_since,
@@ -83,14 +76,14 @@ class SlackTools:
                 time
             )
 
-        if hours_since > 8 and hours_since < 12:
+        if time_bucket == 'hour 12':
             message = ("So far, users have spent an average of *%s* viewing the "
                 "graphic on _%s_.") % (
                 time,
                 story.name
             )
 
-        if hours_since >= 12 and hours_since <= 18:
+        if time_bucket == 'day 1 hour 10':
             message = ("It's been %s hours since publishing _%s_ and users have"
                 " spent, on average, *%s* studying the graphic.") % (
                 hours_since,
@@ -98,20 +91,20 @@ class SlackTools:
                 time
             )
 
-        if hours_since > 18 and hours_since < 24:
+        if time_bucket == 'day 1 hour 15':
             message = ("_%s_ has had users study the graphic for *%s*, on average.") % (
                 story.name,
                 time
             )
 
-        if hours_since > 24 and hours_since <= 36:
+        if time_bucket == 'day 2 hour 10':
             message = ("After 2 days, _%s_ users have spent, on average, *%s* "
                 "studying the graphic.") % (
                 story.name,
                 time
                 )
 
-        if hours_since > 36:
+        if time_bucket == 'day 2 hour 15':
             message = ("_%s_ users have viewed the graphic for *%s*, on average."
                 "\n\n"
                 "I'll keep tracking _%s_ but won't ping you again with updates."
@@ -121,25 +114,5 @@ class SlackTools:
                 story.name
             )
 
-        # TODO:
-        # 8 hours in and _story_title_
-
-        # Longer:
-        # So far, users have spent an average of *time* viewing
-        # the graphic on _story title_
-
-        # It's been 18 hours since publishing _story title_ and
-        # users have spent an average *time* studying the graphic
-
-        # _story title_ has had users study the graphic for *time*,
-        # on average.
-
-        # After x days, _story title_ have spent, on average,
-        # *time* interacting with the graphic
-        #
-        #  _story title_ users have iewed the graphic for *time*,
-        #  on average.
-
-        print message
-
+        logger.info(message)
         self.send_message(app_config.LINGER_UPDATE_CHANNEL, message)
