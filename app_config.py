@@ -38,6 +38,8 @@ COPY_PATH = 'data/copy.xlsx'
 STORIES_GOOGLE_DOC_KEY = '1Gcumd0uOl3eSUvc0y5CWmmHVOKwX609-js5EnE8i3lI'
 STORIES_PATH = 'data/stories.xlsx'
 
+# NPR API
+NPR_API_KEY = os.environ.get('NPR_API_KEY')
 
 """
 Google analytics
@@ -125,6 +127,7 @@ def configure_targets(deployment_target):
     global DEPLOYMENT_TARGET
     global DISQUS_SHORTNAME
     global ASSETS_MAX_AGE
+    global NPR_API_KEY
 
     if deployment_target == 'production':
         # S3_BUCKET = PRODUCTION_S3_BUCKET

@@ -47,6 +47,10 @@ Fill in the values. Then, run `source dev.env` to make them availabe.
 Copy `sample.env` to `production.env` to store production keys. The `.env` file
 is copied to the server on deploy.
 
+### NPR API credentials
+
+You'll need a key for the NPR API. You can [register for one here](http://www.npr.org/api/index.php)
+
 ### Add Google Analytics credentials
 
 The first time you run Carebot, you'll need to authorize the app with your
