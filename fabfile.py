@@ -10,8 +10,9 @@ import app_config
 from oauth import get_document
 from util.models import Story
 from util.slack import SlackTools
-from scrapers.spreadsheet import SpreadsheetScraper
 from scrapers.analytics import GoogleAnalyticsScraper
+from scrapers.nprapi import NPRAPIScraper
+from scrapers.spreadsheet import SpreadsheetScraper
 
 env.user = app_config.SERVER_USER
 env.hosts = app_config.SERVERS
