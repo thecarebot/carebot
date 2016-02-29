@@ -41,18 +41,20 @@ class SpreadsheetScraper:
     def write(self, stories):
         new_stories = []
         for story in stories:
-            date = npr_api_scraper.get_story_date(story['story_url'])
-            if not date:
+            info_from_api = npr_api_scraper.get_story_details(story['story_url'])
+
+            if not info_from_api:
                 logger.info('Not adding %s to database: could not get story' % (story['story_headline']))
 
             try:
                 story = Story.create(
                     name = story['story_headline'],
                     slug = story['graphic_slug'],
-                    date = date,
-                    article_posted = date,
+                    date = info_from_api['date'],
+                    article_posted = info_from_api['date'],
                     story_type = story['graphic_type'],
-                    url = story['story_url']
+                    url = story['story_url'],
+                    image = info_from_api['image']
                 )
                 new_stories.append(story)
             except IntegrityError:

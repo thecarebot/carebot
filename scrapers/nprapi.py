@@ -27,6 +27,40 @@ class NPRAPIScraper:
         return False
 
     """
+    Get details for a story
+    """
+    def get_story_details(self, story_url):
+        story_id = self.get_story_id(story_url)
+
+        if not story_id:
+            return False
+
+        response = requests.get('http://api.npr.org/query', params={
+            'id': story_id,
+            'apiKey': app_config.NPR_API_KEY,
+            'format': 'JSON'
+        })
+
+        doc = json.loads(response.content)
+
+        date_added = doc['list']['story'][0]['pubDate']['$text']
+        date = parse(date_added, ignoretz=True)
+
+        try:
+            image = doc['list']['story'][0]['image'][0]['src']
+        except:
+            image = None
+
+        info = {
+            'date': date,
+            'image': image
+        }
+
+        return info
+
+
+
+    """
     Get details for a story URL
     """
     def get_story_date(self, story_url):

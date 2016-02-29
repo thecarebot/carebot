@@ -1,7 +1,12 @@
 import datetime
+import logging
 from slacker import Slacker
 
 import app_config
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 """
 Right now, Slacker offers a full range of slack tools
@@ -23,15 +28,19 @@ class SlackTools:
         self.slack.chat.post_message(channel, message, as_user=True, parse='full')
 
     def send_tracking_started_message(self, story):
-        message = ("I've just started tracking %s. The first update should appear in an hour. %s") % (
-            story.name,
-            story.url
-        )
+        attachments = [
+            {
+                "fallback": "I just started tracking " + story.name,
+                "color": "good",
+                "pretext": "I just started tracking:",
+                "title": story.name,
+                "text": "Published " + story.article_posted.strftime('%B %d, %Y at %I:%M %p'),
+                "title_link": story.url,
+                "image_url": story.image
+            }
+        ]
 
-        logger.info(message)
-
-        self.send_message(app_config.LINGER_UPDATE_CHANNEL, message)
-
+        self.slack.chat.post_message(app_config.LINGER_UPDATE_CHANNEL, "", as_user=True, attachments=attachments)
 
     def send_linger_time_update(self, story, linger, time_bucket):
         time = ''
