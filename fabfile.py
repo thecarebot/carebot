@@ -120,9 +120,6 @@ def time_bucket(t):
     second_day_midnight_after_publishing.replace(hour = 0, minute = 0, second=0, microsecond = 0)
     seconds_since_second_day = seconds_since(second_day_midnight_after_publishing)
 
-    # print ("seconds since second day " + str(seconds_since_second_day))
-    # print ("seconds " + str(seconds))
-
     if seconds_since_second_day > 15 * 60 * 60: # 15 hours
         return 'day 2 hour 15'
 
@@ -153,6 +150,7 @@ def time_bucket(t):
     if seconds > 4 * 60 * 60: # 4 hours
         return 'hour 4'
 
+    # Too soon.
     return False
 
 
@@ -163,10 +161,6 @@ def get_story_stats():
     for story in Story.select():
         story_time_bucket = time_bucket(story.article_posted)
         last_bucket = time_bucket(story.last_checked)
-
-        print("Looking at " + story.name)
-        print ("Last bucket " + str(last_bucket))
-        print("Story bucket " + str(story_time_bucket))
 
         # Check when the story was last reported on
         if last_bucket:
@@ -190,13 +184,15 @@ def get_story_stats():
             stats = analytics.get_linger_rate(slug)
             if stats:
                 print(story.name, slug, stats)
+                # TODO:
+                # Handle stories with multiple slugs better
                 slackTools.send_linger_time_update(story, stats, story_time_bucket)
             else:
                 print "No stats"
 
         # Mark the story as checked
         story.last_checked = datetime.datetime.now()
-        # story.save() # TODO
+        story.save() # TODO
 
 @task
 def send_message():
