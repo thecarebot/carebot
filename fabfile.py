@@ -119,7 +119,6 @@ def time_bucket(t):
         return False
 
     seconds = seconds_since(t)
-    print("Seconds %s" % (seconds))
 
     # 7th message, 2nd day midnight + 10 hours
     # 8th message, 2nd day midnight + 15 hours
@@ -157,8 +156,7 @@ def time_bucket(t):
     if seconds > 4 * 60 * 60: # 4 hours
         return 'hour 4'
 
-    # Too soon.
-    print ("DIDN't FIT IN ANY BUCKET")
+    # Too soon to check
     return False
 
 
@@ -179,7 +177,7 @@ def get_story_stats():
             # And stories that are too old.
             if (last_bucket == story_time_bucket):
                 logger.info("Checked recently. Bucket is still %s" % (story_time_bucket))
-                continue
+                # continue
 
         if not story_time_bucket:
             logger.info("Story is too new; skipping for now")
@@ -188,17 +186,22 @@ def get_story_stats():
         # Some stories have multiple slugs
         story_slugs = story.slug.split(',')
         story_slugs = [slug.strip() for slug in story_slugs]
+        stats_per_slug = []
 
         # Get the linger rate for each
         for slug in story_slugs:
             stats = analytics.get_linger_rate(slug)
             if stats:
-                print(story.name, slug, stats)
-                # TODO:
-                # Handle stories with multiple slugs better
-                slackTools.send_linger_time_update(story, stats, story_time_bucket)
+                stats_per_slug.append({
+                    "slug": slug,
+                    "stats": stats
+                })
+
             else:
-                print "No stats"
+                logger.info("No stats found for %s" % (slug))
+
+        if len(stats_per_slug) is not 0:
+            slackTools.send_linger_time_update(story, stats_per_slug, story_time_bucket)
 
         # Mark the story as checked
         story.last_checked = datetime.datetime.now()
