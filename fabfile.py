@@ -1,6 +1,7 @@
 import app_config
 import copy
 import datetime
+from dateutil.parser import parse
 from fabric.api import *
 from fabric.state import env
 from jinja2 import Template
@@ -102,56 +103,83 @@ def load_new_stories():
 def get_linger_rate():
     scraper = GoogleAnalyticsScraper()
     stats = scraper.get_linger_rate('space-time-stepper-20160208')
-    print(stats)
 
-def time_since(a):
+def seconds_since(a):
     now = datetime.datetime.now()
-
-    # Convert any dates to datetime
-    # (yes yes imprecise & hacky)
-    if type(a) is datetime.date:
-        a = datetime.datetime.combine(a, datetime.datetime.min.time())
-
-    print (now - a).total_seconds()
     return (now - a).total_seconds()
+
+def time_bucket(t):
+    if not t:
+        return False
+
+    seconds = seconds_since(t)
+
+    # 7th message, 2nd day midnight + 10 hours
+    # 8th message, 2nd day midnight + 15 hours
+    second_day_midnight_after_publishing = t + datetime.timedelta(days=2)
+    second_day_midnight_after_publishing.replace(hour = 0, minute = 0, second=0, microsecond = 0)
+    seconds_since_second_day = seconds_since(second_day_midnight_after_publishing)
+
+    # print ("seconds since second day " + str(seconds_since_second_day))
+    # print ("seconds " + str(seconds))
+
+    if seconds_since_second_day > 15 * 60 * 60: # 15 hours
+        return 'day 2 hour 15'
+
+    if seconds_since_second_day > 10 * 60 * 60: # 10 hours
+        return 'day 2 hour 10'
+
+    # 5th message, 1st day midnight + 10 hours
+    # 6th message, 1st day midnight + 15 hours
+    midnight_after_publishing = t + datetime.timedelta(days=1)
+    midnight_after_publishing.replace(hour = 0, minute = 0, second=0, microsecond = 0)
+    seconds_since_first_day = seconds_since(midnight_after_publishing)
+
+    if seconds_since_second_day > 10 * 60 * 60: # 15 hours
+        return 'day 1 hour 15'
+
+    if seconds_since_second_day > 10 * 60 * 60: # 10 hours
+        return 'day 1 hour 10'
+
+    # 2nd message, tracking start + 4 hours
+    # 3rd message, tracking start + 8 hours
+    # 4th message, tracking start + 12 hours
+    if seconds > 12 * 60 * 60: # 12 hours
+        return 'hour 12'
+
+    if seconds > 8 * 60 * 60: # 8 hours
+        return 'hour 8'
+
+    if seconds > 4 * 60 * 60: # 4 hours
+        return 'hour 4'
+
+    return False
+
 
 @task
 def get_story_stats():
     analytics = GoogleAnalyticsScraper()
 
     for story in Story.select():
-        seconds_since_publishing = time_since(story.date)
-        too_old = (seconds_since_publishing > MAX_SECONDS_SINCE_POSTING)
+        story_time_bucket = time_bucket(story.article_posted)
+        last_bucket = time_bucket(story.last_checked)
 
-        print "Looking at " + story.name
+        print("Looking at " + story.name)
+        print ("Last bucket " + str(last_bucket))
+        print("Story bucket " + str(story_time_bucket))
 
         # Check when the story was last reported on
-        if story.last_checked:
-            seconds_since_check = time_since(story.last_checked)
+        if last_bucket:
 
             # Skip stories that have been checked recently
             # And stories that are too old.
-            if (seconds_since_check < SECONDS_BETWEEN_CHECKS):
-                print "Checked recently. Seconds: " + str(seconds_since_check)
+            if (last_bucket == story_time_bucket):
+                print "Checked recently. Bucket: " + story_time_bucket
                 continue
 
-            if too_old:
-                print "Story is too old, not checking"
-
-        else:
-            # We've never checked this story
-            # See if it's been at least an hour since we first added it.
-            seconds_since_tracking_started = time_since(story.tracking_started)
-
-            if too_old:
-                print "Story too old, not checking"
-                continue
-
-            # TODO -- switch to time published
-            time_since_published = time_since(story.date)
-            if (seconds_since_tracking_started < SECONDS_BETWEEN_CHECKS) and (time_since_published < SECONDS_BETWEEN_CHECKS):
-                print "We started tracking this very recently, not checking"
-                continue
+        if not story_time_bucket:
+            print "This story is too new. Not checking yet."
+            continue
 
         # Some stories have multiple slugs
         story_slugs = story.slug.split(',')
@@ -162,20 +190,18 @@ def get_story_stats():
             stats = analytics.get_linger_rate(slug)
             if stats:
                 print(story.name, slug, stats)
-                slackTools.send_linger_time_update(story, stats)
+                slackTools.send_linger_time_update(story, stats, story_time_bucket)
             else:
                 print "No stats"
 
         # Mark the story as checked
         story.last_checked = datetime.datetime.now()
-        story.save()
+        # story.save() # TODO
 
 @task
 def send_message():
     # Send a message to #general channel
     slack.chat.post_message('#broadway-carebot', 'Hi @livlab!', as_user=True)
-
-
 
 """
 Deploy tasks

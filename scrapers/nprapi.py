@@ -43,7 +43,5 @@ class NPRAPIScraper:
 
         doc = json.loads(response.content)
         date_added = doc['list']['story'][0]['pubDate']['$text']
-        date = parse(date_added)
+        date = parse(date_added, ignoretz=True)
         return date
-
-
