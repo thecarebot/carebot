@@ -177,7 +177,7 @@ def get_story_stats():
             # And stories that are too old.
             if (last_bucket == story_time_bucket):
                 logger.info("Checked recently. Bucket is still %s" % (story_time_bucket))
-                # continue
+                continue
 
         if not story_time_bucket:
             logger.info("Story is too new; skipping for now")
