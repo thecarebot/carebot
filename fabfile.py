@@ -5,6 +5,7 @@ from dateutil.parser import parse
 from fabric.api import *
 from fabric.state import env
 from jinja2 import Template
+import logging
 from slacker import Slacker
 
 import app_config
@@ -20,6 +21,11 @@ env.hosts = app_config.SERVERS
 env.slug = app_config.PROJECT_SLUG
 
 slackTools = SlackTools()
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 
 """
 Base configuration
@@ -113,6 +119,7 @@ def time_bucket(t):
         return False
 
     seconds = seconds_since(t)
+    print("Seconds %s" % (seconds))
 
     # 7th message, 2nd day midnight + 10 hours
     # 8th message, 2nd day midnight + 15 hours
@@ -151,6 +158,7 @@ def time_bucket(t):
         return 'hour 4'
 
     # Too soon.
+    print ("DIDN't FIT IN ANY BUCKET")
     return False
 
 
@@ -159,8 +167,10 @@ def get_story_stats():
     analytics = GoogleAnalyticsScraper()
 
     for story in Story.select():
+        logger.info("About to check %s" % (story.name))
+
         story_time_bucket = time_bucket(story.article_posted)
-        last_bucket = time_bucket(story.last_checked)
+        last_bucket = story.last_bucket
 
         # Check when the story was last reported on
         if last_bucket:
@@ -168,11 +178,11 @@ def get_story_stats():
             # Skip stories that have been checked recently
             # And stories that are too old.
             if (last_bucket == story_time_bucket):
-                print "Checked recently. Bucket: " + story_time_bucket
+                logger.info("Checked recently. Bucket is still %s" % (story_time_bucket))
                 continue
 
         if not story_time_bucket:
-            print "This story is too new. Not checking yet."
+            logger.info("Story is too new; skipping for now")
             continue
 
         # Some stories have multiple slugs
@@ -192,7 +202,8 @@ def get_story_stats():
 
         # Mark the story as checked
         story.last_checked = datetime.datetime.now()
-        story.save() # TODO
+        story.last_bucket = story_time_bucket
+        story.save()
 
 @task
 def send_message():

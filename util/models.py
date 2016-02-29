@@ -14,6 +14,7 @@ class Story(Model):
     article_posted = DateTimeField(null = True)
     tracking_started = DateTimeField(default=datetime.datetime.now)
     last_checked = DateTimeField(null = True)
+    last_bucket = CharField(null = True)
 
     class Meta:
         database = db
