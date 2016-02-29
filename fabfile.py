@@ -434,7 +434,7 @@ def shiva_the_destroyer():
     with settings(warn_only=True):
         run('rm -Rf %(SERVER_PROJECT_PATH)s' % app_config.__dict__)
         run('rm -Rf %(SERVER_VIRTUALENV_PATH)s' % app_config.__dict__)
-        run('rm -Rf %(SERVER_LOG_PATH)s' % app_config.__dict__)
+        sudo('rm -Rf %(SERVER_LOG_PATH)s' % app_config.__dict__)
 
         # Remove any installed services
         stop_service('bot')
