@@ -71,6 +71,8 @@ the NPR Apps template, you may not have to do this.
 python carebot.py
 ```
 
+After starting the bot, make sure to invite it to the channel you set in `.env`.
+
 ### Get new stories from the story spreadsheet
 
 ```
