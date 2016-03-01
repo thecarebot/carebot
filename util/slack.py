@@ -47,6 +47,7 @@ class SlackTools:
         ]
 
         self.slack.chat.post_message(app_config.LINGER_UPDATE_CHANNEL, "", as_user=True, attachments=attachments)
+        logger.info("Started tracking %s with image %s" % (story.name, story.image))
 
     def humanist_time_bucket(self, linger):
         time = ''
