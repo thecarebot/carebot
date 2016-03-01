@@ -1,16 +1,25 @@
 # from analytics import Analytics
 import datetime
-from util.models import Story
+from dateutil.parser import parse
+import json
+import pytz
 import re
 from slackbot.bot import Bot
 from slackbot.bot import respond_to
 from slackbot.bot import listen_to
 
-# Set up analytics to handle inquiries
-# a = Analytics()
+from scrapers.analytics import GoogleAnalyticsScraper
+from util.models import Story
+from util.slack import SlackTools
+slackTools = SlackTools()
 
-LINGER_RATE_REGEX = '[Ww]hat is the linger rate on ((\w*-*)+)?'
+# Set up analytics to handle inquiries
+analytics = GoogleAnalyticsScraper()
+
+LINGER_RATE_REGEX = 'slug ((\w*-*)+)'
 START_TRACKING_REGEX = '[Tt]rack ((\w*-*)+)'
+
+GRUBER_URLINTEXT_PAT = re.compile(ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
 
 """
 Given a message, figure out what is being requested.def
@@ -20,13 +29,21 @@ def parse_message(text):
     if m:
         return 'donation'
 
-    m = re.search(LINGER_RATE_REGEX, text)
-    if m:
-        return 'linger'
+    if 'slug' in text:
+        m = re.search(LINGER_RATE_REGEX, text)
+        if m:
+            return 'linger'
 
     m = re.search(START_TRACKING_REGEX, text)
     if m:
         return 'track'
+
+    m = GRUBER_URLINTEXT_PAT.findall(text)
+    if m:
+        print("Has URL")
+        print(m[0])
+        if 'doing' in text:
+            return 'linger-update'
 
     return False
 
@@ -34,11 +51,10 @@ def parse_message(text):
 Get information on how many people clicked the donate button on a story
 """
 def get_donation_data(message, category):
-    data = a.donation_data(category)
+    data = analytics.donation_data(category)
 
     if data.get('rows', []):
         row = data.get('rows')[0]
-        print(row[0])
         return row[0]
     else:
         return False
@@ -62,7 +78,7 @@ def handle_donation_question(message):
     else:
         return False
 
-def handle_linger_question(message):
+def handle_linger_slug_question(message):
     m = re.search(LINGER_RATE_REGEX, message.body['text'])
 
     if not m:
@@ -71,15 +87,163 @@ def handle_linger_question(message):
     slug = m.group(1)
 
     if slug:
-        rate = a.get_linger_rate(slug)
+        rate = analytics.get_linger_rate(slug)
+        print("GOT RATE")
+        print(rate)
         if rate:
-            message.reply(u"%s people spent an average of %s minutes and %s seconds on %s." % (rate[0], rate[1], rate[2], slug))
+            message.reply(u"%s people spent an average of %s minutes and %s seconds on %s." % (rate['total_people'], rate['minutes'], rate['seconds'], slug))
             return True
         else:
             message.reply("I wasn't able to figure out the linger rate of %s" % slug)
             return False
     else:
         return False
+
+
+
+# SUPER HACKY -- ABSTRACT THIS AND TIME_BUCKET ASAP
+def seconds_since(a):
+    now = datetime.datetime.now(pytz.timezone('US/Eastern'))
+    return (now - a).total_seconds()
+
+def time_bucket(t):
+    if not t:
+        return False
+
+    # For some reason, dates with timezones tend to be returned as unicode
+    if type(t) is not datetime.datetime:
+        t = parse(t)
+
+    seconds = seconds_since(t)
+
+    # 7th message, 2nd day midnight + 10 hours
+    # 8th message, 2nd day midnight + 15 hours
+    second_day_midnight_after_publishing = t + datetime.timedelta(days=2)
+    second_day_midnight_after_publishing.replace(hour = 0, minute = 0, second=0, microsecond = 0)
+    seconds_since_second_day = seconds_since(second_day_midnight_after_publishing)
+
+    if seconds_since_second_day > 15 * 60 * 60: # 15 hours
+        return 'day 2 hour 15'
+
+    if seconds_since_second_day > 10 * 60 * 60: # 10 hours
+        return 'day 2 hour 10'
+
+    # 5th message, 1st day midnight + 10 hours
+    # 6th message, 1st day midnight + 15 hours
+    midnight_after_publishing = t + datetime.timedelta(days=1)
+    midnight_after_publishing.replace(hour = 0, minute = 0, second=0, microsecond = 0)
+    seconds_since_first_day = seconds_since(midnight_after_publishing)
+
+    if seconds_since_second_day > 10 * 60 * 60: # 15 hours
+        return 'day 1 hour 15'
+
+    if seconds_since_second_day > 10 * 60 * 60: # 10 hours
+        return 'day 1 hour 10'
+
+    # 2nd message, tracking start + 4 hours
+    # 3rd message, tracking start + 8 hours
+    # 4th message, tracking start + 12 hours
+    if seconds > 12 * 60 * 60: # 12 hours
+        return 'hour 12'
+
+    if seconds > 8 * 60 * 60: # 8 hours
+        return 'hour 8'
+
+    if seconds > 4 * 60 * 60: # 4 hours
+        return 'hour 4'
+
+    # Too soon to check
+    return False
+
+def humanist_time_bucket(linger):
+    time = ''
+    if linger['minutes'] > 0:
+        time += str(linger['minutes'])
+        if linger['minutes'] == 1:
+            time += ' minute'
+        else:
+            time += ' minutes'
+
+    if linger['seconds'] > 0:
+        if linger['minutes'] > 0:
+            time += ' '
+
+        time += str(linger['seconds'])
+        if linger['seconds'] == 1:
+            time += ' second'
+        else:
+            time += ' seconds'
+
+    return time
+
+def handle_linger_update(message):
+    m = GRUBER_URLINTEXT_PAT.findall(message.body['text'])
+
+    if not m[0]:
+        return False
+
+    url = str(m[0][0])
+    url = url.replace('&amp;', '&')
+    print("looking for url %s" % url)
+
+    try:
+        story = Story.select().where(Story.url == url).get()
+    except:
+        message.reply("Sorry, I don't have stats for %s" % url)
+        return False
+
+    # TODO -- refactor this copied code out from here and fabfile.py
+    # Some stories have multiple slugs
+    story_slugs = story.slug.split(',')
+    story_slugs = [slug.strip() for slug in story_slugs]
+    stats_per_slug = []
+    story_time_bucket = time_bucket(story.article_posted)
+
+    # Get the linger rate for each
+    for slug in story_slugs:
+        stats = analytics.get_linger_rate(slug)
+        if stats:
+            stats_per_slug.append({
+                "slug": slug,
+                "stats": stats
+            })
+
+        else:
+            logger.info("No stats found for %s" % (slug))
+
+    if len(stats_per_slug) is not 0:
+        print(stats_per_slug)
+        print(story_time_bucket)
+
+        reply = ("Here's what I know about the graphics on _%s_:") % (
+            story.name
+        )
+
+        fields = []
+        for stat in stats_per_slug:
+            time = humanist_time_bucket(stat['stats'])
+            fields.append({
+                "title": stat['slug'],
+                "value": time,
+                "short": True
+            })
+
+        attachments = [
+            {
+                "fallback": story.name + " update",
+                "color": "#eeeeee",
+                "title": story.name,
+                "title_link": story.url,
+                "fields": fields
+            }
+        ]
+
+
+        message.send_webapi(reply, json.dumps(attachments))
+
+        # self.slack.chat.post_message(app_config.LINGER_UPDATE_CHANNEL, message, as_user=True, parse='full', attachments=attachments)
+
+
 
 def start_tracking(message):
     m = re.search(START_TRACKING_REGEX, message.body['text'])
@@ -122,8 +286,11 @@ def response_dispatcher(message, text=None):
     elif message_type == 'help':
         pass
     elif message_type == 'linger':
-        print("handling linger")
-        handle_linger_question(message)
+        print("handling slug linger")
+        handle_linger_slug_question(message)
+    elif message_type == 'linger-update':
+        print("Handling linger update")
+        handle_linger_update(message)
     else:
         message.reply("Hi! I got your message, but I don't know enough yet to respond to it.")
 

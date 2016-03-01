@@ -70,10 +70,7 @@ class SlackTools:
 
         return time
 
-    def send_linger_time_update(self, story, stats_per_slug, time_bucket):
-        if not stats_per_slug[0]:
-            return
-
+    def get_linger_time_message_and_attachment(self, story, stats_per_slug, time_bucket):
         time = self.humanist_time_bucket(stats_per_slug[0]['stats'])
         hours_since = self.hours_since(story.article_posted)
 
@@ -164,6 +161,16 @@ class SlackTools:
                     "fields": fields
                 }
             ]
+
+        return (message, attachments)
+
+    def send_linger_time_update(self, story, stats_per_slug, time_bucket):
+        if not stats_per_slug[0]:
+            return
+
+        composed = self.get_linger_time_message_and_attachment(story, stats_per_slug, time_bucket)
+        message = composed[0]
+        attachments = composed[1]
 
         logger.info(message)
         self.slack.chat.post_message(app_config.LINGER_UPDATE_CHANNEL, message, as_user=True, parse='full', attachments=attachments)
