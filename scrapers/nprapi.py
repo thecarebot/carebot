@@ -43,8 +43,8 @@ class NPRAPIScraper:
 
         doc = json.loads(response.content)
 
-        date_added = doc['list']['story'][0]['pubDate']['$text']
-        date = parse(date_added, ignoretz=True)
+        date_added = doc['list']['story'][0]['storyDate']['$text']
+        date = parse(date_added) #, ignoretz=True
 
         try:
             image = doc['list']['story'][0]['image'][0]['src']
@@ -76,6 +76,6 @@ class NPRAPIScraper:
         })
 
         doc = json.loads(response.content)
-        date_added = doc['list']['story'][0]['pubDate']['$text']
-        date = parse(date_added, ignoretz=True)
+        date_added = doc['list']['story'][0]['storyDate']['$text']
+        date = parse(date_added) #, ignoretz=True
         return date

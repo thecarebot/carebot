@@ -36,7 +36,7 @@ class GoogleAnalyticsScraper:
         resp = app_config.authomatic.access(credentials, api_url, params=params)
         data = resp.data
 
-        logger.info('Processing rows {0} - {1}'.format(params['start-index'], params['start-index'] + app_config.GA_RESULT_SIZE - 1))
+        # logger.info('Processing rows {0} - {1}'.format(params['start-index'], params['start-index'] + app_config.GA_RESULT_SIZE - 1))
 
         if not data.get('rows'):
             logger.info('No rows found, done.')
@@ -105,19 +105,17 @@ class GoogleAnalyticsScraper:
         resp = app_config.authomatic.access(credentials, api_url, params=params)
         data = resp.data
 
-        logger.info('Processing rows {0} - {1}'.format(params['start-index'], params['start-index'] + app_config.GA_RESULT_SIZE - 1))
+       #  logger.info('Processing rows {0} - {1}'.format(params['start-index'], params['start-index'] + app_config.GA_RESULT_SIZE - 1))
 
         if not data.get('rows'):
             logger.info('No rows found, done.')
 
         for row in resp.data['rows']:
-            print(row)
             rows.append(row)
 
             # for row in resp.data['rows']:
             #     analytics_row = GoogleAnalyticsRow(row, app_config.GA_METRICS, app_config.GA_DIMENSIONS, data)
             #     rows.append(analytics_row.serialize())
-#
             # params['start-index'] += app_config.GA_RESULT_SIZE
 
         #import ipdb; ipdb.set_trace();

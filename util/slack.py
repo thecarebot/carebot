@@ -1,5 +1,7 @@
 import datetime
+from dateutil.parser import parse
 import logging
+import pytz
 from slacker import Slacker
 
 import app_config
@@ -18,7 +20,11 @@ class SlackTools:
     slack = Slacker(app_config.slack_key)
 
     def hours_since(self, a):
-        now = datetime.datetime.now()
+        # For some reason, dates with timezones tend to be returned as unicode
+        if type(a) is not datetime.datetime:
+            a = parse(a)
+
+        now = datetime.datetime.now(pytz.timezone('US/Eastern'))
         seconds = (now - a).total_seconds()
 
         hours = int(seconds / 60 / 60)

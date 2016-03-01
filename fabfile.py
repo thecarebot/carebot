@@ -6,6 +6,7 @@ from fabric.api import *
 from fabric.state import env
 from jinja2 import Template
 import logging
+import pytz
 from slacker import Slacker
 
 import app_config
@@ -100,7 +101,6 @@ def load_new_stories():
     scraper = SpreadsheetScraper()
     stories = scraper.scrape_spreadsheet(app_config.STORIES_PATH)
     new_stories = scraper.write(stories)
-    print new_stories
 
     for story in new_stories:
         slackTools.send_tracking_started_message(story)
@@ -111,12 +111,16 @@ def get_linger_rate():
     stats = scraper.get_linger_rate('space-time-stepper-20160208')
 
 def seconds_since(a):
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(pytz.timezone('US/Eastern'))
     return (now - a).total_seconds()
 
 def time_bucket(t):
     if not t:
         return False
+
+    # For some reason, dates with timezones tend to be returned as unicode
+    if type(t) is not datetime.datetime:
+        t = parse(t)
 
     seconds = seconds_since(t)
 
@@ -164,6 +168,8 @@ def time_bucket(t):
 def get_story_stats():
     analytics = GoogleAnalyticsScraper()
 
+    # TODO use a SQL query instead of appp logic to exclude stories that are
+    # too old.
     for story in Story.select():
         logger.info("About to check %s" % (story.name))
 
@@ -204,7 +210,7 @@ def get_story_stats():
             slackTools.send_linger_time_update(story, stats_per_slug, story_time_bucket)
 
         # Mark the story as checked
-        story.last_checked = datetime.datetime.now()
+        story.last_checked = datetime.datetime.now(pytz.timezone('US/Eastern'))
         story.last_bucket = story_time_bucket
         story.save()
 
