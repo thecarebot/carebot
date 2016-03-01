@@ -368,6 +368,7 @@ def deploy_analytics_conf():
     # Move google ouath credentials
     local('cp ~/.google_oauth_credentials ./.google_oauth_credentials')
     put('.google_oauth_credentials', '~/.google_oauth_credentials')
+    put('.google_oauth_credentials', '/root/.google_oauth_credentials', use_sudo=True)
 
     # run('mkdir -p %(SERVER_PROJECT_PATH)s' % app_config.__dict__)
 

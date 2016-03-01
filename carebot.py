@@ -88,10 +88,11 @@ def handle_linger_slug_question(message):
 
     if slug:
         rate = analytics.get_linger_rate(slug)
-        print("GOT RATE")
-        print(rate)
         if rate:
-            message.reply(u"%s people spent an average of %s minutes and %s seconds on %s." % (rate['total_people'], rate['minutes'], rate['seconds'], slug))
+            people = "{:,}".format(rate['total_people'])
+
+            time_text = humanist_time_bucket(rate)
+            message.reply(u"%s people spent an average of %s on %s." % (people, time_text, slug))
             return True
         else:
             message.reply("I wasn't able to figure out the linger rate of %s" % slug)
