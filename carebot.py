@@ -156,7 +156,7 @@ def handle_linger_slug_question(message):
             attachments = [
                 {
                     "fallback": slug + " update",
-                    "text": 'Time users spent on graphic in number of sessions' % slug,
+                    "text": 'Time users spent on graphic in number of sessions',
                     "color": "#eeeeee",
                     "title": slug,
                     "image_url": histogram_url
