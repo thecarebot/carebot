@@ -118,15 +118,15 @@ def linger_histogram_link(rows):
     # https://developers.google.com/chart/image/docs/chart_params
     base = 'http://chart.googleapis.com/chart?'
     base += '&'.join([
+        chdt, # Data
+        chco, # Colors
+        chxl, # X-axis Labels
         'cht=bvg',
         'chs=400x200',
-        chdt, # 'chd=t:10,20,50,20,10',
         'chxt=x,x,y',
-        chco, #'chco=e13452',
         'chxs=0,b8b8b8,10,0,_|2,N*s*,b8b8b8,10,1,_',
         'chof=png',
         'chma=50,10,15,0', # Padding: l r t b
-        chxl, # 'chxl=1:||0:|10|20|30|40|50',
         'chxp=1,50',
         'chds=a' # Auto-scale
     ])
@@ -156,6 +156,7 @@ def handle_linger_slug_question(message):
             attachments = [
                 {
                     "fallback": slug + " update",
+                    "text": '*Linger Rate* for graphic `%s`\nTime users spent on graphic in number of sessions' % slug,
                     "color": "#eeeeee",
                     "title": slug,
                     "image_url": histogram_url
