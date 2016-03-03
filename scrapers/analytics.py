@@ -13,9 +13,7 @@ class GoogleAnalyticsScraper:
     def __init__(self):
         self.run_time = datetime.utcnow()
 
-    def get_linger_rate(self, slug):
-        rows = []
-
+    def get_linger_data(self, slug):
         api_url = 'https://www.googleapis.com/analytics/v3/data/ga'
         credentials = get_credentials()
 
@@ -35,14 +33,11 @@ class GoogleAnalyticsScraper:
 
         resp = app_config.authomatic.access(credentials, api_url, params=params)
         data = resp.data
+        return data
 
-        # logger.info('Processing rows {0} - {1}'.format(params['start-index'], params['start-index'] + app_config.GA_RESULT_SIZE - 1))
-
-        if not data.get('rows'):
-            logger.info('No rows found, done.')
-            return False
-
-        for row in resp.data['rows']:
+    def linger_data_to_rows(self, data):
+        rows = []
+        for row in data['rows']:
             time = row[0]
             seconds = 0
             if 'm' in time:
@@ -67,6 +62,16 @@ class GoogleAnalyticsScraper:
         # Exclude everybody in the last bucket
         # (they've been lingering for way too long -- 10+ minutes)
         rows = rows[:-1]
+        return rows
+
+    def get_linger_rate(self, slug):
+        data = self.get_linger_data(slug)
+
+        if not data.get('rows'):
+            logger.info('No rows found, done.')
+            return False
+
+        rows = self.linger_data_to_rows(data)
 
         # Get the average number of seconds
         total_seconds = 0
@@ -84,6 +89,16 @@ class GoogleAnalyticsScraper:
             'minutes': minutes,
             'seconds': seconds
         }
+
+    def get_linger_histogram(self, slug):
+        data = self.get_linger_data(slug)
+
+        if not data.get('rows'):
+            logger.info('No rows found, done.')
+            return False
+
+        rows = self.linger_data_to_rows(data)
+        return rows
 
     def autodiscover_stories(self):
         rows = []

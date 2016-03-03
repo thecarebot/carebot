@@ -78,6 +78,61 @@ def handle_donation_question(message):
     else:
         return False
 
+def linger_histogram_link(rows):
+    chdt='chd=t:' # Chart data
+    chco='chco=' # Colors of each bar
+    chxl='chxl=1:||0:|' # X-axis labels
+
+    counts = []
+    for row in rows:
+        print (row)
+
+        if row[0] == 300:
+            chco += '3612b5' # color
+            chxl += '5%2B'
+
+        elif row[0] >= 60:
+            chco +='12b5a3|' # color
+
+            minutes = str(row[0] / 60)
+            if minutes == '1':
+                chxl += '1+m|'
+            else:
+                chxl += minutes + '|'
+        else:
+            chco +='ffcc00|' # color
+
+            # Set legend
+            if row[0] == 10:
+                chxl += '10s|'
+            else:
+                chxl += str(row[0]) + '|'
+
+
+        counts.append(str(row[1]))
+
+    chdt += ','.join(counts)
+
+    base = 'http://chart.googleapis.com/chart?'
+    base += '&'.join([
+        'cht=bvg',
+        'chs=400x200',
+        chdt, # 'chd=t:10,20,50,20,10',
+        'chxt=x,x,y',
+        chco, #'chco=e13452',
+        'chxs=0,b8b8b8,10,0,_|2,N*s*,b8b8b8,10,1,_',
+        'chof=png',
+        'chma=50,10,15,0', # Padding: l r t b
+        chxl, # 'chxl=1:||0:|10|20|30|40|50',
+        'chxp=1,50',
+        'chds=a' # Auto-scale
+    ])
+
+    # Append chof=validate to debug
+    print(base)
+    return base
+
+
 def handle_linger_slug_question(message):
     m = re.search(LINGER_RATE_REGEX, message.body['text'])
 
@@ -90,16 +145,29 @@ def handle_linger_slug_question(message):
         rate = analytics.get_linger_rate(slug)
         if rate:
             people = "{:,}".format(rate['total_people'])
-
             time_text = humanist_time_bucket(rate)
-            message.reply(u"%s people spent an average of %s on %s." % (people, time_text, slug))
+            reply = u"%s people spent an average of %s on %s." % (people, time_text, slug)
+
+            rows = analytics.get_linger_histogram(slug)
+            histogram_url = linger_histogram_link(rows)
+            attachments = [
+                {
+                    "fallback": slug + " update",
+                    "color": "#eeeeee",
+                    "title": slug,
+                    "image_url": histogram_url
+                }
+            ]
+
+            message.send_webapi(reply, json.dumps(attachments))
+
+            # message.reply()
             return True
         else:
             message.reply("I wasn't able to figure out the linger rate of %s" % slug)
             return False
     else:
         return False
-
 
 
 # SUPER HACKY -- ABSTRACT THIS AND TIME_BUCKET ASAP
@@ -177,6 +245,7 @@ def humanist_time_bucket(linger):
 
     return time
 
+
 def handle_linger_update(message):
     m = GRUBER_URLINTEXT_PAT.findall(message.body['text'])
 
@@ -229,6 +298,8 @@ def handle_linger_update(message):
                 "short": True
             })
 
+        rows = analytics.get_linger_histogram(slug)
+        histogram_url = linger_histogram_link(rows)
         attachments = [
             {
                 "fallback": story.name + " update",
@@ -238,7 +309,6 @@ def handle_linger_update(message):
                 "fields": fields
             }
         ]
-
 
         message.send_webapi(reply, json.dumps(attachments))
 
