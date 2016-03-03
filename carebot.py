@@ -96,7 +96,7 @@ def linger_histogram_link(rows):
 
             minutes = str(row[0] / 60)
             if minutes == '1':
-                chxl += '1+m|'
+                chxl += '1m|'
             else:
                 chxl += minutes + '|'
         else:
@@ -113,6 +113,9 @@ def linger_histogram_link(rows):
 
     chdt += ','.join(counts)
 
+    # Uses the Google Chart API
+    # Super deprecated but still running!
+    # https://developers.google.com/chart/image/docs/chart_params
     base = 'http://chart.googleapis.com/chart?'
     base += '&'.join([
         'cht=bvg',
