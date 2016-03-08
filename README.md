@@ -75,8 +75,19 @@ After starting the bot, make sure to invite it to the channel you set in `.env`.
 
 ### Get new stories from the story spreadsheet
 
+This is usually run via a cronjob, but you can fire it manually:
+
 ```
 fab load_new_stories
+```
+
+### Get stats on stories
+
+This is usually run via a cronjob after `load_new_stories`, but you can fire it 
+manually:
+
+```
+fab get_story_stats
 ```
 
 ## Deploying the project
