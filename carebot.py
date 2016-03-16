@@ -1,8 +1,6 @@
 # from analytics import Analytics
-import datetime
-from dateutil.parser import parse
 import json
-import pytz
+import logging
 import re
 from slackbot.bot import Bot
 from slackbot.bot import respond_to
@@ -15,6 +13,10 @@ from util.slack import SlackTools
 from util.time import TimeTools
 
 slackTools = SlackTools()
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 # Set up analytics to handle inquiries
 analytics = GoogleAnalyticsScraper()
@@ -62,6 +64,7 @@ def handle_linger_slug_question(message):
 def handle_linger_update(message):
     if 'doing' not in message.body['text']:
         return
+
     m = GRUBER_URLINTEXT_PAT.findall(message.body['text'])
 
     if not m[0]:
@@ -69,7 +72,7 @@ def handle_linger_update(message):
 
     url = str(m[0][0])
     url = url.replace('&amp;', '&')
-    print("looking for url %s" % url)
+    logger.info("Looking for url %s" % url)
 
     try:
         story = Story.select().where(Story.url == url).get()
@@ -77,8 +80,6 @@ def handle_linger_update(message):
         message.reply("Sorry, I don't have stats for %s" % url)
         return
 
-    # TODO -- refactor this copied code out from here and fabfile.py
-    # Some stories have multiple slugs
     story_time_bucket = story.time_bucket()
     stats_per_slug = analytics.get_linger_data_for_story(story)
 
@@ -96,8 +97,8 @@ def handle_linger_update(message):
                 "short": True
             })
 
-        rows = analytics.get_linger_histogram(slug)
-        histogram_url = ChartTools.linger_histogram_link(rows)
+            # rows = analytics.get_linger_histogram(stat['slug'])
+            # histogram_url = ChartTools.linger_histogram_link(rows)
         attachments = [
             {
                 "fallback": story.name + " update",
@@ -108,10 +109,9 @@ def handle_linger_update(message):
             }
         ]
 
-        message.send_webapi(reply, json.dumps(attachments))
-
-        # self.slack.chat.post_message(app_config.LINGER_UPDATE_CHANNEL, message, as_user=True, parse='full', attachments=attachments)
-
+        # Use send_message instead of message.reply, otherwise we lose
+        # the bot icon.
+        slackTools.send_message(message.body['channel'], reply, attachments)
 
 patterns = [
     ['linger update', LINGER_RATE_REGEX, handle_linger_slug_question],
@@ -131,7 +131,6 @@ def response_dispatcher(message, text=None):
     for pattern in patterns:
         match = pattern[1].findall(text)
         if match:
-            print ("Matched")
             pattern[2](message)
             return
 
@@ -149,7 +148,6 @@ def reply(message, text):
 
 def main():
     bot = Bot()
-    # bot._client.rtm_send_message('secret-carebot-test', 'hi there')
     bot.run()
 
 if __name__ == "__main__":
