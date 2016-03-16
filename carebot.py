@@ -50,7 +50,9 @@ def handle_linger_slug_question(message):
                 }
             ]
 
-            message.send_webapi(reply, json.dumps(attachments))
+            slackTools.send_message(message.body['channel'], reply, attachments)
+
+            # message.send_webapi(reply, json.dumps(attachments))
 
             # TODO -- how to send?
             # message.reply()
