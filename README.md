@@ -83,7 +83,7 @@ fab load_new_stories
 
 ### Get stats on stories
 
-This is usually run via a cronjob after `load_new_stories`, but you can fire it 
+This is usually run via a cronjob after `load_new_stories`, but you can fire it
 manually:
 
 ```
@@ -137,6 +137,14 @@ help.
 * By defauly, cron errors will be in `/var/log/carebot/`
 
 ## Developing Carebot
+
+### Tests
+
+To run tests:
+
+```
+nose2
+```
 
 ### Migrations
 If you make changes to existing models in `models.py`, you will need to [write

@@ -35,6 +35,24 @@ class GoogleAnalyticsScraper:
         data = resp.data
         return data
 
+    def get_linger_data_for_story(self, story):
+        story_slugs = story.slug_list()
+        stats_per_slug = []
+
+        # Get the linger rate for each slug
+        for slug in story_slugs:
+            stats = self.get_linger_rate(slug)
+            if stats:
+                stats_per_slug.append({
+                    "slug": slug,
+                    "stats": stats
+                })
+
+            else:
+                logger.info("No stats found for %s" % (slug))
+
+        return stats_per_slug
+
     def linger_data_to_rows(self, data):
         rows = []
         for row in data['rows']:
@@ -120,23 +138,10 @@ class GoogleAnalyticsScraper:
         resp = app_config.authomatic.access(credentials, api_url, params=params)
         data = resp.data
 
-       #  logger.info('Processing rows {0} - {1}'.format(params['start-index'], params['start-index'] + app_config.GA_RESULT_SIZE - 1))
-
         if not data.get('rows'):
             logger.info('No rows found, done.')
 
         for row in resp.data['rows']:
             rows.append(row)
 
-            # for row in resp.data['rows']:
-            #     analytics_row = GoogleAnalyticsRow(row, app_config.GA_METRICS, app_config.GA_DIMENSIONS, data)
-            #     rows.append(analytics_row.serialize())
-            # params['start-index'] += app_config.GA_RESULT_SIZE
-
-        #import ipdb; ipdb.set_trace();
         return rows
-
-    # def write(self, db, rows):
-    #     table = db['google_analytics']
-    #     table.delete()
-    #     table.insert_many(rows)

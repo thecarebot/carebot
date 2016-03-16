@@ -1,5 +1,6 @@
 import datetime
 from peewee import *
+from util.time import TimeTools
 
 db = SqliteDatabase('carebot.db')
 
@@ -15,6 +16,14 @@ class Story(Model):
     tracking_started = DateTimeField(default=datetime.datetime.now)
     last_checked = DateTimeField(null = True)
     last_bucket = CharField(null = True)
+
+    def slug_list(self):
+        slugs = self.slug.split(',')
+        slugs = [slug.strip() for slug in slugs]
+        return slugs
+
+    def time_bucket(self):
+        return TimeTools.time_bucket(self.article_posted)
 
     class Meta:
         database = db

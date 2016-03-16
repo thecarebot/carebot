@@ -34,6 +34,10 @@ class SlackTools:
         self.slack.chat.post_message(channel, message, as_user=True, parse='full')
 
     def send_tracking_started_message(self, story):
+        if not story.article_posted:
+            logger.error("No start date for %s; not announcing." % story.name)
+            return
+
         attachments = [
             {
                 "fallback": "I just started tracking " + story.name,
@@ -75,9 +79,9 @@ class SlackTools:
         short_name = ' '.join(parts[:5])
         if len(parts) > 5:
             short_name += '...'
-            
+
         return short_name
-       
+
     def get_linger_time_message_and_attachment(self, story, stats_per_slug, time_bucket):
         time = self.humanist_time_bucket(stats_per_slug[0]['stats'])
         hours_since = self.hours_since(story.article_posted)
