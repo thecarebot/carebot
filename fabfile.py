@@ -168,7 +168,7 @@ def time_bucket(t):
 def get_story_stats():
     analytics = GoogleAnalyticsScraper()
 
-    # TODO use a SQL query instead of appp logic to exclude stories that are
+    # TODO use a SQL query instead of app logic to exclude stories that are
     # too old.
     for story in Story.select():
         logger.info("About to check %s" % (story.name))
@@ -190,21 +190,7 @@ def get_story_stats():
             continue
 
         # Some stories have multiple slugs
-        story_slugs = story.slug.split(',')
-        story_slugs = [slug.strip() for slug in story_slugs]
-        stats_per_slug = []
-
-        # Get the linger rate for each
-        for slug in story_slugs:
-            stats = analytics.get_linger_rate(slug)
-            if stats:
-                stats_per_slug.append({
-                    "slug": slug,
-                    "stats": stats
-                })
-
-            else:
-                logger.info("No stats found for %s" % (slug))
+        stats_per_slug = analytics.get_linger_data_for_story(story)
 
         if len(stats_per_slug) is not 0:
             slackTools.send_linger_time_update(story, stats_per_slug, story_time_bucket)
@@ -214,10 +200,6 @@ def get_story_stats():
         story.last_bucket = story_time_bucket
         story.save()
 
-@task
-def send_message():
-    # Send a message to #general channel
-    slack.chat.post_message('#broadway-carebot', 'Hi @livlab!', as_user=True)
 
 """
 Deploy tasks
