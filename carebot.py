@@ -28,7 +28,7 @@ def handle_linger_slug_question(message):
     m = re.search(LINGER_RATE_REGEX, message.body['text'])
 
     if not m:
-        return False
+        return
 
     slug = m.group(1)
 
@@ -52,16 +52,8 @@ def handle_linger_slug_question(message):
 
             slackTools.send_message(message.body['channel'], reply, attachments)
 
-            # message.send_webapi(reply, json.dumps(attachments))
-
-            # TODO -- how to send?
-            # message.reply()
-            return True
         else:
             message.reply("I wasn't able to figure out the linger rate of %s" % slug)
-            return False
-    else:
-        return False
 
 def handle_linger_update(message):
     if 'doing' not in message.body['text']:
