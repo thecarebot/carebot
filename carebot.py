@@ -1,4 +1,5 @@
 # from analytics import Analytics
+import datetime
 import json
 import inflect
 import logging
@@ -8,13 +9,14 @@ from slackbot.bot import respond_to
 from slackbot.bot import listen_to
 
 from scrapers.analytics import GoogleAnalyticsScraper
+from scrapers.nprapi import NPRAPIScraper
 from util.models import Story
 from util.chart import ChartTools
 from util.slack import SlackTools
 from util.time import TimeTools
 
 slackTools = SlackTools()
-
+npr_api_scraper = NPRAPIScraper()
 inflector = inflect.engine()
 
 logging.basicConfig()
@@ -26,6 +28,8 @@ analytics = GoogleAnalyticsScraper()
 
 LINGER_RATE_REGEX = re.compile(ur'slug ((\w*-*)+)')
 GRUBER_URLINTEXT_PAT = re.compile(ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
+START_TRACKING_REGEX = re.compile(ur'[Tt]rack ((\w*-*)+)')
+
 
 def handle_linger_slug_question(message):
     m = re.search(LINGER_RATE_REGEX, message.body['text'])
@@ -44,7 +48,7 @@ def handle_linger_slug_question(message):
             time_text = TimeTools.humanist_time_bucket(median)
             reply = u"*%s* people spent a median *%s* on `%s`." % (people, time_text, slug)
 
-            reply += '\n\nThis graphic appeared in %s %s:' % (inflector.number_to_words(len(stories)),
+            reply += '\n\nThis graphic appears in %s %s:' % (inflector.number_to_words(len(stories)),
                 inflector.plural('story', len(stories)))
 
             for story in stories:
@@ -130,11 +134,57 @@ def handle_linger_update(message):
         # the bot icon.
         slackTools.send_message(message.body['channel'], reply, attachments)
 
+
+
+def start_tracking(message):
+    m = re.search(START_TRACKING_REGEX, message.body['text'])
+
+    if not m:
+        return False
+
+    slug = m.group(1)
+
+    if slug:
+        # Check if the slug is in the database.
+        try:
+            story = Story.select().where(Story.slug.contains(slug)).get()
+            message.reply("Thanks! I'm already tracking `%s`, and you should start seeing results within a couple hours." % slug)
+        except Story.DoesNotExist:
+
+            # If it's not in the database, start tracking it.
+            url = re.search(GRUBER_URLINTEXT_PAT, message.body['text'])
+
+            if not url:
+                logger.error("Couldn't find story URL in message %s", message.body['text'])
+                message.reply("Sorry, I need a story URL to start tracking.")
+                return
+
+            details = npr_api_scraper.get_story_details(url.group(1))
+
+            if not details:
+                logger.error("Couldn't find story in API for URL %s", url.group(1))
+                message.reply("Sorry, I wasn't able to find that story in the API, so I couldn't start tracking it.")
+                return
+
+            story = Story.create(slug=slug,
+                                 tracking_started=datetime.datetime.now(),
+                                 url=url,
+                                 date=details['date'],
+                                 image=details['image']
+                                )
+            story.save()
+            message.reply("Ok, I've started tracking `%s`. The first stats should arrive in 4 hours or less." % slug)
+    else:
+        message.reply("Sorry, I wasn't able to start tracking `%s` right now." % slug)
+
+    return True
+
+
 patterns = [
+    ['start tracking', START_TRACKING_REGEX, start_tracking],
     ['linger update', LINGER_RATE_REGEX, handle_linger_slug_question],
     ['linger details', GRUBER_URLINTEXT_PAT, handle_linger_update]
 ]
-
 
 """
 We start out responding to everything -- there doesn't seem to be a way for a
@@ -148,8 +198,9 @@ def response_dispatcher(message, text=None):
     for pattern in patterns:
         match = pattern[1].findall(text)
         if match:
+            logger.info("Dispatching to %s with message %s" % (pattern[0], message.body['text']))
             pattern[2](message)
-            return
+            return # Stop at the first match.
 
     message.reply("Hi! I got your message, but I don't know enough yet to respond to it.")
 
