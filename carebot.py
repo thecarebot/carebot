@@ -29,6 +29,7 @@ analytics = GoogleAnalyticsScraper()
 LINGER_RATE_REGEX = re.compile(ur'slug ((\w*-*)+)')
 GRUBER_URLINTEXT_PAT = re.compile(ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
 START_TRACKING_REGEX = re.compile(ur'[Tt]rack ((\w*-*)+)')
+HELP_REGEX = re.compile(ur'[Hh]elp')
 
 
 def handle_linger_slug_question(message):
@@ -168,9 +169,10 @@ def start_tracking(message):
 
             story = Story.create(slug=slug,
                                  tracking_started=datetime.datetime.now(),
-                                 url=url,
+                                 url=url.group(1),
                                  date=details['date'],
-                                 image=details['image']
+                                 image=details['image'],
+                                 name=details['title']
                                 )
             story.save()
             message.reply("Ok, I've started tracking `%s`. The first stats should arrive in 4 hours or less." % slug)

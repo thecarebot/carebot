@@ -58,9 +58,15 @@ class NPRAPIScraper:
         except:
             image = None
 
+        try:
+            title = doc['list']['story'][0]['title']['$text']
+        except:
+            title = None
+
         info = {
             'date': date,
-            'image': image
+            'image': image,
+            'title': title
         }
 
         return info
