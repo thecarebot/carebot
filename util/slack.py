@@ -32,9 +32,9 @@ class SlackTools:
 
     def send_message(self, channel, message, attachments=None):
         if attachments:
-            self.slack.chat.post_message(channel, message, as_user=True, parse='full', attachments=attachments)
+            self.slack.chat.post_message(channel, message, as_user=True, attachments=attachments)
         else:
-            self.slack.chat.post_message(channel, message, as_user=True, parse='full')
+            self.slack.chat.post_message(channel, message, as_user=True)
 
     def send_tracking_started_message(self, story):
         if not story.article_posted:

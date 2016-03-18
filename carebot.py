@@ -33,20 +33,31 @@ def handle_linger_slug_question(message):
     slug = m.group(1)
 
     if slug:
-        rate = analytics.get_linger_rate(slug)
-        if rate:
-            people = "{:,}".format(rate['total_people'])
-            time_text = TimeTools.humanist_time_bucket(rate)
-            reply = u"%s people spent an average of %s on %s." % (people, time_text, slug)
+        median = analytics.get_linger_rate(slug)
+        if median:
+            people = "{:,}".format(median['total_people'])
+            time_text = TimeTools.humanist_time_bucket(median)
+            reply = u"*%s* people spent a median *%s* on %s." % (people, time_text, slug)
 
-            rows = analytics.get_linger_histogram(slug)
-            histogram_url = ChartTools.linger_histogram_link(rows)
+            rows = analytics.get_linger_rows(slug)
+            histogram_url = ChartTools.linger_histogram_link(rows, median)
+
+            all_graphics_rows = analytics.get_linger_rows()
+            all_graphics_median = analytics.get_linger_rate()
+            all_histogram = ChartTools.linger_histogram_link(all_graphics_rows, all_graphics_median)
+
             attachments = [
                 {
                     "fallback": slug + " update",
                     "color": "#eeeeee",
                     "title": slug,
                     "image_url": histogram_url
+                },
+                {
+                    "fallback": slug + " update",
+                    "color": "#eeeeee",
+                    "title": "How all graphics performed",
+                    "image_url": all_histogram
                 }
             ]
 
@@ -91,7 +102,7 @@ def handle_linger_update(message):
                 "short": True
             })
 
-            # rows = analytics.get_linger_histogram(stat['slug'])
+            # rows = analytics.get_linger_rows(stat['slug'])
             # histogram_url = ChartTools.linger_histogram_link(rows)
         attachments = [
             {
