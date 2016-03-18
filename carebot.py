@@ -1,5 +1,6 @@
 # from analytics import Analytics
 import json
+import inflect
 import logging
 import re
 from slackbot.bot import Bot
@@ -13,6 +14,8 @@ from util.slack import SlackTools
 from util.time import TimeTools
 
 slackTools = SlackTools()
+
+inflector = inflect.engine()
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -34,10 +37,19 @@ def handle_linger_slug_question(message):
 
     if slug:
         median = analytics.get_linger_rate(slug)
+        stories = Story.select().where(Story.slug.contains(slug))
+
         if median:
             people = "{:,}".format(median['total_people'])
             time_text = TimeTools.humanist_time_bucket(median)
-            reply = u"*%s* people spent a median *%s* on %s." % (people, time_text, slug)
+            reply = u"*%s* people spent a median *%s* on `%s`." % (people, time_text, slug)
+
+            reply += '\n\nThis graphic appeared in %s %s:' % (inflector.number_to_words(len(stories)),
+                inflector.plural('story', len(stories)))
+
+            for story in stories:
+                reply += '\n' + '*<%s|%s>*' % (story.url, story.name)
+
 
             rows = analytics.get_linger_rows(slug)
             histogram_url = ChartTools.linger_histogram_link(rows, median)
@@ -61,7 +73,7 @@ def handle_linger_slug_question(message):
                 }
             ]
 
-            slackTools.send_message(message.body['channel'], reply, attachments)
+            slackTools.send_message(message.body['channel'], reply, attachments, unfurl_links=False)
 
         else:
             message.reply("I wasn't able to figure out the linger rate of %s" % slug)

@@ -5,6 +5,7 @@ Flask==0.9
 google-api-python-client==1.4.2
 gspread==0.3.0
 gunicorn==19.1.1
+inflect>=0.2.5
 Jinja2==2.7.3
 nose>=1.1.2
 peewee==2.8.0
