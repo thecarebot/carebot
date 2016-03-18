@@ -30,11 +30,17 @@ class SlackTools:
         hours = int(seconds / 60 / 60)
         return hours
 
-    def send_message(self, channel, message, attachments=None):
+    def send_message(self, channel, message, attachments=None, unfurl_links=True):
         if attachments:
-            self.slack.chat.post_message(channel, message, as_user=True, parse='full', attachments=attachments)
+            self.slack.chat.post_message(channel,
+                                         message,
+                                         as_user=True,
+                                         attachments=attachments,
+                                         unfurl_links=unfurl_links
+                                        )
+
         else:
-            self.slack.chat.post_message(channel, message, as_user=True, parse='full')
+            self.slack.chat.post_message(channel, message, as_user=True, unfurl_links=unfurl_links)
 
     def send_tracking_started_message(self, story):
         if not story.article_posted:

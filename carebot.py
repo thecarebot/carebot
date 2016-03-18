@@ -1,5 +1,6 @@
 # from analytics import Analytics
 import json
+import inflect
 import logging
 import re
 from slackbot.bot import Bot
@@ -13,6 +14,8 @@ from util.slack import SlackTools
 from util.time import TimeTools
 
 slackTools = SlackTools()
+
+inflector = inflect.engine()
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -33,24 +36,44 @@ def handle_linger_slug_question(message):
     slug = m.group(1)
 
     if slug:
-        rate = analytics.get_linger_rate(slug)
-        if rate:
-            people = "{:,}".format(rate['total_people'])
-            time_text = TimeTools.humanist_time_bucket(rate)
-            reply = u"%s people spent an average of %s on %s." % (people, time_text, slug)
+        median = analytics.get_linger_rate(slug)
+        stories = Story.select().where(Story.slug.contains(slug))
 
-            rows = analytics.get_linger_histogram(slug)
-            histogram_url = ChartTools.linger_histogram_link(rows)
+        if median:
+            people = "{:,}".format(median['total_people'])
+            time_text = TimeTools.humanist_time_bucket(median)
+            reply = u"*%s* people spent a median *%s* on `%s`." % (people, time_text, slug)
+
+            reply += '\n\nThis graphic appeared in %s %s:' % (inflector.number_to_words(len(stories)),
+                inflector.plural('story', len(stories)))
+
+            for story in stories:
+                reply += '\n' + '*<%s|%s>*' % (story.url, story.name)
+
+
+            rows = analytics.get_linger_rows(slug)
+            histogram_url = ChartTools.linger_histogram_link(rows, median)
+
+            all_graphics_rows = analytics.get_linger_rows()
+            all_graphics_median = analytics.get_linger_rate()
+            all_histogram = ChartTools.linger_histogram_link(all_graphics_rows, all_graphics_median)
+
             attachments = [
                 {
                     "fallback": slug + " update",
                     "color": "#eeeeee",
                     "title": slug,
                     "image_url": histogram_url
+                },
+                {
+                    "fallback": slug + " update",
+                    "color": "#eeeeee",
+                    "title": "How all graphics performed",
+                    "image_url": all_histogram
                 }
             ]
 
-            slackTools.send_message(message.body['channel'], reply, attachments)
+            slackTools.send_message(message.body['channel'], reply, attachments, unfurl_links=False)
 
         else:
             message.reply("I wasn't able to figure out the linger rate of %s" % slug)
@@ -91,7 +114,7 @@ def handle_linger_update(message):
                 "short": True
             })
 
-            # rows = analytics.get_linger_histogram(stat['slug'])
+            # rows = analytics.get_linger_rows(stat['slug'])
             # histogram_url = ChartTools.linger_histogram_link(rows)
         attachments = [
             {
