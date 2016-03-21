@@ -95,8 +95,6 @@ class SlackTools:
         time = self.humanist_time_bucket(stats_per_slug[0]['stats'])
         hours_since = self.hours_since(story.article_posted)
 
-        short_name =  self.get_truncated_name(story.name)
-
         if time_bucket == 'hour 4':
             hours_since_message = str(hours_since) + ' hour'
             if hours_since > 1:
@@ -107,7 +105,7 @@ class SlackTools:
             message = ("It's been %s since I started tracking _%s_ and users have "
                 "spent, on average, *%s* studying the graphic.") % (
                 hours_since_message,
-                short_name,
+                story.name,
                 time
             )
 
@@ -115,7 +113,7 @@ class SlackTools:
             message = ("%s hours in and _%s_ had users spending about *%s* "
                 "interacting with the graphic.") % (
                 hours_since,
-                short_name,
+                story.name,
                 time
             )
 
@@ -123,27 +121,27 @@ class SlackTools:
             message = ("So far, users have spent an average of *%s* viewing the "
                 "graphic on _%s_.") % (
                 time,
-                short_name
+                story.name
             )
 
         if time_bucket == 'day 1 hour 10':
             message = ("It's been %s hours since publishing _%s_ and users have"
                 " spent, on average, *%s* studying the graphic.") % (
                 hours_since,
-                short_name,
+                story.name,
                 time
             )
 
         if time_bucket == 'day 1 hour 15':
             message = ("_%s_ has had users study the graphic for *%s*, on average.") % (
-                short_name,
+                story.name,
                 time
             )
 
         if time_bucket == 'day 2 hour 10':
             message = ("After 2 days, _%s_ users have spent, on average, *%s* "
                 "studying the graphic.") % (
-                short_name,
+                story.name,
                 time
                 )
 
@@ -152,7 +150,7 @@ class SlackTools:
                 "\n\n"
                 "I'll keep tracking _%s_ but won't ping you again with updates."
                 " Let me know if this has been useful. <3") % (
-                short_name,
+                story.name,
                 time,
                 story.name
             )
@@ -163,7 +161,7 @@ class SlackTools:
             # Use a generic message for now
             message = ("%s hours in and here's what I know about the graphics on _%s_:") % (
                 hours_since,
-                short_name
+                story.name
             )
 
             fields = []
