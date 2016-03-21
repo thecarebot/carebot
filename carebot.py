@@ -29,7 +29,9 @@ analytics = GoogleAnalyticsScraper()
 LINGER_RATE_REGEX = re.compile(ur'slug ((\w*-*)+)')
 GRUBER_URLINTEXT_PAT = re.compile(ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
 START_TRACKING_REGEX = re.compile(ur'[Tt]rack ((\w*-*)+)')
-HELP_REGEX = re.compile(ur'[Hh]elp')
+HELP_REGEX_1 = re.compile(ur'Help', re.IGNORECASE)
+HELP_REGEX_2 = re.compile(ur'What can you do', re.IGNORECASE)
+HELP_REGEX_3 = re.compile(ur'What are you up to', re.IGNORECASE)
 
 
 def handle_linger_slug_question(message):
@@ -135,6 +137,38 @@ def handle_linger_update(message):
         # the bot icon.
         slackTools.send_message(message.body['channel'], reply, attachments)
 
+def help(message):
+    text = """I'm currently tracking two measures:
+1. *On-screen visibility* of a graphic in a story: how much time a user views a \
+graphic on their screen
+2. *Scroll depth* across a story: how far down the length of a story a user \
+scrolled.
+
+I use those to calculate two indicators:
+1. *Graphic Linger Rate*: The median visibility of a graphic across all users \
+who viewed it.
+2. *Engaged Completion Rate*: Percentage of people who start and complete the \
+story.
+
+Lately I have been focusing on graphics-only stories. I start tracking a story \
+when it is published on npr.org. I start posting notifications when someone \
+adds the story to the graphics spreadsheet. You'll hear from me every \
+4 hours on the first day and twice daily for days two and and three.
+
+If you ask me about a specific graphic, I'll give you the most up to date \
+Graphic Linger Rate distribution for the graphic in a nifty histogram. I'll also show \
+how the story that graphic is in is comparing to all other graphic stories overall. \
+Just mention me with the word "slug" followed by your slug:
+
+> @carebot, how is slug red-rackhams-treasure doing?
+> @carebot, what about slug tintin-in-tibet?
+
+I am learning to answer questions so if you have them, please send them over and \
+I'll get cracking!
+"""
+
+    slackTools.send_message(message.body['channel'], text)
+
 
 
 def start_tracking(message):
@@ -185,7 +219,10 @@ def start_tracking(message):
 patterns = [
     ['start tracking', START_TRACKING_REGEX, start_tracking],
     ['linger update', LINGER_RATE_REGEX, handle_linger_slug_question],
-    ['linger details', GRUBER_URLINTEXT_PAT, handle_linger_update]
+    ['linger details', GRUBER_URLINTEXT_PAT, handle_linger_update],
+    ['help', HELP_REGEX_1, help],
+    ['help', HELP_REGEX_2, help],
+    ['help', HELP_REGEX_3, help]
 ]
 
 """
