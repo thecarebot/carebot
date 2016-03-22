@@ -143,7 +143,7 @@ help.
 To run tests:
 
 ```
-nose2
+nosetests
 ```
 
 ### Migrations
