@@ -34,8 +34,11 @@ class SpreadsheetScraper:
         spreadsheet = copytext.Copy(filename)
         data = spreadsheet['published']
         for row in data:
-            if self.parse_date(row['date']) > MAGIC_DATE_CUTOFF:
-                stories.append(row)
+            if str(row['graphic_slug']) is not '' and str(row['date']) is not '':
+                if self.parse_date(row['date']) > MAGIC_DATE_CUTOFF:
+                    stories.append(row)
+            else:
+                logger.info('Not adding %s to database: missing slug or date' % (row['story_headline']))
         return stories
 
     def write(self, stories):
