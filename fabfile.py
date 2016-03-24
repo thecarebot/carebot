@@ -354,6 +354,8 @@ def deploy_confs():
     put('%s.env' % env.settings, '%(SERVER_PROJECT_PATH)s/.env' % app_config.__dict__)
     # TODO -- we might want to run `source .env`?
 
+    put('config.yml', '%(SERVER_PROJECT_PATH)s/config.yml')
+
     render_confs()
 
     with settings(warn_only=True):
