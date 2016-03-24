@@ -13,8 +13,10 @@ import app_config
 from oauth import get_document
 from util.models import Story
 from util.slack import SlackTools
+from util.config import Config
 from scrapers.analytics import GoogleAnalyticsScraper
 from scrapers.nprapi import NPRAPIScraper
+from scrapers.rss import RSSScraper
 from scrapers.spreadsheet import SpreadsheetScraper
 
 env.user = app_config.SERVER_USER
@@ -26,6 +28,8 @@ slackTools = SlackTools()
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+config = Config()
 
 
 """
@@ -92,18 +96,38 @@ def app(port='8000'):
     else:
         local('gunicorn -b 0.0.0.0:%s --timeout 3600 --debug --reload app:wsgi_app' % port)
 
+
 """
 Data tasks
 """
-@task
-def load_new_stories():
-    get_document(app_config.STORIES_GOOGLE_DOC_KEY, app_config.STORIES_PATH)
+
+def load_spreadsheet(source):
+    get_document(source['doc_key'], app_config.STORIES_PATH)
     scraper = SpreadsheetScraper()
     stories = scraper.scrape_spreadsheet(app_config.STORIES_PATH)
     new_stories = scraper.write(stories)
+    return new_stories
 
-    for story in new_stories:
+
+def load_rss(source):
+    scraper = RSSScraper(source['url'])
+    stories = scraper.scrape()
+    new_stories = scraper.write(stories)
+    return new_stories
+
+@task
+def load_new_stories():
+    sources = config.get_sources()
+    for source in sources:
+        if source['type'] == 'spreadsheet':
+            stories = load_spreadsheet(source)
+
+        elif source['type'] == 'rss':
+            stories = load_rss(source)
+
+    for story in stories:
         slackTools.send_tracking_started_message(story)
+
 
 @task
 def get_linger_rate():
@@ -266,6 +290,13 @@ def clone_repo():
     if app_config.REPOSITORY_ALT_URL:
         run('git remote add bitbucket %(REPOSITORY_ALT_URL)s' % app_config.__dict__)
 
+"""
+fab migration:name='201603241327_add_team'
+"""
+@task
+def migration(name):
+    run('source %(SERVER_VIRTUALENV_PATH)s/bin/activate' % app_config.__dict__)
+    run('python migrations/%s.py' % name)
 
 @task
 def checkout_latest():

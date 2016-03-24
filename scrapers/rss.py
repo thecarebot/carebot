@@ -7,7 +7,6 @@ import pytz
 import time
 
 from util.models import Story
-from scrapers.nprapi import NPRAPIScraper
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -23,7 +22,7 @@ class RSSScraper:
     """
     Scrae an RSS feed
     """
-    def get_posts(self):
+    def scrape(self):
         feed = feedparser.parse(self.path)
         stories = []
         for entry in feed.entries:

@@ -12,6 +12,7 @@ class Story(Model):
     image = CharField(null=True)
     date = DateField(null=True)
 
+    team = CharField(null=True)
     article_posted = DateTimeField(null = True)
     tracking_started = DateTimeField(default=datetime.datetime.now)
     last_checked = DateTimeField(null = True)
