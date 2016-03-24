@@ -73,6 +73,34 @@ python carebot.py
 
 After starting the bot, make sure to invite it to the channel you set in `.env`.
 
+### Configuring Carebot to load new stories
+
+Configure Carebot to pull stores from various sources by customizing `config.yml`.
+
+Under `teams`, define team names and the channel messages for that team should
+post to.
+
+Under `sources` define where content should be pulled from, and what team it
+belongs to. Here's an example:
+
+```
+teams:
+  viz:
+    channel: "visuals-graphics"
+  carebot:
+    channel: "carebot-dev"
+sources:
+  -
+    team: "viz"
+    type: "spreadsheet"
+    doc_key: "1Gcumd0uOl3eSUvc0y5CWmmHVOKwX609-js5EnE8i3lI"
+  -
+    team: "carebot"
+    type: "rss"
+    url: "https://thecarebot.github.io/feed.xml"
+
+```
+
 ### Get new stories from the story spreadsheet
 
 This is usually run via a cronjob, but you can fire it manually:

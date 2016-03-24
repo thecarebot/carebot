@@ -38,7 +38,7 @@ class SpreadsheetScraper:
                 stories.append(row)
         return stories
 
-    def write(self, stories):
+    def write(self, stories, team=None):
         new_stories = []
         for story in stories:
             info_from_api = npr_api_scraper.get_story_details(story['story_url'])
@@ -54,7 +54,8 @@ class SpreadsheetScraper:
                     article_posted = info_from_api['date'],
                     story_type = story['graphic_type'],
                     url = story['story_url'],
-                    image = info_from_api['image']
+                    image = info_from_api['image'],
+                    team = team
                 )
                 new_stories.append(story)
             except IntegrityError:

@@ -105,14 +105,14 @@ def load_spreadsheet(source):
     get_document(source['doc_key'], app_config.STORIES_PATH)
     scraper = SpreadsheetScraper()
     stories = scraper.scrape_spreadsheet(app_config.STORIES_PATH)
-    new_stories = scraper.write(stories)
+    new_stories = scraper.write(stories, team=source['team'])
     return new_stories
 
 
 def load_rss(source):
     scraper = RSSScraper(source['url'])
     stories = scraper.scrape()
-    new_stories = scraper.write(stories)
+    new_stories = scraper.write(stories, team=source['team'])
     return new_stories
 
 @task

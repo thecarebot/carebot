@@ -3,7 +3,7 @@ from dateutil.parser import parse
 import logging
 import pytz
 from slacker import Slacker
-
+from util.config import Config
 import app_config
 
 logging.basicConfig()
@@ -59,7 +59,9 @@ class SlackTools:
             }
         ]
 
-        self.slack.chat.post_message(app_config.LINGER_UPDATE_CHANNEL, "", as_user=True, attachments=attachments)
+        channel = story.channel()
+
+        self.slack.chat.post_message(channel, "", as_user=True, attachments=attachments)
         logger.info("Started tracking %s with image %s" % (story.name, story.image))
 
     def humanist_time_bucket(self, linger):
@@ -193,5 +195,7 @@ class SlackTools:
         message = composed[0]
         attachments = composed[1]
 
+        channel = story.channel()
+
         logger.info(message)
-        self.slack.chat.post_message(app_config.LINGER_UPDATE_CHANNEL, message, as_user=True, parse='full', attachments=attachments)
+        self.slack.chat.post_message(channel, message, as_user=True, parse='full', attachments=attachments)

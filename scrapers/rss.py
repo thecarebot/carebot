@@ -20,21 +20,20 @@ class RSSScraper:
         self.magic_date_cutoff = datetime.now(pytz.timezone('US/Eastern')) - timedelta(days=5)
 
     """
-    Scrae an RSS feed
+    Scrape an RSS feed
     """
     def scrape(self):
         feed = feedparser.parse(self.path)
         stories = []
         for entry in feed.entries:
             date = parse(entry.published)
-            print "parsed date"
-            print date
-            print type(date)
+            slug = entry.id
+            slug = slug.replace('https://thecarebot.github.io//', '') # Temp hack
 
             # if date > self.magic_date_cutoff:
             stories.append({
                 'name': entry.title,
-                'slug': entry.id,
+                'slug': slug,
                 'url': entry.link,
                 'date': date,
                 'article_posted': date
@@ -42,7 +41,9 @@ class RSSScraper:
 
         return stories
 
-    def write(self, stories):
+    def write(self, stories, team=None):
+        # TODO
+        # this should be abstracted here and in spreadsheet.py
         new_stories = []
         for story in stories:
             try:
@@ -51,12 +52,13 @@ class RSSScraper:
                     slug = story['slug'],
                     date = story['date'],
                     article_posted = story['date'],
-                    url = story['url']
+                    url = story['url'],
+                    team = team
                 )
                 new_stories.append(story)
             except IntegrityError:
                 # Story probably already exists.
-                logger.info('Not adding %s to database: probably already exists' % (story['story_headline']))
+                logger.info('Not adding %s to database: probably already exists' % (story['name']))
 
 
         return new_stories
