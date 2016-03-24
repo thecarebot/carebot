@@ -29,7 +29,7 @@ REPOSITORY_ALT_URL = None # 'git@bitbucket.org:nprapps/%s.git' % REPOSITORY_NAME
 
 # Slack info
 slack_key = os.environ.get('SLACKBOT_API_TOKEN')
-LINGER_UPDATE_CHANNEL = os.environ.get('SLACK_CHANNEL')
+DEFAULT_CHANNEL = os.environ.get('SLACK_CHANNEL')
 
 # Dailygraphics archive
 COPY_GOOGLE_DOC_KEY = '0Ak3IIavLYTovdGdpcXlFS1lBaVE5aEJqcG1nMUFTVWc'

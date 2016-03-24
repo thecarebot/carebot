@@ -1,6 +1,7 @@
 -e git+https://github.com/nprapps/authomatic.git@94abc06bbb163c1aac8b69ea65305918f1c937dd#egg=Authomatic-master
 copytext==0.1.8
 Fabric==1.4.3
+feedparser==5.2.1
 Flask==0.9
 google-api-python-client==1.4.2
 gspread==0.3.0
@@ -11,6 +12,7 @@ nose>=1.1.2
 peewee==2.8.0
 python-dateutil==2.4.2
 pytz==2015.7
+PyYAML==3.11
 slackbot==0.3.0
 slacker==0.9.0
 slimit==0.7.4

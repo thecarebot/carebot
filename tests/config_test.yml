@@ -1,0 +1,14 @@
+teams:
+  viz:
+    channel: "visuals-graphics"
+  carebot:
+    channel: "carebot-dev"
+sources:
+  -
+    team: "viz"
+    type: "spreadsheet"
+    doc_key: "1Gcumd0uOl3eSUvc0y5CWmmHVOKwX609-js5EnE8i3lI"
+  -
+    team: "carebot"
+    type: "rss"
+    url: "https://thecarebot.github.io/feed.xml"

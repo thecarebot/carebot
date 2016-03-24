@@ -1,6 +1,11 @@
 import datetime
 from peewee import *
+
+import app_config
+from util.config import Config
 from util.time import TimeTools
+
+config = Config()
 
 db = SqliteDatabase('carebot.db')
 
@@ -12,6 +17,7 @@ class Story(Model):
     image = CharField(null=True)
     date = DateField(null=True)
 
+    team = CharField(null=True)
     article_posted = DateTimeField(null = True)
     tracking_started = DateTimeField(default=datetime.datetime.now)
     last_checked = DateTimeField(null = True)
@@ -24,6 +30,21 @@ class Story(Model):
 
     def time_bucket(self):
         return TimeTools.time_bucket(self.article_posted)
+
+    def channel(self):
+        channel = app_config.DEFAULT_CHANNEL
+        if self.team:
+            teams = config.get_teams()
+            try:
+                channel = teams[self.team]['channel']
+            except:
+                pass
+
+            channel = '#' + channel
+
+        print 'Using channel %s' % channel
+        return channel
+
 
     class Meta:
         database = db
