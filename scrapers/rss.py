@@ -1,8 +1,9 @@
-import copytext
 from datetime import datetime, timedelta
+from dateutil.parser import parse
 import feedparser
 import logging
 from peewee import IntegrityError
+import pytz
 import time
 
 from util.models import Story
@@ -17,16 +18,7 @@ class RSSScraper:
         self.path = path
 
         # We'll ignore stories older than this.
-        self.magic_date_cutoff = datetime.now() - timedelta(days=5)
-
-    """
-    From https://github.com/tarbell-project/tarbell/blob/1.0.5/tarbell/app.py#L251
-    """
-    def parse_date(self, value):
-        value = float(value)
-        seconds = (value - 25569) * 86400.0
-        parsed = datetime.utcfromtimestamp(seconds).date()
-        return parsed
+        self.magic_date_cutoff = datetime.now(pytz.timezone('US/Eastern')) - timedelta(days=5)
 
     """
     Scrae an RSS feed
@@ -35,19 +27,19 @@ class RSSScraper:
         feed = feedparser.parse(self.path)
         stories = []
         for entry in feed.entries:
-            date = entry.published
+            date = parse(entry.published)
             print "parsed date"
             print date
             print type(date)
 
-            if date > self.magic_date_cutoff:
-                stories.append({
-                    'name': entry.title,
-                    'slug': entry.id,
-                    'url': entry.link,
-                    'date': date,
-                    'article_posted': date
-                })
+            # if date > self.magic_date_cutoff:
+            stories.append({
+                'name': entry.title,
+                'slug': entry.id,
+                'url': entry.link,
+                'date': date,
+                'article_posted': date
+            })
 
         return stories
 
