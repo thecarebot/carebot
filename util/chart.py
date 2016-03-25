@@ -37,6 +37,56 @@ class ChartTools:
     Row should be in the format [seconds, count]
     """
     @staticmethod
+    def scroll_histogram_link(rows, median=None):
+        chdt = 'chd=t:' # Chart data
+        chco = 'chco=' # Colors of each bar
+        chxl = 'chxl=3:|MED|4:|%20|1:||0:|' # X-axis labels
+
+
+        print rows
+        data = []
+        for row in rows:
+            data.append(str(row[3]))
+
+        chdt += ','.join(data)
+
+        """
+        Basic scroll depth chart
+cht=bhs
+chs=250x300
+chco=4b7ef0
+chd=t:5,10,15,20,25,30,45,10,20,60
+chxt=y,x
+chxs=0,666666,10,1,_|1,666666,10,0,_,ffffff
+chxl=0:|100%|90%|80%|70%|60%|50%|40%|30%|20%|10%|1:|
+        """
+
+        # Uses the Google Chart API
+        # Super deprecated but still running!
+        # https://developers.google.com/chart/image/docs/chart_params
+        base = 'http://chart.googleapis.com/chart?'
+        base += '&'.join([
+            chdt, # Data
+            'chco=4b7ef0', # Colors
+            'cht=bhs',
+            'chs=200x300',
+            'chxt=y,x',
+            'chxs=0,666666,10,1,_|1,666666,10,0,_,ffffff',
+            'chxl=0:|100%|90%|80%|70%|60%|50%|40%|30%|20%|10%|1:|',
+            'chof=png',
+            'chbh=26,1,1', # Width, spacing, group spacing
+            'chds=a' # Auto-scale
+        ])
+
+        # Append chof=validate to the URL to debug errors
+        return base
+
+
+    """
+    Set up a link to a Google Chart to create a histogram
+    Row should be in the format [seconds, count]
+    """
+    @staticmethod
     def linger_histogram_link(rows, median=None):
         chdt = 'chd=t:' # Chart data
         chco = 'chco=' # Colors of each bar
