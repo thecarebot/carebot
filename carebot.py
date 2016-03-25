@@ -54,7 +54,9 @@ def handle_scroll_slug_question(message):
                 inflector.plural('story', len(stories)))
 
             for story in stories:
-                reply += '\n' + '*<%s|%s>*' % (story.url, story.name.encode('utf8'))
+                # name = str(story.name.replace("'", "").encode('utf8'))
+                # print name
+                reply += '\n' + '*<%s|%s>*' % (story.url, story.name.strip())
 
             histogram_url = ChartTools.scroll_histogram_link(rows)
 
