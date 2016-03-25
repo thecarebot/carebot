@@ -43,6 +43,8 @@ NPR_API_KEY = os.environ.get('NPR_API_KEY')
 
 """
 Google analytics
+118286276 = carebot
+100688391 = viz
 """
 GA_ORGANIZATION_ID = '100688391'
 GA_SAMPLING_LEVEL = 'HIGHER_PRECISION'

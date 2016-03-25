@@ -296,7 +296,7 @@ fab migration:name='201603241327_add_team'
 @task
 def migration(name):
     run('source %(SERVER_VIRTUALENV_PATH)s/bin/activate' % app_config.__dict__)
-    run('python migrations/%s.py' % name)
+    run('python %s/migrations/%s.py' % (app_config.__dict__['SERVER_PROJECT_PATH'], name))
 
 @task
 def checkout_latest():

@@ -7,6 +7,7 @@ import re
 from slackbot.bot import Bot
 from slackbot.bot import respond_to
 from slackbot.bot import listen_to
+import unicodedata
 
 from scrapers.analytics import GoogleAnalyticsScraper
 from scrapers.nprapi import NPRAPIScraper
@@ -27,11 +28,49 @@ logger.setLevel(logging.INFO)
 analytics = GoogleAnalyticsScraper()
 
 LINGER_RATE_REGEX = re.compile(ur'slug ((\w*-*)+)')
+SCROLL_RATE_REGEX = re.compile(ur'scroll ((\w*-*)+)')
 GRUBER_URLINTEXT_PAT = re.compile(ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
 START_TRACKING_REGEX = re.compile(ur'[Tt]rack ((\w*-*)+)')
 HELP_REGEX_1 = re.compile(ur'Help', re.IGNORECASE)
 HELP_REGEX_2 = re.compile(ur'What can you do', re.IGNORECASE)
 HELP_REGEX_3 = re.compile(ur'What are you up to', re.IGNORECASE)
+
+def handle_scroll_slug_question(message):
+    m = re.search(SCROLL_RATE_REGEX, message.body['text'])
+
+    if not m:
+        return
+
+    slug = m.group(1)
+
+    if slug:
+        stories = Story.select().where(Story.slug.contains(slug))
+        rows = analytics.get_depth_rate(slug)
+
+        if rows:
+            reply = u"Here's what I know about `%s`." % slug
+
+            reply += '\n\nThis graphic appears in %s %s:' % (inflector.number_to_words(len(stories)),
+                inflector.plural('story', len(stories)))
+
+            for story in stories:
+                reply += '\n' + '*<%s|%s>*' % (story.url, story.name.encode('utf8'))
+
+            histogram_url = ChartTools.scroll_histogram_link(rows)
+
+            attachments = [
+                {
+                    "fallback": slug + " update",
+                    "color": "#eeeeee",
+                    "title": slug,
+                    "image_url": histogram_url
+                }
+            ]
+
+            slackTools.send_message(message.body['channel'], reply, attachments, unfurl_links=False)
+
+        else:
+            message.reply("I wasn't able to find scroll data for %s" % slug)
 
 
 def handle_linger_slug_question(message):
@@ -121,8 +160,6 @@ def handle_linger_update(message):
                 "short": True
             })
 
-            # rows = analytics.get_linger_rows(stat['slug'])
-            # histogram_url = ChartTools.linger_histogram_link(rows)
         attachments = [
             {
                 "fallback": story.name + " update",
@@ -219,6 +256,7 @@ def start_tracking(message):
 patterns = [
     ['start tracking', START_TRACKING_REGEX, start_tracking],
     ['linger update', LINGER_RATE_REGEX, handle_linger_slug_question],
+    ['scroll update', SCROLL_RATE_REGEX, handle_scroll_slug_question],
     ['linger details', GRUBER_URLINTEXT_PAT, handle_linger_update],
     ['help', HELP_REGEX_1, help],
     ['help', HELP_REGEX_2, help],

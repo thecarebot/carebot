@@ -1,9 +1,9 @@
-import app_config
-
+from __future__ import division
 from datetime import datetime
-from oauth import get_credentials
-
 import logging
+
+import app_config
+from oauth import get_credentials
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -45,6 +45,26 @@ class GoogleAnalyticsScraper:
         resp = app_config.authomatic.access(credentials, api_url, params=params)
         data = resp.data
         return data
+
+    def get_depth_data(self, slug=None):
+        if slug:
+            filters = 'ga:eventCategory==%s;ga:eventAction==scroll-depth' % slug
+        else:
+            filters = 'ga:eventAction==scroll-depth'
+
+        params = {
+            'ids': 'ga:{0}'.format(app_config.GA_ORGANIZATION_ID),
+            'start-date': '90daysAgo', # start_date.strftime('%Y-%m-%d'),
+            'end-date': 'today',
+            'metrics': 'ga:users,ga:eventValue',
+            'dimensions': 'ga:eventLabel',
+            'filters': filters,
+            'max-results': app_config.GA_RESULT_SIZE,
+            'samplingLevel': app_config.GA_SAMPLING_LEVEL,
+            'start-index': 1,
+        }
+
+        return self.query_ga(params)
 
     def get_linger_data(self, slug=None):
         if slug:
@@ -114,7 +134,6 @@ class GoogleAnalyticsScraper:
         rows = rows[:-1]
         return rows
 
-
     def get_linger_rate(self, slug=None):
         if slug:
             data = self.get_linger_data(slug)
@@ -157,6 +176,36 @@ class GoogleAnalyticsScraper:
             return False
 
         rows = self.linger_data_to_rows(data)
+        return rows
+
+    def depth_data_to_rows(self, data):
+        rows = []
+        for row in data:
+            row[0] = int(row[0]) # Percent viewed
+            row[1] = int(row[1]) # Total users
+            row[2] = int(row[2]) # Value
+            rows.append(row)
+
+        # Sort the row data from 10% => 100%
+        rows.sort(key=lambda tup: tup[0])
+
+        # Calculate the percentage of users
+        total_engaged = rows[0][1]
+        for row in rows:
+            pct = round((row[1] / total_engaged) * 100)
+            row.append(int(pct))
+
+        truncated = rows[:10]
+        return truncated
+
+    def get_depth_rate(self, slug=None):
+        data = self.get_depth_data(slug)
+
+        if not data.get('rows'):
+            logger.info('No rows found, done.')
+            return False
+
+        rows = self.depth_data_to_rows(data.get('rows'))
         return rows
 
     def autodiscover_stories(self):
