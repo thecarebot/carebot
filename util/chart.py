@@ -25,10 +25,7 @@ class ChartTools:
 
         pct = dist_from_left / width
 
-        print "col %s dist %s pct %s width %s" % (col, dist_from_left, pct, width)
-
         pct = int(round(pct * 100))
-        print "Dist " + str(pct)
         return pct
 
 
@@ -42,8 +39,6 @@ class ChartTools:
         chco = 'chco=' # Colors of each bar
         chxl = 'chxl=3:|MED|4:|%20|1:||0:|' # X-axis labels
 
-
-        print rows
         data = []
         for row in rows:
             data.append(str(row[3]))
@@ -52,13 +47,14 @@ class ChartTools:
 
         """
         Basic scroll depth chart
-cht=bhs
-chs=250x300
-chco=4b7ef0
-chd=t:5,10,15,20,25,30,45,10,20,60
-chxt=y,x
-chxs=0,666666,10,1,_|1,666666,10,0,_,ffffff
-chxl=0:|100%|90%|80%|70%|60%|50%|40%|30%|20%|10%|1:|
+        cht=bhs
+        chs=250x300
+        chco=4b7ef0
+        chd=t:5,10,15,20,25,30,45,10,20,60
+        chxt=y,x,x
+        chxs=0,666666,10,1,_|1,666666,10,0,_,ffffff
+        chxl=0:|100%|90%|80%|70%|60%|50%|40%|30%|20%|10%|1:|0|25|50|75|100%|2:|Percent%20of%20users
+        chxp=2,50
         """
 
         # Uses the Google Chart API
@@ -67,13 +63,15 @@ chxl=0:|100%|90%|80%|70%|60%|50%|40%|30%|20%|10%|1:|
         base = 'http://chart.googleapis.com/chart?'
         base += '&'.join([
             chdt, # Data
+            'chs=200x315', # Dimensions
             'chco=4b7ef0', # Colors
-            'cht=bhs',
-            'chs=200x300',
-            'chxt=y,x',
+            'cht=bhs',     # Type
+            'chxt=y,x,x',
             'chxs=0,666666,10,1,_|1,666666,10,0,_,ffffff',
-            'chxl=0:|100%|90%|80%|70%|60%|50%|40%|30%|20%|10%|1:|',
+            'chxl=0:|100%|90%|80%|70%|60%|50%|40%|30%|20%|10%|1:|0|25|50|75|100%|2:|Percent%20of%20users',
+            'chxp=2,50',
             'chof=png',
+            'chma=10,20,10,10',
             'chbh=26,1,1', # Width, spacing, group spacing
             'chds=a' # Auto-scale
         ])
@@ -124,16 +122,16 @@ chxl=0:|100%|90%|80%|70%|60%|50%|40%|30%|20%|10%|1:|
 
         """
         Chart with median lines
-        cht=bvg
-        chs=250x150
-        chd=t:5,10,15,20,25,30,45
-        chxt=x,y,t,x
-        chxs=0,ff0000,12,0,lt
-            1,0000ff,10,1,lt
-            2,666666,10,0,l,000000
-        chxl=2:|MED|3:| ,
-        chxtc=3,-160
-        chxp=3,43|4,43
+cht=bvg
+chs=400x200
+chd=t:5,10,15,20,25,30,45|10,20,30,40,50,60,70
+chxt=x,x,y,t,x
+chxs=0,b8b8b8,10,0,_|2,N*s*,b8b8b8,10,1,_|3,666666,10,0,l,666666|4,000000,1,-1,t,000000
+chxl=2:|MED|3:| ,
+chxtc=4,-180
+chxp=3,43|4,43
+chbh=16,1,3
+chco=ffcc00|ffcc00|ffcc00|12b5a3,ffeca0|12b5a3|12b5a3
         """
 
         # Uses the Google Chart API
