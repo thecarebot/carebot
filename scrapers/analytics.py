@@ -155,7 +155,7 @@ class GoogleAnalyticsScraper:
         # average_seconds = total_seconds/total_people
 
         average_seconds = self.median_of_time_buckets(rows)
-        minutes = average_seconds / 60
+        minutes = int(average_seconds / 60)
         seconds = average_seconds % 60
 
         return {

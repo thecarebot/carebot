@@ -122,16 +122,16 @@ class ChartTools:
 
         """
         Chart with median lines
-        cht=bvg
-        chs=250x150
-        chd=t:5,10,15,20,25,30,45
-        chxt=x,y,t,x
-        chxs=0,ff0000,12,0,lt
-            1,0000ff,10,1,lt
-            2,666666,10,0,l,000000
-        chxl=2:|MED|3:| ,
-        chxtc=3,-160
-        chxp=3,43|4,43
+cht=bvg
+chs=400x200
+chd=t:5,10,15,20,25,30,45|10,20,30,40,50,60,70
+chxt=x,x,y,t,x
+chxs=0,b8b8b8,10,0,_|2,N*s*,b8b8b8,10,1,_|3,666666,10,0,l,666666|4,000000,1,-1,t,000000
+chxl=2:|MED|3:| ,
+chxtc=4,-180
+chxp=3,43|4,43
+chbh=16,1,3
+chco=ffcc00|ffcc00|ffcc00|12b5a3,ffeca0|12b5a3|12b5a3
         """
 
         # Uses the Google Chart API
