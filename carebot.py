@@ -73,7 +73,7 @@ def handle_scroll_slug_question(message):
             message.reply("I wasn't able to find scroll data for %s" % slug)
 
 
-def handle_linger_slug_question(message):
+def handle_slug_question(message):
     m = re.search(LINGER_RATE_REGEX, message.body['text'])
 
     if not m:
@@ -85,11 +85,14 @@ def handle_linger_slug_question(message):
         median = analytics.get_linger_rate(slug)
         stories = Story.select().where(Story.slug.contains(slug))
 
+        message.reply("Ok! I'm looking up %s. This may take a second." % slug)
+
         if median:
             people = "{:,}".format(median['total_people'])
             time_text = TimeTools.humanist_time_bucket(median)
             reply = u"*%s* people spent a median *%s* on `%s`." % (people, time_text, slug)
 
+            # List the stories this slug appears on
             reply += '\n\nThis graphic appears in %s %s:' % (inflector.number_to_words(len(stories)),
                 inflector.plural('story', len(stories)))
 
@@ -97,8 +100,9 @@ def handle_linger_slug_question(message):
                 reply += '\n' + '*<%s|%s>*' % (story.url, story.name)
 
 
-            rows = analytics.get_linger_rows(slug)
-            histogram_url = ChartTools.linger_histogram_link(rows, median)
+            # Get linger rate data
+            linger_rows = analytics.get_linger_rows(slug)
+            linger_histogram_url = ChartTools.linger_histogram_link(linger_rows, median)
 
             all_graphics_rows = analytics.get_linger_rows()
             all_graphics_median = analytics.get_linger_rate()
@@ -109,7 +113,7 @@ def handle_linger_slug_question(message):
                     "fallback": slug + " update",
                     "color": "#eeeeee",
                     "title": slug,
-                    "image_url": histogram_url
+                    "image_url": linger_histogram_url
                 },
                 {
                     "fallback": slug + " update",
@@ -118,6 +122,19 @@ def handle_linger_slug_question(message):
                     "image_url": all_histogram
                 }
             ]
+
+            # Get scroll data, if any.
+            scroll_depth_rows = analytics.get_depth_rate(slug)
+            if scroll_depth_rows:
+                scroll_histogram_url = ChartTools.scroll_histogram_link(scroll_depth_rows)
+
+                attachments.append({
+                    "fallback": slug + " update",
+                    "color": "#eeeeee",
+                    "title": "How far did people scroll?",
+                    "image_url": scroll_histogram_url
+                })
+
 
             slackTools.send_message(message.body['channel'], reply, attachments, unfurl_links=False)
 
@@ -255,7 +272,7 @@ def start_tracking(message):
 
 patterns = [
     ['start tracking', START_TRACKING_REGEX, start_tracking],
-    ['linger update', LINGER_RATE_REGEX, handle_linger_slug_question],
+    ['linger update', LINGER_RATE_REGEX, handle_slug_question],
     ['scroll update', SCROLL_RATE_REGEX, handle_scroll_slug_question],
     ['linger details', GRUBER_URLINTEXT_PAT, handle_linger_update],
     ['help', HELP_REGEX_1, help],

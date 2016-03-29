@@ -25,10 +25,7 @@ class ChartTools:
 
         pct = dist_from_left / width
 
-        print "col %s dist %s pct %s width %s" % (col, dist_from_left, pct, width)
-
         pct = int(round(pct * 100))
-        print "Dist " + str(pct)
         return pct
 
 
@@ -42,8 +39,6 @@ class ChartTools:
         chco = 'chco=' # Colors of each bar
         chxl = 'chxl=3:|MED|4:|%20|1:||0:|' # X-axis labels
 
-
-        print rows
         data = []
         for row in rows:
             data.append(str(row[3]))
@@ -52,13 +47,14 @@ class ChartTools:
 
         """
         Basic scroll depth chart
-cht=bhs
-chs=250x300
-chco=4b7ef0
-chd=t:5,10,15,20,25,30,45,10,20,60
-chxt=y,x
-chxs=0,666666,10,1,_|1,666666,10,0,_,ffffff
-chxl=0:|100%|90%|80%|70%|60%|50%|40%|30%|20%|10%|1:|
+        cht=bhs
+        chs=250x300
+        chco=4b7ef0
+        chd=t:5,10,15,20,25,30,45,10,20,60
+        chxt=y,x,x
+        chxs=0,666666,10,1,_|1,666666,10,0,_,ffffff
+        chxl=0:|100%|90%|80%|70%|60%|50%|40%|30%|20%|10%|1:|0|25|50|75|100%|2:|Percent%20of%20users
+        chxp=2,50
         """
 
         # Uses the Google Chart API
@@ -67,13 +63,15 @@ chxl=0:|100%|90%|80%|70%|60%|50%|40%|30%|20%|10%|1:|
         base = 'http://chart.googleapis.com/chart?'
         base += '&'.join([
             chdt, # Data
+            'chs=200x315', # Dimensions
             'chco=4b7ef0', # Colors
-            'cht=bhs',
-            'chs=200x300',
-            'chxt=y,x',
+            'cht=bhs',     # Type
+            'chxt=y,x,x',
             'chxs=0,666666,10,1,_|1,666666,10,0,_,ffffff',
-            'chxl=0:|100%|90%|80%|70%|60%|50%|40%|30%|20%|10%|1:|',
+            'chxl=0:|100%|90%|80%|70%|60%|50%|40%|30%|20%|10%|1:|0|25|50|75|100%|2:|Percent%20of%20users',
+            'chxp=2,50',
             'chof=png',
+            'chma=10,20,10,10',
             'chbh=26,1,1', # Width, spacing, group spacing
             'chds=a' # Auto-scale
         ])
