@@ -133,7 +133,7 @@ def handle_slug_question(message):
                 attachments.append({
                     "fallback": slug + " update",
                     "color": "#eeeeee",
-                    "title": "How far dow did people scroll?",
+                    "title": "How far down did people scroll?",
                     "image_url": scroll_histogram_url
                 })
 
