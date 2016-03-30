@@ -27,8 +27,11 @@ GITHUB_USERNAME = 'thecarebot'
 REPOSITORY_URL = 'https://github.com/%s/%s.git' % (GITHUB_USERNAME, REPOSITORY_NAME)
 REPOSITORY_ALT_URL = None # 'git@bitbucket.org:nprapps/%s.git' % REPOSITORY_NAME'
 
+# S3 info
+S3_BUCKET = os.environ.get('S3_BUCKET')
+
 # Slack info
-slack_key = os.environ.get('SLACKBOT_API_TOKEN')
+SLACK_KEY = os.environ.get('SLACKBOT_API_TOKEN')
 DEFAULT_CHANNEL = os.environ.get('SLACK_CHANNEL')
 
 # Dailygraphics archive
@@ -132,7 +135,7 @@ def configure_targets(deployment_target):
     global NPR_API_KEY
 
     if deployment_target == 'production':
-        # S3_BUCKET = PRODUCTION_S3_BUCKET
+        S3_BUCKET = S3_BUCKET
         S3_BASE_URL = 'http://%s/%s' % (S3_BUCKET, PROJECT_SLUG)
         S3_DEPLOY_URL = 's3://%s/%s' % (S3_BUCKET, PROJECT_SLUG)
         SERVERS = PRODUCTION_SERVERS
@@ -142,7 +145,7 @@ def configure_targets(deployment_target):
         DEBUG = False
         ASSETS_MAX_AGE = 86400
     elif deployment_target == 'staging':
-        # S3_BUCKET = STAGING_S3_BUCKET
+        S3_BUCKET = S3_BUCKET
         S3_BASE_URL = 'http://%s/%s' % (S3_BUCKET, PROJECT_SLUG)
         S3_DEPLOY_URL = 's3://%s/%s' % (S3_BUCKET, PROJECT_SLUG)
         SERVERS = STAGING_SERVERS
@@ -152,7 +155,7 @@ def configure_targets(deployment_target):
         DEBUG = True
         ASSETS_MAX_AGE = 20
     else:
-        S3_BUCKET = None
+        S3_BUCKET = S3_BUCKET
         S3_BASE_URL = 'http://127.0.0.1:8000'
         S3_DEPLOY_URL = None
         SERVERS = []

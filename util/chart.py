@@ -1,7 +1,16 @@
+from decimal import *
+
 import logging
+import matplotlib
+import matplotlib.pyplot as plt
+
+from util.s3 import Uploader
+
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+s3 = Uploader()
 
 """
 Tools for managing charts
@@ -86,74 +95,73 @@ class ChartTools:
     """
     @staticmethod
     def linger_histogram_link(rows, median=None):
-        chdt = 'chd=t:' # Chart data
-        chco = 'chco=' # Colors of each bar
-        chxl = 'chxl=3:|MED|4:|%20|1:||0:|' # X-axis labels
+        font = {'family' : 'normal',
+                'weight' : 'normal',
+                'size'   : 10,
+                'color'  : '#b8b8b8' }
 
-        marker_position = ChartTools.marker_position(median['raw_avg_seconds'])
+        range = [1,2,3,4,5,6,7,8,9,10]
 
-        counts = []
+        data = []
         for row in rows:
-            if row[0] == 300:
-                chco += '3612b5' # color
-                chxl += '5%2B' # label for 5+ minutes
+            data.append(row[1])
 
-            elif row[0] >= 60:
-                chco += '12b5a3|' # color
+        # Set the chart size
+        plt.figure(figsize=(4,2), dpi=100)
 
-                minutes = str(row[0] / 60)
-                if minutes == '1':
-                    chxl += '1m|'
-                else:
-                    chxl += minutes + '|'
-            else:
-                chco += 'ffcc00|' # color
+        # Remove the plot frame lines. They are unnecessary chartjunk.
+        ax = plt.subplot(111)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["bottom"].set_visible(False)
+        ax.spines["left"].set_visible(False)
 
-                # Set legend
-                if row[0] == 10:
-                    chxl += '10s|'
-                else:
-                    chxl += str(row[0]) + '|'
+        # Ensure that the axis ticks only show up on the bottom and left of the plot.
+        # Ticks on the right and top of the plot are generally unnecessary chartjunk.
+        ax.get_xaxis().tick_bottom()
+        ax.get_yaxis().tick_left()
 
+        # Configure y-axis ticks
+        # plt.ylim(0, 100)
+        plt.axes().yaxis.set_ticks_position('none')
+        ax.tick_params(axis='y', colors='#b8b8b8', labelsize=8)
+        plt.axes().yaxis.set_major_formatter(
+            matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
 
-            counts.append(str(row[1]))
+        # Configure x-axis ticks
+        plt.axes().xaxis.set_ticks_position('none')
+        ax.tick_params(axis='x', colors='#b8b8b8', labelsize=8)
+        plt.xticks(range, ['10s', '20', '30', '40', '50', '1m', '2m', '3m', '4m', '5m+'])
 
-        chdt += ','.join(counts)
+        chart = plt.bar(range, data, align="center")
+        chart[0].set_color('#ffcc00')
+        chart[1].set_color('#ffcc00')
+        chart[2].set_color('#ffcc00')
+        chart[3].set_color('#ffcc00')
+        chart[4].set_color('#ffcc00')
+        chart[5].set_color('#12b5a3')
+        chart[6].set_color('#12b5a3')
+        chart[7].set_color('#12b5a3')
+        chart[8].set_color('#12b5a3')
+        chart[9].set_color('#3612b5')
 
-        """
-        Chart with median lines
-cht=bvg
-chs=400x200
-chd=t:5,10,15,20,25,30,45|10,20,30,40,50,60,70
-chxt=x,x,y,t,x
-chxs=0,b8b8b8,10,0,_|2,N*s*,b8b8b8,10,1,_|3,666666,10,0,l,666666|4,000000,1,-1,t,000000
-chxl=2:|MED|3:| ,
-chxtc=4,-180
-chxp=3,43|4,43
-chbh=16,1,3
-chco=ffcc00|ffcc00|ffcc00|12b5a3,ffeca0|12b5a3|12b5a3
-        """
+        # Add the median marker
+        if median:
+            position = (median['raw_avg_seconds'] / 10) - 1
+            bar = chart[position]
+            height = bar.get_height()
+            ax.text(
+                bar.get_x() + bar.get_width()/2.,
+                1.05*height,
+                "MED",
+                ha='center',
+                va='bottom',
+                color='#b8b8b8',
+                fontsize=8
+            )
 
-        # Uses the Google Chart API
-        # Super deprecated but still running!
-        # https://developers.google.com/chart/image/docs/chart_params
-        base = 'http://chart.googleapis.com/chart?'
-        base += '&'.join([
-            chdt, # Data
-            chco, # Colors
-            chxl, # X-axis Labels
-            'cht=bvg',
-            'chs=400x200',
-            'chxt=x,x,y,t,x',
-            'chxs=0,b8b8b8,10,0,_|2,N*s*,b8b8b8,10,1,_|3,666666,10,0,l,666666|4,000000,1,-1,t,000000', # Blame Google Charts.
-            'chxtc=4,-180', # Median marker line
-            'chof=png',
-            'chbh=32,2,2', # Width, spacing, group spacing
-            'chma=50,10,0,0', # Padding order: left right top bottom
-            'chxp=1,50|3,%s|4,%s' % (marker_position, marker_position),
-            'chds=a' # Auto-scale
-        ])
-
-        # Append chof=validate to the URL to debug errors
-        # print base
-        return base
+        # TODO: Save to a better temp path.
+        plt.savefig('tmp.png', bbox_inches='tight')
+        f = open('tmp.png', 'rb')
+        url = s3.upload(f)
+        return url
