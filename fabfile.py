@@ -13,6 +13,7 @@ import app_config
 from oauth import get_document
 from util.models import Story
 from util.slack import SlackTools
+from util.s3 import Uploader
 from util.config import Config
 from scrapers.analytics import GoogleAnalyticsScraper
 from scrapers.nprapi import NPRAPIScraper
@@ -24,6 +25,7 @@ env.hosts = app_config.SERVERS
 env.slug = app_config.PROJECT_SLUG
 
 slackTools = SlackTools()
+uploader = Uploader()
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -41,7 +43,7 @@ env.forward_agent = True
 env.hosts = []
 env.settings = None
 
-slack = Slacker(app_config.slack_key)
+slack = Slacker(app_config.SLACK_KEY)
 
 SECONDS_BETWEEN_CHECKS = 1 * 60 * 60 # 1 hour
 MAX_SECONDS_SINCE_POSTING = 3 * 24 * 60 * 60 # 2 days
@@ -100,6 +102,14 @@ def app(port='8000'):
 """
 Data tasks
 """
+
+@task
+def test_upload():
+    uploader = Uploader()
+    data = open('./test.gif', 'rb')
+    f = uploader.upload(data)
+    print f
+
 
 def load_spreadsheet(source):
     get_document(source['doc_key'], app_config.STORIES_PATH)

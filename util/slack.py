@@ -17,7 +17,7 @@ We want both!
 We'll probably do somethign to join them up here.
 """
 class SlackTools:
-    slack = Slacker(app_config.slack_key)
+    slack = Slacker(app_config.SLACK_KEY)
 
     def hours_since(self, a):
         # For some reason, dates with timezones tend to be returned as unicode
