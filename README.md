@@ -132,6 +132,8 @@ You'll need a couple packages:
 
 * SQLite: `sudo apt-get install sqlite3 libsqlite3-dev`
 * `sudo apt-get install python-dev` for pycrypto
+* `sudo apt-get install libpng-dev` for matplotlib
+* `sudo apt-get install libfreetype6-dev libxft-dev` for matplotlib
 * Any other basics: python, pip.
 
 ### First deploy
