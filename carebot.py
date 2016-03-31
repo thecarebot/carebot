@@ -54,8 +54,6 @@ def handle_scroll_slug_question(message):
                 inflector.plural('story', len(stories)))
 
             for story in stories:
-                # name = str(story.name.replace("'", "").encode('utf8'))
-                # print name
                 reply += '\n' + '*<%s|%s>*' % (story.url, story.name.strip())
 
             histogram_url = ChartTools.scroll_histogram_link(rows)
@@ -99,7 +97,7 @@ def handle_slug_question(message):
                 inflector.plural('story', len(stories)))
 
             for story in stories:
-                reply += '\n' + '*<%s|%s>*' % (story.url, story.name)
+                reply += '\n' + '*<%s|%s>*' % (story.url, story.name.strip())
 
 
             # Get linger rate data
@@ -167,7 +165,7 @@ def handle_linger_update(message):
 
     if len(stats_per_slug) is not 0:
         reply = ("Here's what I know about the graphics on _%s_:") % (
-            story.name
+            story.name.strip()
         )
 
         fields = []
