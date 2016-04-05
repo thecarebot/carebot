@@ -3,7 +3,6 @@ from dateutil.parser import parse
 import logging
 import pytz
 from slacker import Slacker
-from util.config import Config
 import app_config
 
 logging.basicConfig()
@@ -41,6 +40,14 @@ class SlackTools:
 
         else:
             self.slack.chat.post_message(channel, message, as_user=True, unfurl_links=unfurl_links)
+
+    def get_channel_name(self, channel_id):
+        try:
+            results = self.slack.channels.info(channel_id)
+            results['name']
+        except:
+            logger.error("Channel %s not found" % channel_id)
+            return None
 
     def send_tracking_started_message(self, story):
         if not story.article_posted:

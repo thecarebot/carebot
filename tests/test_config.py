@@ -18,3 +18,12 @@ class TestConfig(unittest.TestCase):
         sources = config.get_sources()
         self.assertEqual(sources[1]['team'], 'carebot')
 
+    def test_config_get_team_for_channel(self):
+        config = Config(path='tests/config_test.yml')
+        team = config.get_team_for_channel('carebot-dev')
+        self.assertEqual(team, 'carebot')
+
+    def test_config_get_team_for_channel_default(self):
+        config = Config(path='tests/config_test.yml')
+        team = config.get_team_for_channel('doesnotexist')
+        self.assertEqual(team, 'viz')

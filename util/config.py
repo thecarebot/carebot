@@ -14,5 +14,16 @@ class Config:
     def get_teams(self):
         return self.config['teams']
 
+    def get_team_for_channel(self, channel):
+        teams = self.config['teams']
+        for key in teams:
+            print key, teams[key]['channel']
+            if teams[key]['channel'] == channel:
+                return key
+
+        # Default to the first team's channel
+        # Not robust, since dictionaries are not ordered.
+        return teams.keys()[0]
+
     def get_sources(self):
         return self.config['sources']

@@ -12,13 +12,15 @@ import unicodedata
 
 from scrapers.analytics import GoogleAnalyticsScraper
 from scrapers.nprapi import NPRAPIScraper
-from util.models import Story
+from util.config import Config
 from util.chart import ChartTools
+from util.models import Story
 from util.slack import SlackTools
 from util.time import TimeTools
 
 slackTools = SlackTools()
 npr_api_scraper = NPRAPIScraper()
+config = Config()
 inflector = inflect.engine()
 
 logging.basicConfig()
@@ -307,19 +309,24 @@ def start_tracking(message):
                 message.reply("Sorry, I wasn't able to find that story in the API, so I couldn't start tracking it.")
                 return
 
+            # Find out what team we need to save this story to
+            channel = slackTools.get_channel_name(message.body['channel'])
+            team = config.get_team_for_channel(channel)
+
+            # Create the story
             story = Story.create(slug=slug,
                                  tracking_started=datetime.datetime.now(),
                                  url=url.group(1),
                                  date=details['date'],
                                  image=details['image'],
-                                 name=details['title']
+                                 name=details['title'],
+                                 team=team
                                 )
             story.save()
             message.reply("Ok, I've started tracking `%s`. The first stats should arrive in 4 hours or less." % slug)
+
     else:
         message.reply("Sorry, I wasn't able to start tracking `%s` right now." % slug)
-
-    return True
 
 
 patterns = [
