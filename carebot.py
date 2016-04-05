@@ -4,6 +4,7 @@ import json
 import inflect
 import logging
 import re
+from sets import Set
 from slackbot.bot import Bot
 from slackbot.bot import respond_to
 from slackbot.bot import listen_to
@@ -31,9 +32,60 @@ LINGER_RATE_REGEX = re.compile(ur'slug ((\w*-*)+)')
 SCROLL_RATE_REGEX = re.compile(ur'scroll ((\w*-*)+)')
 GRUBER_URLINTEXT_PAT = re.compile(ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
 START_TRACKING_REGEX = re.compile(ur'[Tt]rack ((\w*-*)+)')
+HELLO_REGEX = re.compile(ur'Hello', re.IGNORECASE)
 HELP_REGEX_1 = re.compile(ur'Help', re.IGNORECASE)
 HELP_REGEX_2 = re.compile(ur'What can you do', re.IGNORECASE)
 HELP_REGEX_3 = re.compile(ur'What are you up to', re.IGNORECASE)
+
+def handle_overview_question(message):
+    message.reply("Let me check what's been happening. This may take a second.")
+    seven_days_ago = datetime.datetime.now() - datetime.timedelta(days=7)
+    stories = Story.select().where(Story.tracking_started > seven_days_ago)
+
+    slugs = Set()
+    for story in stories:
+        print story.name
+        story_slugs = story.slug.split(',')
+        for slug in story_slugs:
+            slugs.add(slug)
+
+    total_users = analytics.get_user_data(start_date='7daysAgo')
+    total_users = int(total_users['rows'][0][0])
+    total_users = "{:,}".format(total_users)
+
+    median = analytics.get_linger_rate(start_date='7daysAgo')
+    linger_rows = analytics.get_linger_rows(start_date='7daysAgo')
+    linger_histogram_url = ChartTools.linger_histogram_link(linger_rows, median)
+
+    attachments = [{
+        "fallback": "linger update",
+        "color": "#eeeeee",
+        "title": "Time spent on graphics over the last week",
+        "image_url": linger_histogram_url
+    }]
+
+    slackTools.send_message(message.body['channel'], "In the past 7 days, I've tracked %s stories and %s graphics." % (len(stories), len(slugs)))
+    slackTools.send_message(message.body['channel'], "%s people looked at graphics on those stories. Here's how much time they spent:" % total_users, attachments, unfurl_links=False)
+
+    fields = []
+    for story in stories:
+        print "Adding %s" % story.name
+        fields.append({
+            "title": story.name.strip(),
+            "value": '<' + story.url + '|' + story.slug.strip() + '>',
+            "short": True
+        })
+
+    attachments = [{
+        "fallback": "linger update",
+        "color": "#eeeeee",
+        # "title": "What we have done",
+        "fields": fields
+    }]
+
+    slackTools.send_message(message.body['channel'], "Here's everything:", attachments, unfurl_links=False)
+
+
 
 def handle_scroll_slug_question(message):
     m = re.search(SCROLL_RATE_REGEX, message.body['text'])
@@ -275,6 +327,7 @@ patterns = [
     ['linger update', LINGER_RATE_REGEX, handle_slug_question],
     ['scroll update', SCROLL_RATE_REGEX, handle_scroll_slug_question],
     ['linger details', GRUBER_URLINTEXT_PAT, handle_linger_update],
+    ['hello', HELLO_REGEX, handle_overview_question],
     ['help', HELP_REGEX_1, help],
     ['help', HELP_REGEX_2, help],
     ['help', HELP_REGEX_3, help]

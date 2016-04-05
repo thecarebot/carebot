@@ -46,6 +46,26 @@ class GoogleAnalyticsScraper:
         data = resp.data
         return data
 
+    def get_user_data(self, start_date=None):
+
+        if not start_date:
+            start_date = '90daysAgo'
+
+        params = {
+            'ids': 'ga:{0}'.format(app_config.GA_ORGANIZATION_ID),
+            'start-date': start_date, # start_date.strftime('%Y-%m-%d'),
+            'end-date': 'today',
+            'metrics': 'ga:users',
+            # 'dimensions': 'ga:eventLabel',
+            # 'filters': filters,
+            'max-results': app_config.GA_RESULT_SIZE,
+            'samplingLevel': app_config.GA_SAMPLING_LEVEL,
+            'start-index': 1,
+        }
+
+        return self.query_ga(params)
+
+
     def get_depth_data(self, slug=None):
         if slug:
             filters = 'ga:eventCategory==%s;ga:eventAction==scroll-depth' % slug
@@ -66,15 +86,18 @@ class GoogleAnalyticsScraper:
 
         return self.query_ga(params)
 
-    def get_linger_data(self, slug=None):
+    def get_linger_data(self, slug=None, start_date=None):
         if slug:
             filters = 'ga:eventCategory==%s;ga:eventAction==on-screen;ga:eventLabel==10s,ga:eventLabel==20s,ga:eventLabel==30s,ga:eventLabel==40s,ga:eventLabel==50s,ga:eventLabel==1m,ga:eventLabel==2m,ga:eventLabel==3m,ga:eventLabel==4m,ga:eventLabel==5m,ga:eventLabel==10m' % slug
         else:
             filters = 'ga:eventAction==on-screen;ga:eventLabel==10s,ga:eventLabel==20s,ga:eventLabel==30s,ga:eventLabel==40s,ga:eventLabel==50s,ga:eventLabel==1m,ga:eventLabel==2m,ga:eventLabel==3m,ga:eventLabel==4m,ga:eventLabel==5m,ga:eventLabel==10m'
 
+        if not start_date:
+            start_date = '90daysAgo'
+
         params = {
             'ids': 'ga:{0}'.format(app_config.GA_ORGANIZATION_ID),
-            'start-date': '90daysAgo', # start_date.strftime('%Y-%m-%d'),
+            'start-date': start_date, # start_date.strftime('%Y-%m-%d'),
             'end-date': 'today',
             'metrics': 'ga:totalEvents',
             'dimensions': 'ga:eventLabel',
@@ -134,11 +157,11 @@ class GoogleAnalyticsScraper:
         rows = rows[:-1]
         return rows
 
-    def get_linger_rate(self, slug=None):
+    def get_linger_rate(self, slug=None, start_date=None):
         if slug:
-            data = self.get_linger_data(slug)
+            data = self.get_linger_data(slug, start_date=start_date)
         else:
-            data = self.get_linger_data()
+            data = self.get_linger_data(start_date=start_date)
 
         if not data.get('rows'):
             logger.info('No rows found, done.')
@@ -165,11 +188,11 @@ class GoogleAnalyticsScraper:
             'seconds': seconds
         }
 
-    def get_linger_rows(self, slug=None):
+    def get_linger_rows(self, slug=None, start_date=None):
         if slug:
-            data = self.get_linger_data(slug)
+            data = self.get_linger_data(slug, start_date=start_date)
         else:
-            data = self.get_linger_data()
+            data = self.get_linger_data(start_date=start_date)
 
         if not data.get('rows'):
             logger.info('No rows found, done.')
