@@ -314,12 +314,12 @@ def start_tracking(message):
             team = config.get_team_for_channel(channel)
 
             # Create the story
-            story = Story.create(slug=slug,
-                                 tracking_started=datetime.datetime.now(),
-                                 url=url.group(1),
+            story = Story.create(name=details['title'],
+                                 slug=slug,
                                  date=details['date'],
+                                 url=url.group(1),
+                                 article_posted = details['date'],
                                  image=details['image'],
-                                 name=details['title'],
                                  team=team
                                 )
             story.save()
