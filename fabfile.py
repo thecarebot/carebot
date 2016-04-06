@@ -234,17 +234,16 @@ def get_story_stats():
         story.last_bucket = story_time_bucket
         story.save()
 
-
 """
-Deploy tasks
+Environments
 """
-
 @task
 def production():
     """
     Run as though on production.
     """
     env.settings = 'production'
+    env.branch = 'master'
     app_config.configure_targets(env.settings)
     env.hosts = app_config.SERVERS
 
@@ -254,8 +253,20 @@ def staging():
     Run as though on staging.
     """
     env.settings = 'staging'
+    env.branch = 'master'
     app_config.configure_targets(env.settings)
     env.hosts = app_config.SERVERS
+
+"""
+Branches
+"""
+@task
+def branch(branch_name):
+    """
+    Work on any specified branch.
+    """
+    env.branch = branch_name
+
 
 @task
 def create_directories():
@@ -309,11 +320,12 @@ def migration(name):
     run('python %s/migrations/%s.py' % (app_config.__dict__['SERVER_PROJECT_PATH'], name))
 
 @task
-def checkout_latest():
+def checkout_latest(remote='origin'):
     """
     Get the updated code
     """
-    run('cd %s; git pull origin master' % (app_config.SERVER_PROJECT_PATH))
+    run('cd %s; git fetch %s' % (app_config.SERVER_REPOSITORY_PATH, remote))
+    run('cd %s; git checkout %s; git pull %s %s' % (app_config.SERVER_REPOSITORY_PATH, env.branch, remote, env.branch))
 
 
 @task
