@@ -135,8 +135,8 @@ def load_new_stories():
         elif source['type'] == 'rss':
             stories = load_rss(source)
 
-    for story in stories:
-        slackTools.send_tracking_started_message(story)
+        for story in stories:
+            slackTools.send_tracking_started_message(story)
 
 
 @task
