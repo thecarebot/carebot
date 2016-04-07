@@ -111,6 +111,12 @@ def handle_scroll_slug_question(message):
                 reply += '\n' + '*<%s|%s>*' % (story.url, story.name.strip())
 
             histogram_url = ChartTools.scroll_histogram_link(rows)
+            print histogram_url
+
+            if story.screenshot:
+                histogram_url = ChartTools.add_screenshot_to_chart(story.screenshot, histogram_url)
+
+                print histogram_url
 
             attachments = [
                 {
@@ -153,7 +159,6 @@ def handle_slug_question(message):
             for story in stories:
                 reply += '\n' + '*<%s|%s>*' % (story.url, story.name.strip())
 
-
             # Get linger rate data
             linger_rows = analytics.get_linger_rows(slug)
             linger_histogram_url = ChartTools.linger_histogram_link(linger_rows, median)
@@ -181,6 +186,12 @@ def handle_slug_question(message):
             scroll_depth_rows = analytics.get_depth_rate(slug)
             if scroll_depth_rows:
                 scroll_histogram_url = ChartTools.scroll_histogram_link(scroll_depth_rows)
+                print scroll_histogram_url
+
+                if stories[0].screenshot:
+                    scroll_histogram_url = ChartTools.add_screenshot_to_chart(stories[0].screenshot, scroll_histogram_url)
+                    print stories[0].screenshot
+                    print scroll_histogram_url
 
                 attachments.append({
                     "fallback": slug + " update",

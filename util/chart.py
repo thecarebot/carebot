@@ -3,6 +3,9 @@ from decimal import *
 import logging
 import matplotlib
 import matplotlib.pyplot as plt
+from PIL import Image
+import StringIO
+import requests
 
 from util.s3 import Uploader
 
@@ -38,55 +41,120 @@ class ChartTools:
         return pct
 
 
+    @staticmethod
+    def add_screenshot_to_chart(screenshot_url, chart_url):
+        # Fetch the two images
+        chart = requests.get(chart_url)
+        screenshot = requests.get(screenshot_url)
+
+        # offset the screenshot so we have a nice buffer.
+        # Let's say 10px for now.
+        magic_chart_buffer = 10
+
+        # Open them up so we can mess with them
+        chart = Image.open(StringIO.StringIO(chart.content))
+        screenshot = Image.open(StringIO.StringIO(screenshot.content))
+
+        c_width, c_height = chart.size
+        s_width, s_height = screenshot.size
+
+        # Calculate the dimensions for the resized screenshot using the
+        # chart's height
+        h_ratio = (c_height - magic_chart_buffer * 2) / float(s_height)
+        new_width = int(h_ratio * s_width)
+        new_s = screenshot.resize((new_width, c_height - magic_chart_buffer * 2))
+        print chart.size
+        print screenshot.size
+        print new_s.size
+
+        full_width = new_width + c_width + magic_chart_buffer * 2
+        full_height = c_height
+
+        # Combine the two images
+        result = Image.new('RGB', (full_width, full_height), color='#fff')
+        result.paste(im=chart, box=(new_width + magic_chart_buffer, 0))
+        result.paste(im=new_s, box=(magic_chart_buffer, magic_chart_buffer))
+
+        # Get them as a buffer and save 'em to s3
+        output = StringIO.StringIO()
+        result.save(output, format="PNG")
+        contents = output.getvalue()
+        url = s3.upload(contents)
+        return url
+
     """
     Set up a link to a Google Chart to create a histogram
     Row should be in the format [seconds, count]
     """
     @staticmethod
     def scroll_histogram_link(rows, median=None):
-        chdt = 'chd=t:' # Chart data
-        chco = 'chco=' # Colors of each bar
-        chxl = 'chxl=3:|MED|4:|%20|1:||0:|' # X-axis labels
-
+        range = [1,2,3,4,5,6,7,8,9,10]
         data = []
         for row in rows:
-            data.append(str(row[3]))
+            data.append(row[1])
 
-        chdt += ','.join(data)
+        # Set the chart size
+        plt.figure(figsize=(2,4), dpi=100)
 
-        """
-        Basic scroll depth chart
-        cht=bhs
-        chs=250x300
-        chco=4b7ef0
-        chd=t:5,10,15,20,25,30,45,10,20,60
-        chxt=y,x,x
-        chxs=0,666666,10,1,_|1,666666,10,0,_,ffffff
-        chxl=0:|100%|90%|80%|70%|60%|50%|40%|30%|20%|10%|1:|0|25|50|75|100%|2:|Percent%20of%20users
-        chxp=2,50
-        """
+        # Remove the plot frame lines. They are unnecessary chartjunk.
+        ax = plt.subplot(1, 1, 1)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["bottom"].set_visible(False)
+        ax.spines["left"].set_visible(False)
 
-        # Uses the Google Chart API
-        # Super deprecated but still running!
-        # https://developers.google.com/chart/image/docs/chart_params
-        base = 'http://chart.googleapis.com/chart?'
-        base += '&'.join([
-            chdt, # Data
-            'chs=200x315', # Dimensions
-            'chco=4b7ef0', # Colors
-            'cht=bhs',     # Type
-            'chxt=y,x,x',
-            'chxs=0,666666,10,1,_|1,666666,10,0,_,ffffff',
-            'chxl=0:|100%|90%|80%|70%|60%|50%|40%|30%|20%|10%|1:|0|25|50|75|100%|2:|Percent%20of%20users',
-            'chxp=2,50',
-            'chof=png',
-            'chma=10,20,10,10',
-            'chbh=26,1,1', # Width, spacing, group spacing
-            'chds=a' # Auto-scale
-        ])
+        # Ensure that the axis ticks only show up on the bottom and left of the plot.
+        # Ticks on the right and top of the plot are generally unnecessary chartjunk.
+        ax.get_xaxis().tick_bottom()
+        ax.get_yaxis().tick_left()
 
-        # Append chof=validate to the URL to debug errors
-        return base
+        # Configure x-axis ticks
+        plt.xlim(0, 100)
+        ax.tick_params(axis='x', colors='#b8b8b8', labelsize=8, labelbottom='off')
+        plt.axes().xaxis.set_ticks_position('none')
+
+        # Configure y-axis ticks
+        plt.axes().yaxis.set_ticks_position('none')
+        ax.tick_params(axis='y', colors='#b8b8b8', labelsize=7)
+        ax.yaxis.label.set_fontsize(10)
+        plt.yticks(range, ['100%', '90%', '80%', '70%', '60%', '50%', '40%', '30%', '20%', '10%'])
+
+        data = [10, 20, 30, 40, 50, 30, 25, 80, 10, 50]
+        chart = plt.barh(range, data, align="center")
+
+        # TODO: Set colors in one sweep
+        chart[0].set_color('#4b7ef0')
+        chart[1].set_color('#4b7ef0')
+        chart[2].set_color('#4b7ef0')
+        chart[3].set_color('#4b7ef0')
+        chart[4].set_color('#4b7ef0')
+        chart[5].set_color('#4b7ef0')
+        chart[6].set_color('#4b7ef0')
+        chart[7].set_color('#4b7ef0')
+        chart[8].set_color('#4b7ef0')
+        chart[9].set_color('#4b7ef0')
+
+        # TODO: Median line
+        # for bar in chart:
+        #     width = bar.get_width()
+        #     print width
+        #     print bar.get_y()
+        #     if bar.get_y() == 1.6:
+        #         print
+        #         ax.text(
+        #             bar.get_y() + bar.get_height()/2.,
+        #             1.05 * width,
+        #             "MED",
+        #             ha='center',
+        #             va='bottom',
+        #             color='#b8b8b8',
+        #             fontsize=8
+        #         )
+
+        plt.savefig('tmp.png', bbox_inches='tight')
+        f = open('tmp.png', 'rb')
+        url = s3.upload(f)
+        return url
 
 
     """
@@ -95,13 +163,7 @@ class ChartTools:
     """
     @staticmethod
     def linger_histogram_link(rows, median=None):
-        font = {'family' : 'normal',
-                'weight' : 'normal',
-                'size'   : 10,
-                'color'  : '#b8b8b8' }
-
         range = [1,2,3,4,5,6,7,8,9,10]
-
         data = []
         for row in rows:
             data.append(row[1])

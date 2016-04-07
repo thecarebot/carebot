@@ -22,6 +22,7 @@ class Story(Model):
     tracking_started = DateTimeField(default=datetime.datetime.now)
     last_checked = DateTimeField(null = True)
     last_bucket = CharField(null = True)
+    screenshot = CharField(null=True)
 
     def slug_list(self):
         slugs = self.slug.split(',')

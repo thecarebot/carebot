@@ -18,12 +18,14 @@ from util.config import Config
 from scrapers.analytics import GoogleAnalyticsScraper
 from scrapers.nprapi import NPRAPIScraper
 from scrapers.rss import RSSScraper
+from scrapers.screenshot import Screnshotter
 from scrapers.spreadsheet import SpreadsheetScraper
 
 env.user = app_config.SERVER_USER
 env.hosts = app_config.SERVERS
 env.slug = app_config.PROJECT_SLUG
 
+screenshotter = Screnshotter()
 slackTools = SlackTools()
 uploader = Uploader()
 
@@ -196,6 +198,16 @@ def time_bucket(t):
 
     # Too soon to check
     return False
+
+
+@task
+def add_story_screenshots():
+    for story in Story.select().where(Story.screenshot == None):
+        logger.info("About to check %s" % (story.name))
+
+        story.screenshot = screenshotter.get_story_image(story.url)
+        story.save()
+
 
 
 @task

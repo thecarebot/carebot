@@ -13,11 +13,11 @@ class Uploader:
         self.s3 = boto3.resource('s3')
         self.bucket = self.s3.Bucket(app_config.S3_BUCKET)
 
-    def upload(self, data, name=None):
+    def upload(self, data, name=None, dir='graphics'):
         if not name:
             name = str(uuid.uuid4())
 
-        key = 'graphics/' + name + '.png'
+        key = dir + '/' + name + '.png'
 
         obj = self.bucket.put_object(
             Key=key,

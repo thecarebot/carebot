@@ -6,12 +6,14 @@ import time
 
 from util.models import Story
 from scrapers.nprapi import NPRAPIScraper
+from scrapers.screenshot import Screnshotter
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 npr_api_scraper = NPRAPIScraper()
+screenshotter = Screnshotter()
 
 # Right now, we don't care about stories before this time
 MAGIC_DATE_CUTOFF = datetime.date(2016, 02, 28)
@@ -45,6 +47,7 @@ class SpreadsheetScraper:
         new_stories = []
         for story in stories:
             info_from_api = npr_api_scraper.get_story_details(story['story_url'])
+            screenshot_url = screenshotter.get_story_image(story['story_url'])
 
             if not info_from_api:
                 logger.info('Not adding %s to database: could not get story' % (story['story_headline']))
@@ -58,7 +61,8 @@ class SpreadsheetScraper:
                     story_type = story['graphic_type'],
                     url = story['story_url'],
                     image = info_from_api['image'],
-                    team = team
+                    team = team,
+                    screenshot = screenshot_url
                 )
                 new_stories.append(story)
             except IntegrityError:

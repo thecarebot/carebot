@@ -41,3 +41,5 @@ client_secrets*.json
 
 # Deploy
 confs/rendered/*
+
+*.png
