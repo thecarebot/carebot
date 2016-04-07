@@ -28,6 +28,7 @@ odict==1.5.1
 openpyxl==2.3.3
 ordereddict==1.1
 peewee==2.8.0
+Pillow==3.2.0
 ply==3.8
 pyasn1==0.1.9
 pyasn1-modules==0.0.8
