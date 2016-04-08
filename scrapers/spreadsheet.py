@@ -47,28 +47,31 @@ class SpreadsheetScraper:
         new_stories = []
         for story in stories:
             info_from_api = npr_api_scraper.get_story_details(story['story_url'])
-            screenshot_url = screenshotter.get_story_image(story['story_url'])
 
             if not info_from_api:
                 logger.info('Not adding %s to database: could not get story' % (story['story_headline']))
 
-            try:
-                story = Story.create(
-                    name = story['story_headline'],
-                    slug = story['graphic_slug'],
-                    date = info_from_api['date'],
-                    article_posted = info_from_api['date'],
-                    story_type = story['graphic_type'],
-                    url = story['story_url'],
-                    image = info_from_api['image'],
-                    team = team,
-                    screenshot = screenshot_url
-                )
-                new_stories.append(story)
-            except IntegrityError:
-                # Story probably already exists.
-                logger.info('Not adding %s to database: probably already exists' % (story['story_headline']))
-                pass
+            exists = Story.select().where(Story.url == story['story_url'])
+            if exists:
+                logger.info('Not adding %s to database: already exists' % (story['story_headline']))
 
-
+            else:
+                try:
+                    screenshot_url = screenshotter.get_story_image(story['story_url'])
+                    story = Story.create(
+                        name = story['story_headline'].strip(),
+                        slug = story['graphic_slug'].strip(),
+                        date = info_from_api['date'],
+                        article_posted = info_from_api['date'],
+                        story_type = story['graphic_type'].strip(),
+                        url = story['story_url'].strip(),
+                        image = info_from_api['image'],
+                        team = team,
+                        screenshot = screenshot_url
+                    )
+                    new_stories.append(story)
+                except IntegrityError:
+                    # Story probably already exists.
+                    logger.info('Not adding %s to database: probably already exists' % (story['story_headline']))
+                    pass
         return new_stories

@@ -46,6 +46,8 @@ class ChartTools:
         # Fetch the two images
         chart = requests.get(chart_url)
         screenshot = requests.get(screenshot_url)
+        print screenshot.content
+        print screenshot_url
 
         # offset the screenshot so we have a nice buffer.
         # Let's say 10px for now.

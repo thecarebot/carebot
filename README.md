@@ -161,10 +161,10 @@ start. The debug process is fairly annoying, but here are some things that might
 help.
 
 * Logs should be available in `/var/log/upstart/carebot.log`
-* Not all errors go there :-/. You might want to try outputting each command in `confs/bot.conf`, eg `...command >> {{ SERVER_PROJECT_PATH }}/log.txt
+* Not all errors go there :-/. You might want to try outputting each command in `confs/bot.conf`, eg `...command >> {{ SERVER_PROJECT_PATH }}/log.txt`
 * The cron file is `/etc/cron.d/carebot`
 * Cron errors might end up in `/var/log/syslog`; check `tail -100 /var/log/syslog`
-* By defauly, cron errors will be in `/var/log/carebot/`
+* By default, cron errors will be in `/var/log/carebot/`
 
 ## Developing Carebot
 

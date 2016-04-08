@@ -1,4 +1,10 @@
+"""
+Charting playground
+Used for testing image-based charts
+"""
+
 import matplotlib.pyplot as plt
+
 
 font = {'family' : 'normal',
         'weight' : 'normal',
