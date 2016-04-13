@@ -19,7 +19,12 @@ class Screnshotter:
     def get_story_image(self, story_url):
         url = "http://carebot-capture.herokuapp.com/api/image?id=%s&url=%s" % ('storytext', story_url)
         r = requests.get(url)
-        url = s3.upload(r.content, dir='screenshots')
-        return url
+
+        if r.status_code == 200:
+          url = s3.upload(r.content, dir='screenshots')
+          return url
+
+        logger.info("Error % getting screenshot via %s" % (r.status_code, url))
+        return None
 
 

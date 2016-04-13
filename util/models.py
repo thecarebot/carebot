@@ -7,7 +7,7 @@ from util.time import TimeTools
 
 config = Config()
 
-db = SqliteDatabase('carebot.db')
+db = SqliteDatabase(app_config.DATABASE_NAME)
 
 class Story(Model):
     name = CharField(null = True)

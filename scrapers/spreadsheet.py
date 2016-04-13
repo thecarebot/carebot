@@ -43,6 +43,9 @@ class SpreadsheetScraper:
                 logger.info('Not adding %s to database: missing slug or date' % (row['story_headline']))
         return stories
 
+    """
+    Save rows to the database
+    """
     def write(self, stories, team=None):
         new_stories = []
         for story in stories:
@@ -50,6 +53,7 @@ class SpreadsheetScraper:
 
             if not info_from_api:
                 logger.info('Not adding %s to database: could not get story' % (story['story_headline']))
+                pass
 
             exists = Story.select().where(Story.url == story['story_url'])
             if exists:

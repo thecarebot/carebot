@@ -27,6 +27,9 @@ GITHUB_USERNAME = 'thecarebot'
 REPOSITORY_URL = 'https://github.com/%s/%s.git' % (GITHUB_USERNAME, REPOSITORY_NAME)
 REPOSITORY_ALT_URL = None # 'git@bitbucket.org:nprapps/%s.git' % REPOSITORY_NAME'
 
+# What to call the database
+DATABASE_NAME = 'carebot.db'
+
 # S3 info
 S3_BUCKET = os.environ.get('S3_BUCKET')
 

@@ -199,7 +199,6 @@ def time_bucket(t):
     # Too soon to check
     return False
 
-
 @task
 def add_story_screenshots(regenerate=False):
     if regenerate:
@@ -215,8 +214,6 @@ def add_story_screenshots(regenerate=False):
 
             story.screenshot = screenshotter.get_story_image(story.url)
             story.save()
-
-
 
 @task
 def get_story_stats():

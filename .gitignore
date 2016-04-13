@@ -37,7 +37,8 @@ client_secrets*.json
 +sample.env
 .google*
 
-*.xlsx
+data/*.xlsx
++tests/data/*
 
 # Deploy
 confs/rendered/*
