@@ -89,6 +89,13 @@ fab app
 And follow the on-screen instructions. If you have already set up an app using
 the NPR Apps template, you may not have to do this.
 
+### Run the optional screenshot tool
+
+Scroll depth stats use an [optional screenshot tool](https://github.com/thecarebot/screenshotter) to 
+take snaps of your pages. We've hardcoded in the URL to our service and you can run it on your own if 
+you prefer. It runs well on Heroku or any other place you can run a Node app. However, it's totally 
+optional and the bot will run just fine without it. 
+
 ## Running Carebot
 
 ### Run the bot
