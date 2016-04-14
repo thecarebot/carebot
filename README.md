@@ -12,7 +12,33 @@ Carebot is a prototype approach to more meaningful analytics in journalism. We a
 
 The project is currently under development, thanks to a Knight Foundation [Prototype Grant](http://www.knightfoundation.org/grants/201551645/). The first implementation of Carebot is using a Slack bot account (this repo) and a [tracker component](https://github.com/thecarebot/carebot-tracker). This code is free to use. See [license](https://github.com/thecarebot/carebot/blob/master/LICENSE.md) for details.
 
-## Assumptions
+## Using Carebot
+
+Here's how to work with Carebot if it's in your channels. 
+
+### Handy commands
+
+Help!
+
+> @carebot help
+
+To find out details about a story: 
+
+> @carebot slug story-slug-here
+
+> @carebot What's going on with slug story-slug-here?
+
+> @carebot Give me the scoop on slug another-slug-here please! 
+
+To see an overview of the last week: 
+
+> @carebot hello!
+
+Carebot will automatically track stories (see "Running Carebot", below). Sometimes you want to manually add stories to the queue:
+
+> @carebot track story-slug-here http://example.com/story
+
+## Assumptions for developing
 
 The following things are assumed to be true in this documentation.
 
@@ -63,7 +89,7 @@ fab app
 And follow the on-screen instructions. If you have already set up an app using
 the NPR Apps template, you may not have to do this.
 
-## Using Carebot
+## Running Carebot
 
 ### Run the bot
 
@@ -118,7 +144,7 @@ manually:
 fab get_story_stats
 ```
 
-## Deploying the project
+## Carebot in production 
 
 To deploy carebot to production:
 
