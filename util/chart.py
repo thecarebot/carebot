@@ -46,8 +46,6 @@ class ChartTools:
         # Fetch the two images
         chart = requests.get(chart_url)
         screenshot = requests.get(screenshot_url)
-        print screenshot.content
-        print screenshot_url
 
         # offset the screenshot so we have a nice buffer.
         # Let's say 10px for now.
@@ -65,9 +63,6 @@ class ChartTools:
         h_ratio = (c_height - magic_chart_buffer * 2) / float(s_height)
         new_width = int(h_ratio * s_width)
         new_s = screenshot.resize((new_width, c_height - magic_chart_buffer * 2))
-        print chart.size
-        print screenshot.size
-        print new_s.size
 
         full_width = new_width + c_width + magic_chart_buffer * 2
         full_height = c_height
@@ -92,9 +87,17 @@ class ChartTools:
     def scroll_histogram_link(rows, median=None):
         range = [1,2,3,4,5,6,7,8,9,10]
         data = []
-        for row in rows:
-            data.append(row[1])
 
+        # Rows are drawn "upside down" so we need to reverse them:
+        rows.reverse()
+
+        print "Chart with rows"
+        print rows
+        for row in rows:
+            data.append(row[3])
+
+        print "Chart with data"
+        print data
         # Set the chart size
         plt.figure(figsize=(2,4), dpi=100)
 
@@ -121,10 +124,11 @@ class ChartTools:
         ax.yaxis.label.set_fontsize(10)
         plt.yticks(range, ['100%', '90%', '80%', '70%', '60%', '50%', '40%', '30%', '20%', '10%'])
 
-        data = [10, 20, 30, 40, 50, 30, 25, 80, 10, 50]
+        # data = [10, 20, 30, 40, 50, 30, 25, 80, 10, 50]
         chart = plt.barh(range, data, align="center")
 
         # TODO: Set colors in one sweep
+        # Broken out for now in case we want to play with hihlighting segments
         chart[0].set_color('#4b7ef0')
         chart[1].set_color('#4b7ef0')
         chart[2].set_color('#4b7ef0')

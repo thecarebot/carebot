@@ -65,7 +65,6 @@ class GoogleAnalyticsScraper:
 
         return self.query_ga(params)
 
-
     def get_depth_data(self, slug=None):
         if slug:
             filters = 'ga:eventCategory==%s;ga:eventAction==scroll-depth' % slug
@@ -201,19 +200,41 @@ class GoogleAnalyticsScraper:
         rows = self.linger_data_to_rows(data)
         return rows
 
-    def depth_data_to_rows(self, data):
+    """
+    Given a list of [percent_depth, total_users, seconds]
+    1. Find the max number of total_users
+    2. Fill in results before that with that max
+
+    We do this because people with larger screens start on the 20% bucket, or
+    30%, and so the 10% bucket number is often smaller than it technically is.
+    """
+    @staticmethod
+    def fill_in_max(data):
+        max_people = max(data, key=lambda item:item[1])[1]
+
+        for row in data:
+            if row[1] == max_people:
+                break
+
+            row[1] = max_people
+
+        return data
+
+    def process_depth_data(self, data):
         rows = []
         for row in data:
-            row[0] = int(row[0]) # Percent viewed
+            row[0] = int(row[0]) # Percent depth on page
             row[1] = int(row[1]) # Total users
-            row[2] = int(row[2]) # Value
+            row[2] = int(row[2]) # Seconds on page
             rows.append(row)
 
         # Sort the row data from 10% => 100%
         rows.sort(key=lambda tup: tup[0])
 
+        row = GoogleAnalyticsScraper.fill_in_max(rows)
+
         # Calculate the percentage of users
-        total_engaged = rows[0][1]
+        total_engaged = rows[0][1] # 100% of the users see bucket 1.
         for row in rows:
             pct = round((row[1] / total_engaged) * 100)
             row.append(int(pct))
@@ -228,7 +249,7 @@ class GoogleAnalyticsScraper:
             logger.info('No rows found, done.')
             return False
 
-        rows = self.depth_data_to_rows(data.get('rows'))
+        rows = self.process_depth_data(data.get('rows'))
         return rows
 
     def autodiscover_stories(self):
