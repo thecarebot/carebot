@@ -23,4 +23,4 @@ class TestRSS(unittest.TestCase):
         scraper = RSSScraper(FakeSource)
         stories = scraper.scrape()
         self.assertEqual(stories[0]['name'], 'Carebot Design Principles')
-        self.assertEqual(type(stories[1]['article_posted']), datetime.datetime)
+        self.assertEqual(type(stories[1]['date']), datetime.datetime)
