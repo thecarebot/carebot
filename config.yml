@@ -14,5 +14,7 @@ sources:
     team: "carebot"
     type: "rss"
     url: "https://thecarebot.github.io/feed.xml"
-    property: ''
+    date_field: 'published'
+    url_field: 'id'
+    title_fied: 'title'
 

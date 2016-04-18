@@ -122,10 +122,10 @@ def load_spreadsheet(source):
 
 
 def load_rss(source):
-    scraper = RSSScraper(source['url'])
-    stories = scraper.scrape()
-    new_stories = scraper.write(stories, team=source['team'])
-    return new_stories
+    scraper = RSSScraper(source)
+    raw_stories = scraper.scrape()
+    stories = scraper.write(raw_stories, team=source['team'])
+    return stories
 
 @task
 def load_new_stories():

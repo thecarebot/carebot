@@ -15,7 +15,6 @@ class Story(Model):
     story_type = CharField(null=True)
     url = CharField(null=True)
     image = CharField(null=True)
-    date = DateField(null=True)
 
     team = CharField(null=True)
     article_posted = DateTimeField(null = True)

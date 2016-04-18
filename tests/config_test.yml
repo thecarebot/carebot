@@ -12,3 +12,6 @@ sources:
     team: "carebot"
     type: "rss"
     url: "https://thecarebot.github.io/feed.xml"
+    date_field: 'url_field'
+    url_field: 'id'
+    title_fied: 'title'

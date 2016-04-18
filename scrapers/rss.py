@@ -5,6 +5,7 @@ import logging
 from peewee import IntegrityError
 import pytz
 import time
+from urlparse import urlparse
 
 from util.models import Story
 
@@ -13,8 +14,8 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 class RSSScraper:
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, source):
+        self.source = source
 
         # We'll ignore stories older than this.
         self.magic_date_cutoff = datetime.now(pytz.timezone('US/Eastern')) - timedelta(days=5)
@@ -23,19 +24,21 @@ class RSSScraper:
     Scrape an RSS feed
     """
     def scrape(self):
-        feed = feedparser.parse(self.path)
+        feed = feedparser.parse(self.source.url)
         stories = []
         for entry in feed.entries:
-            date = parse(entry.published)
-            slug = entry.id
-            slug = slug.replace('https://thecarebot.github.io//', '') # Temp hack
+            title = entry[self.source.title_field] if self.source.title_field else entry.title
+
+            date = parse(entry[self.source.date_field])
+            link = entry[self.source.url_field]
+            slug = urlparse(link).path #  entry.id
+            slug = slug.replace('//', '') # Temp hack for bad carebot blog urls
 
             # if date > self.magic_date_cutoff:
             stories.append({
-                'name': entry.title,
+                'name': title,
                 'slug': slug,
-                'url': entry.link,
-                'date': date,
+                'url': link,
                 'article_posted': date
             })
 
@@ -50,7 +53,6 @@ class RSSScraper:
                 story = Story.create(
                     name = story['name'],
                     slug = story['slug'],
-                    date = story['date'],
                     article_posted = story['date'],
                     url = story['url'],
                     team = team
