@@ -17,7 +17,7 @@ class Story(Model):
     image = CharField(null=True)
 
     team = CharField(null=True)
-    article_posted = DateTimeField(null = True)
+    date = DateTimeField(null = True)
     tracking_started = DateTimeField(default=datetime.datetime.now)
     last_checked = DateTimeField(null = True)
     last_bucket = CharField(null = True)
@@ -29,7 +29,7 @@ class Story(Model):
         return slugs
 
     def time_bucket(self):
-        return TimeTools.time_bucket(self.article_posted)
+        return TimeTools.time_bucket(self.date)
 
     def channel(self):
         channel = app_config.DEFAULT_CHANNEL

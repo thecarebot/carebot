@@ -224,7 +224,7 @@ def get_story_stats():
     for story in Story.select():
         logger.info("About to check %s" % (story.name))
 
-        story_time_bucket = time_bucket(story.article_posted)
+        story_time_bucket = time_bucket(story.date)
         last_bucket = story.last_bucket
 
         # Check when the story was last reported on
@@ -515,4 +515,3 @@ def shiva_the_destroyer():
         stop_service('bot')
         installed_service_path = _get_installed_conf_path(service, remote_path, extension)
         sudo('rm -f %s' % installed_service_path)
-
