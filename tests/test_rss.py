@@ -12,15 +12,16 @@ from scrapers.rss import RSSScraper
 
 class TestRSS(unittest.TestCase):
     def test_parse(self):
-        class FakeSource:
-            team = "carebot"
-            type = "rss"
-            url = "https://thecarebot.github.io/feed.xml"
-            date_field = 'published'
-            url_field = 'id'
-            title_field = 'title'
+        fake_source = {
+            'team': "carebot",
+            'type': "rss",
+            'url': "https://thecarebot.github.io/feed.xml",
+            'date_field': 'published',
+            'url_field': 'id',
+            'title_field':'title'
+        }
 
-        scraper = RSSScraper(FakeSource)
+        scraper = RSSScraper(fake_source)
         stories = scraper.scrape()
         self.assertEqual(stories[0]['name'], 'Carebot Design Principles')
         self.assertEqual(type(stories[1]['article_posted']), datetime.datetime)

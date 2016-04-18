@@ -24,13 +24,13 @@ class RSSScraper:
     Scrape an RSS feed
     """
     def scrape(self):
-        feed = feedparser.parse(self.source.url)
+        feed = feedparser.parse(self.source['url'])
         stories = []
         for entry in feed.entries:
-            title = entry[self.source.title_field] if self.source.title_field else entry.title
+            title = entry[self.source['title_field']] if self.source['title_field'] else entry.title
 
-            date = parse(entry[self.source.date_field])
-            link = entry[self.source.url_field]
+            date = parse(entry[self.source['date_field']])
+            link = entry[self.source['url_field']]
             slug = urlparse(link).path #  entry.id
             slug = slug.replace('//', '') # Temp hack for bad carebot blog urls
 
