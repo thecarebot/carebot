@@ -32,15 +32,14 @@ class Story(Model):
         return TimeTools.time_bucket(self.date)
 
     def channel(self):
-        channel = app_config.DEFAULT_CHANNEL
+        channel = '#' + config.get_default_team()['channel']
         if self.team:
             teams = config.get_teams()
             try:
                 channel = teams[self.team]['channel']
+                channel = '#' + channel
             except:
                 pass
-
-            channel = '#' + channel
 
         print 'Using channel %s' % channel
         return channel
