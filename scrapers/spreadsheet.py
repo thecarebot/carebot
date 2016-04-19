@@ -6,14 +6,14 @@ import time
 
 from util.models import Story
 from scrapers.nprapi import NPRAPIScraper
-from scrapers.screenshot import Screnshotter
+from scrapers.screenshot import Screenshotter
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 npr_api_scraper = NPRAPIScraper()
-screenshotter = Screnshotter()
+screenshotter = Screenshotter()
 
 # Right now, we don't care about stories before this time
 MAGIC_DATE_CUTOFF = datetime.date(2016, 02, 28)

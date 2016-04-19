@@ -18,14 +18,14 @@ from util.config import Config
 from scrapers.analytics import GoogleAnalyticsScraper
 from scrapers.nprapi import NPRAPIScraper
 from scrapers.rss import RSSScraper
-from scrapers.screenshot import Screnshotter
+from scrapers.screenshot import Screenshotter
 from scrapers.spreadsheet import SpreadsheetScraper
 
 env.user = app_config.SERVER_USER
 env.hosts = app_config.SERVERS
 env.slug = app_config.PROJECT_SLUG
 
-screenshotter = Screnshotter()
+screenshotter = Screenshotter()
 slackTools = SlackTools()
 uploader = Uploader()
 
