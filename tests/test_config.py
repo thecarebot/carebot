@@ -26,4 +26,17 @@ class TestConfig(unittest.TestCase):
     def test_config_get_team_for_channel_default(self):
         config = Config(path='tests/config_test.yml')
         team = config.get_team_for_channel('doesnotexist')
-        self.assertEqual(team, 'viz')
+        self.assertEqual(team, 'default')
+
+    def test_config_get_default_team(self):
+        config = Config(path='tests/config_test.yml')
+        team = config.get_default_team()
+        self.assertEqual(team['ga_org_id'], 'DEFAULT-ID')
+
+    def test_config_get_team_for_story(self):
+        config = Config(path='tests/config_test.yml')
+        class FakeStory:
+            team = 'viz'
+
+        team = config.get_team_for_story(FakeStory)
+        self.assertEqual(team['ga_org_id'], 'visuals-sample-id')

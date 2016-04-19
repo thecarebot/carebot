@@ -12,7 +12,7 @@ logger.setLevel(logging.INFO)
 
 s3 = Uploader()
 
-class Screnshotter:
+class Screenshotter:
     """
     Given a story URL, get a screenshot
     """

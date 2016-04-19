@@ -14,7 +14,7 @@ The project is currently under development, thanks to a Knight Foundation [Proto
 
 ## Using Carebot
 
-Here's how to work with Carebot if it's in your channels. 
+Here's how to work with Carebot if it's in your channels.
 
 ### Handy commands
 
@@ -22,15 +22,15 @@ Help!
 
 > @carebot help
 
-To find out details about a story: 
+To find out details about a story:
 
 > @carebot slug story-slug-here
 
 > @carebot What's going on with slug story-slug-here?
 
-> @carebot Give me the scoop on slug another-slug-here please! 
+> @carebot Give me the scoop on slug another-slug-here please!
 
-To see an overview of the last week: 
+To see an overview of the last week:
 
 > @carebot hello!
 
@@ -91,10 +91,10 @@ the NPR Apps template, you may not have to do this.
 
 ### Run the optional screenshot tool
 
-Scroll depth stats use an [optional screenshot tool](https://github.com/thecarebot/screenshotter) to 
-take snaps of your pages. We've hardcoded in the URL to our service and you can run it on your own if 
-you prefer. It runs well on Heroku or any other place you can run a Node app. However, it's totally 
-optional and the bot will run just fine without it. 
+Scroll depth stats use an [optional screenshot tool](https://github.com/thecarebot/screenshotter) to
+take snaps of your pages. We've hardcoded in the URL to our service and you can run it on your own if
+you prefer. It runs well on Heroku or any other place you can run a Node app. However, it's totally
+optional and the bot will run just fine without it.
 
 ## Running Carebot
 
@@ -108,16 +108,18 @@ After starting the bot, make sure to invite it to the channel you set in `.env`.
 
 ### Configuring Carebot to load new stories
 
-Configure Carebot to pull stores from various sources by customizing `config.yml`.
+Configure Carebot to pull stores from various sources by copying
+ `config.sample.yml` to `config.yml` and customizin the settings.
 
 Under `teams`, define team names and the channel messages for that team should
-post to.
+post to. Make sure you have a default team.
 
-Under `sources` define where content should be pulled from, and what team it
+Under `sources`, define where content should be pulled from, and what team it
 belongs to. Here's an example:
 
 ```
 teams:
+
   viz:
     channel: "visuals-graphics"
   carebot:
@@ -151,7 +153,7 @@ manually:
 fab get_story_stats
 ```
 
-## Carebot in production 
+## Carebot in production
 
 To deploy carebot to production:
 

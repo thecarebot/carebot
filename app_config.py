@@ -52,7 +52,6 @@ Google analytics
 118286276 = carebot
 100688391 = viz
 """
-GA_ORGANIZATION_ID = '100688391'
 GA_SAMPLING_LEVEL = 'HIGHER_PRECISION'
 GA_RESULT_SIZE = 10000
 GA_METRICS = ['sessions', 'pageviews']
