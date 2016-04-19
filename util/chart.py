@@ -84,8 +84,10 @@ class ChartTools:
     Row should be in the format [seconds, count]
     """
     @staticmethod
-    def scroll_histogram_link(rows, median=None):
-        range = [1,2,3,4,5,6,7,8,9,10]
+    def scroll_histogram_link(rows,
+                              median=None,
+                              labels=['100%', '90%', '80%', '70%', '60%', '50%', '40%', '30%', '20%', '10%']):
+        r = range(1, len(rows) + 1)
         data = []
 
         # Rows are drawn "upside down" so we need to reverse them:
@@ -122,23 +124,14 @@ class ChartTools:
         plt.axes().yaxis.set_ticks_position('none')
         ax.tick_params(axis='y', colors='#b8b8b8', labelsize=7)
         ax.yaxis.label.set_fontsize(10)
-        plt.yticks(range, ['100%', '90%', '80%', '70%', '60%', '50%', '40%', '30%', '20%', '10%'])
+        plt.yticks(r, labels)
 
-        # data = [10, 20, 30, 40, 50, 30, 25, 80, 10, 50]
-        chart = plt.barh(range, data, align="center")
+        chart = plt.barh(r, data, align="center")
 
         # TODO: Set colors in one sweep
         # Broken out for now in case we want to play with hihlighting segments
-        chart[0].set_color('#4b7ef0')
-        chart[1].set_color('#4b7ef0')
-        chart[2].set_color('#4b7ef0')
-        chart[3].set_color('#4b7ef0')
-        chart[4].set_color('#4b7ef0')
-        chart[5].set_color('#4b7ef0')
-        chart[6].set_color('#4b7ef0')
-        chart[7].set_color('#4b7ef0')
-        chart[8].set_color('#4b7ef0')
-        chart[9].set_color('#4b7ef0')
+        for index, value in enumerate(data):
+            chart[index].set_color('#4b7ef0')
 
         # TODO: Median line
         # for bar in chart:
@@ -168,8 +161,24 @@ class ChartTools:
     Row should be in the format [seconds, count]
     """
     @staticmethod
-    def linger_histogram_link(rows, median=None):
-        range = [1,2,3,4,5,6,7,8,9,10]
+    def linger_histogram_link(rows,
+                              median=None,
+                              labels=['10s', '20', '30', '40', '50', '1m', '2m', '3m', '4m', '5m+'],
+                              colors = [
+                                '#ffcc00',
+                                '#ffcc00',
+                                '#ffcc00',
+                                '#ffcc00',
+                                '#ffcc00',
+                                '#12b5a3',
+                                '#12b5a3',
+                                '#12b5a3',
+                                '#12b5a3',
+                                '#3612b5',
+                              ]):
+
+        r = range(1, len(rows) + 1)
+
         data = []
         for row in rows:
             data.append(row[1])
@@ -199,19 +208,12 @@ class ChartTools:
         # Configure x-axis ticks
         plt.axes().xaxis.set_ticks_position('none')
         ax.tick_params(axis='x', colors='#b8b8b8', labelsize=8)
-        plt.xticks(range, ['10s', '20', '30', '40', '50', '1m', '2m', '3m', '4m', '5m+'])
+        plt.xticks(r, labels)
 
-        chart = plt.bar(range, data, align="center")
-        chart[0].set_color('#ffcc00')
-        chart[1].set_color('#ffcc00')
-        chart[2].set_color('#ffcc00')
-        chart[3].set_color('#ffcc00')
-        chart[4].set_color('#ffcc00')
-        chart[5].set_color('#12b5a3')
-        chart[6].set_color('#12b5a3')
-        chart[7].set_color('#12b5a3')
-        chart[8].set_color('#12b5a3')
-        chart[9].set_color('#3612b5')
+        chart = plt.bar(r, data, align="center")
+
+        for index, color in enumerate(colors):
+            chart[index].set_color(color)
 
         # Add the median marker
         if median:
