@@ -1,3 +1,7 @@
+[Carebot](http://thecarebot.github.io) is an effort in thinking about alternative ways to look at analytics for journalism: both the measures and indicators used to understand story impact, and the way which analytics data is used in the newsroom. 
+
+
+
 # Carebot: The Slackbot
 
 * [What is this?](#what-is-this)
@@ -7,6 +11,8 @@
 * [Setup analytics](#setup-analytics)
 
 ## What is this?
+
+
 
 Carebot is a prototype approach to more meaningful analytics in journalism. We are [currently developing](https://github.com/thecarebot/carebot/wiki) a set of experimental metrics (measures and indicators) for a variety of storytelling approaches and exploring new ways to offer insights in a timely and conveniant manner to journalists after stories are published.
 
