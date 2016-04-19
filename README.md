@@ -75,7 +75,10 @@ is copied to the server on deploy.
 
 ### NPR API credentials
 
-You'll need a key for the NPR API. You can [register for one here](http://www.npr.org/api/index.php)
+If you're running this internally at NPR, you'll want a key for the NPR API.
+This will be used to pull more details about articles, like primary image and a
+more accurate "published at" date.
+You can [register for one here](http://www.npr.org/api/index.php).
 
 ### Add Google Analytics credentials
 
