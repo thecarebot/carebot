@@ -78,6 +78,12 @@ to make them availabe to the app.
 Copy `sample.env` to `production.env` to store production keys. The appropriate
 `.env` file is copied to the server on deploy.
 
+#### Add S3 credentials
+
+Create an S3 bucket and add the bucket name, access key, and secret to your
+`.env` file. You might want to setup up a user that only has read-write access
+to that bucket; no other Amazon services are needed.
+
 #### Adding a slackbot integration
 
 You'll need to add a slackbot integration to get a `SLACKBOT_API_TOKEN`:
@@ -140,7 +146,6 @@ This will be used to pull more details about articles, like primary image and a
 more accurate "published at" date.
 You can [register for one here](http://www.npr.org/api/index.php).
 
-
 ### Run the optional screenshot tool
 
 Scroll depth stats use an [optional screenshot tool](https://github.com/thecarebot/screenshotter) to
@@ -164,7 +169,8 @@ Configure Carebot to pull stores from various sources by copying
  `config.sample.yml` to `config.yml` and customizin the settings.
 
 Under `teams`, define team names and the channel messages for that team should
-post to. Make sure you have a default team.
+post to. Make sure you have a default team (it can have the same properties as
+another team).
 
 `ga_org_id` should be the ID of the team's Google Analytics account. You can
 find the ID you need using the [Analytics API explorer](https://ga-dev-tools.appspot.com/query-explorer/):
