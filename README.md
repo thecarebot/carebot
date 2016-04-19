@@ -90,7 +90,8 @@ You'll need to add a slackbot integration to get a `SLACKBOT_API_TOKEN`:
 6. Copy the API token to your `.env`
 
 After adding the bot, add it to a slack channel. You might want to set up
-a private channel for testing. Note that you can't make
+a private channel for testing. (Note that you can't make a channel private
+channel public later.)
 
 ####  Add Google Analytics credentials, including `GOOGLE_OAUTH_CLIENT_ID`
 and `GOOGLE_OAUTH_CONSUMER_SECRET`:
