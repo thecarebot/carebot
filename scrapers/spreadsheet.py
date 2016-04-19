@@ -61,7 +61,7 @@ class SpreadsheetScraper:
 
             else:
                 try:
-                    screenshot_url = screenshotter.get_story_image(story['story_url'])
+                    screenshot_url = screenshotter.get_story_image(story=story)
                     story = Story.create(
                         name = story['story_headline'].strip(),
                         slug = story['graphic_slug'].strip(),

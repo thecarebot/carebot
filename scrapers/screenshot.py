@@ -16,8 +16,8 @@ class Screenshotter:
     """
     Given a story URL, get a screenshot
     """
-    def get_story_image(self, story_url):
-        url = "http://carebot-capture.herokuapp.com/api/image?id=%s&url=%s" % ('storytext', story_url)
+    def get_story_image(self, story, article_id='storytext'):
+        url = "http://carebot-capture.herokuapp.com/api/image?id=%s&url=%s" % (article_id, story.url)
         r = requests.get(url)
 
         if r.status_code == 200:

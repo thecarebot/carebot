@@ -189,19 +189,21 @@ def time_bucket(t):
     return False
 
 @task
-def add_story_screenshots(regenerate=False):
+def add_story_screenshots(regenerate=False, article_id='storytext'):
     if regenerate:
         for story in Story.select():
             logger.info("About to check %s" % (story.name))
 
-            story.screenshot = screenshotter.get_story_image(story.url)
+            story.screenshot = screenshotter.get_story_image(story=story,
+                article_id=article_id)
             story.save()
 
     else:
         for story in Story.select().where(Story.screenshot == None):
             logger.info("About to check %s" % (story.name))
 
-            story.screenshot = screenshotter.get_story_image(story.url)
+            story.screenshot = screenshotter.get_story_image(story=story,
+                article_id=article_id)
             story.save()
 
 @task

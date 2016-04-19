@@ -7,7 +7,12 @@ logger.setLevel(logging.INFO)
 
 
 class Config:
-    def __init__(self, path='config.yml'):
+    _DEFAULT_PATH = 'config.yml'
+
+    def __init__(self, path=None):
+        if not path:
+            path = self._DEFAULT_PATH
+
         with open(path, 'r') as yaml_file:
             data = yaml.load(yaml_file)
             self.config = data
