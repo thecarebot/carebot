@@ -4,7 +4,7 @@
 To get Carebot up and running you will need to:
 
 1. Add the [Carebot Tracker](http://github.com/theCarebot/carebot-tracker) to your content.
-2. Set up the Carebot Slackbot to report data through notifications.
+2. Set up the [Carebot Slackbot](#what-is-this) to report data through notifications.
 
 Note: You will need accounts with [Google Analytics](http://analytics.google.com) and [Slack](http://slack.com/create).
 
