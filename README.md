@@ -166,16 +166,25 @@ Configure Carebot to pull stores from various sources by copying
 Under `teams`, define team names and the channel messages for that team should
 post to. Make sure you have a default team.
 
+`ga_org_id` should be the ID of the team's Google Analytics account. You can
+find the ID you need using the [Analytics API explorer](https://ga-dev-tools.appspot.com/query-explorer/):
+select the account, property, and view, then copy the number after `ga:` in
+the `ids` field.
+
 Under `sources`, define where content should be pulled from, and what team it
 belongs to. Here's an example:
 
 ```
 teams:
-
+  default:
+    channel: "visuals-graphics"
+    ga_org_id: "xxxxxxxxx"
   viz:
     channel: "visuals-graphics"
+    ga_org_id: "xxxxxxxxx"
   carebot:
     channel: "carebot-dev"
+    ga_org_id: "xxxxxxxxx"
 sources:
   -
     team: "viz"
@@ -188,9 +197,9 @@ sources:
 
 ```
 
-### Get new stories from the story spreadsheet
+### Load new stories
 
-This is usually run via a cronjob, but you can fire it manually:
+This is usually run via a cronjob, but you can fire it manually to test it out:
 
 ```
 fab load_new_stories
