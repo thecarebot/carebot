@@ -1,6 +1,14 @@
 [Carebot](http://thecarebot.github.io) is an effort in thinking about alternative ways to look at analytics for journalism: both the measures and indicators used to understand story impact, and the way which analytics data is used in the newsroom. 
 
+##Quick Start Guide
+To get Carebot up and running you will need to:
 
+1. Add the [Carebot Tracker](http://github.com/theCarebot/carebot-tracker) to your content.
+2. Set up the Carebot Slackbot to report data through notifications.
+
+Note: You will need a Google Analytics account and a Slack account.
+
+Coming soon: See the **Carebot Newsroom Analytics Guide** for a more detailed walkthrough of how to plan for analytics in the newsroom and make decisions about the right tools for the job.
 
 # Carebot: The Slackbot
 
@@ -12,11 +20,7 @@
 
 ## What is this?
 
-
-
-Carebot is a prototype approach to more meaningful analytics in journalism. We are [currently developing](https://github.com/thecarebot/carebot/wiki) a set of experimental metrics (measures and indicators) for a variety of storytelling approaches and exploring new ways to offer insights in a timely and conveniant manner to journalists after stories are published.
-
-The project is currently under development, thanks to a Knight Foundation [Prototype Grant](http://www.knightfoundation.org/grants/201551645/). The first implementation of Carebot is using a Slack bot account (this repo) and a [tracker component](https://github.com/thecarebot/carebot-tracker). This code is free to use. See [license](https://github.com/thecarebot/carebot/blob/master/LICENSE.md) for details.
+Carebot reports data insights from [tracked metrics](http://github.com/theCarebot/carebot-tracker) in the form of notifications. This slackbot implementation allows you to push those notifications into [Slack](http://slack.com) channels for your team.
 
 ## Using Carebot
 
