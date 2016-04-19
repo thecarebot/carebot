@@ -323,7 +323,6 @@ def start_tracking(message):
                                  slug=slug,
                                  date=details['date'],
                                  url=url.group(1),
-                                 article_posted = details['date'],
                                  image=details['image'],
                                  team=team
                                 )

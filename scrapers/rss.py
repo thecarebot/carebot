@@ -27,10 +27,9 @@ class RSSScraper:
         feed = feedparser.parse(self.source['url'])
         stories = []
         for entry in feed.entries:
-            title = entry[self.source['title_field']] if self.source['title_field'] else entry.title
-
-            date = parse(entry[self.source['date_field']])
-            link = entry[self.source['url_field']]
+            title = entry.title
+            date = parse(entry.published)
+            link = entry.link
             slug = urlparse(link).path #  entry.id
             slug = slug.replace('//', '') # Temp hack for bad carebot blog urls
 
@@ -39,7 +38,7 @@ class RSSScraper:
                 'name': title,
                 'slug': slug,
                 'url': link,
-                'article_posted': date
+                'date': date
             })
 
         return stories
@@ -53,7 +52,7 @@ class RSSScraper:
                 story = Story.create(
                     name = story['name'],
                     slug = story['slug'],
-                    article_posted = story['date'],
+                    date = story['date'],
                     url = story['url'],
                     team = team
                 )

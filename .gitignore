@@ -44,3 +44,4 @@ data/*.xlsx
 confs/rendered/*
 
 *.png
+config.yml

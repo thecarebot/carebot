@@ -50,7 +50,7 @@ class SlackTools:
             return None
 
     def send_tracking_started_message(self, story):
-        if not story.article_posted:
+        if not story.date:
             logger.error("No start date for %s; not announcing." % story.name)
             return
 
@@ -60,7 +60,7 @@ class SlackTools:
                 "color": "good",
                 "pretext": "I just started tracking:",
                 "title": story.name,
-                "text": "Published " + story.article_posted.strftime('%B %d, %Y at %I:%M %p'),
+                "text": "Published " + story.date.strftime('%B %d, %Y at %I:%M %p'),
                 "title_link": story.url,
                 "image_url": story.image
             }
@@ -102,7 +102,7 @@ class SlackTools:
 
     def get_linger_time_message_and_attachment(self, story, stats_per_slug, time_bucket):
         time = self.humanist_time_bucket(stats_per_slug[0]['stats'])
-        hours_since = self.hours_since(story.article_posted)
+        hours_since = self.hours_since(story.date)
 
         if time_bucket == 'hour 4':
             hours_since_message = str(hours_since) + ' hour'

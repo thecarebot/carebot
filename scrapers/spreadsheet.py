@@ -66,7 +66,6 @@ class SpreadsheetScraper:
                         name = story['story_headline'].strip(),
                         slug = story['graphic_slug'].strip(),
                         date = info_from_api['date'],
-                        article_posted = info_from_api['date'],
                         story_type = story['graphic_type'].strip(),
                         url = story['story_url'].strip(),
                         image = info_from_api['image'],
