@@ -26,6 +26,8 @@ class Config:
             if key == story.team:
                 return teams[key]
 
+        return teams['default']
+
     def get_default_team(self):
         teams = self.config['teams']
         print self.config['teams']

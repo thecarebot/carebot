@@ -40,3 +40,11 @@ class TestConfig(unittest.TestCase):
 
         team = config.get_team_for_story(FakeStory)
         self.assertEqual(team['ga_org_id'], 'visuals-sample-id')
+
+    def test_config_get_team_for_story_none(self):
+        config = Config(path='tests/config_test.yml')
+        class FakeStory:
+            team = 'no-such-team'
+
+        team = config.get_team_for_story(FakeStory)
+        self.assertEqual(team['ga_org_id'], 'DEFAULT-ID')

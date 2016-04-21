@@ -57,7 +57,7 @@ def handle_overview_question(message):
     total_users = "{:,}".format(total_users)
 
     median = analytics.get_linger_rate(team=team, start_date='7daysAgo')
-    linger_rows = analytics.get_linger_rows(start_date='7daysAgo')
+    linger_rows = analytics.get_linger_rows(team=team, start_date='7daysAgo')
     linger_histogram_url = ChartTools.linger_histogram_link(linger_rows, median)
 
     attachments = [{
