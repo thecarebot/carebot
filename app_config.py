@@ -20,6 +20,7 @@ PROJECT_SLUG = 'carebot'
 
 # Project name to be used in file paths
 PROJECT_FILENAME = 'carebot'
+PROJECT_TIMEZONE = 'US/Eastern'
 
 # The name of the repository containing the source
 REPOSITORY_NAME = 'carebot'

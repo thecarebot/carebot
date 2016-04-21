@@ -2,6 +2,8 @@ import datetime
 from dateutil.parser import parse
 import pytz
 
+import app_config
+
 import logging
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -13,7 +15,7 @@ Tools for managing charts
 class TimeTools:
     @staticmethod
     def seconds_since(a):
-        now = datetime.datetime.now(pytz.timezone('US/Eastern'))
+        now = datetime.datetime.now(pytz.timezone(app_config.PROJECT_TIMEZONE))
         return (now - a).total_seconds()
 
     @staticmethod

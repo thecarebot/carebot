@@ -23,7 +23,7 @@ class SlackTools:
         if type(a) is not datetime.datetime:
             a = parse(a)
 
-        now = datetime.datetime.now(pytz.timezone('US/Eastern'))
+        now = datetime.datetime.now(pytz.timezone(app_config.PROJECT_TIMEZONE))
         seconds = (now - a).total_seconds()
 
         hours = int(seconds / 60 / 60)

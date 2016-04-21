@@ -136,7 +136,7 @@ def load_new_stories():
             slackTools.send_tracking_started_message(story)
 
 def seconds_since(a):
-    now = datetime.datetime.now(pytz.timezone('US/Eastern'))
+    now = datetime.datetime.now(pytz.timezone(app_config.PROJECT_TIMEZONE))
     return (now - a).total_seconds()
 
 def time_bucket(t):
@@ -238,7 +238,7 @@ def get_story_stats():
             slackTools.send_linger_time_update(story, stats_per_slug, story_time_bucket)
 
         # Mark the story as checked
-        story.last_checked = datetime.datetime.now(pytz.timezone('US/Eastern'))
+        story.last_checked = datetime.datetime.now(pytz.timezone(app_config.PROJECT_TIMEZONE))
         story.last_bucket = story_time_bucket
         story.save()
 

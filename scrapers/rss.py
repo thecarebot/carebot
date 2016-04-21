@@ -7,6 +7,7 @@ import pytz
 import time
 from urlparse import urlparse
 
+import app_config
 from util.models import Story
 
 logging.basicConfig()
@@ -18,7 +19,7 @@ class RSSScraper:
         self.source = source
 
         # We'll ignore stories older than this.
-        self.magic_date_cutoff = datetime.now(pytz.timezone('US/Eastern')) - timedelta(days=5)
+        self.magic_date_cutoff = datetime.now(pytz.timezone(app_config.PROJECT_TIMEZONE)) - timedelta(days=5)
 
     """
     Scrape an RSS feed
