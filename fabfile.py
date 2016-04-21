@@ -407,9 +407,6 @@ def deploy_confs():
 
 @task
 def deploy_analytics_conf():
-    # put('client_secrets.json', '%(SERVER_PROJECT_PATH)s/client_secrets.json' % app_config.__dict__)
-    put('analytics.dat', '%(SERVER_PROJECT_PATH)s/analytics.dat' % app_config.__dict__)
-
     # Move google ouath credentials
     local('cp ~/.google_oauth_credentials ./.google_oauth_credentials')
     put('.google_oauth_credentials', '~/.google_oauth_credentials')
