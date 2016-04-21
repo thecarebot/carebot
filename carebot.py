@@ -51,11 +51,12 @@ def handle_overview_question(message):
         for slug in story_slugs:
             slugs.add(slug)
 
-    total_users = analytics.get_user_data(start_date='7daysAgo')
+    team = config.get_team_for_story(stories[0])
+    total_users = analytics.get_user_data(team=team, start_date='7daysAgo')
     total_users = int(total_users['rows'][0][0])
     total_users = "{:,}".format(total_users)
 
-    median = analytics.get_linger_rate(start_date='7daysAgo')
+    median = analytics.get_linger_rate(team=team, start_date='7daysAgo')
     linger_rows = analytics.get_linger_rows(start_date='7daysAgo')
     linger_histogram_url = ChartTools.linger_histogram_link(linger_rows, median)
 
@@ -99,7 +100,9 @@ def handle_scroll_slug_question(message):
 
     if slug:
         stories = Story.select().where(Story.slug.contains(slug))
-        rows = analytics.get_depth_rate(slug)
+
+        team = config.get_team_for_story(story)
+        rows = analytics.get_depth_rate(team=team, slug=slug)
 
         if rows:
             reply = u"Here's what I know about `%s`." % slug
@@ -113,7 +116,8 @@ def handle_scroll_slug_question(message):
             histogram_url = ChartTools.scroll_histogram_link(rows)
 
             if story.screenshot:
-                histogram_url = ChartTools.add_screenshot_to_chart(story.screenshot, histogram_url)
+                histogram_url = ChartTools.add_screenshot_to_chart(story.screenshot,
+                    histogram_url)
 
             attachments = [
                 {
@@ -139,8 +143,13 @@ def handle_slug_question(message):
     slug = m.group(1)
 
     if slug:
-        median = analytics.get_linger_rate(slug)
         stories = Story.select().where(Story.slug.contains(slug))
+        if stories:
+            team = config.get_team_for_story(stories[0])
+        else:
+            team = config.get_default_team()
+
+        median = analytics.get_linger_rate(team=team, slug=slug)
 
         message.reply("Ok! I'm looking up %s. This may take a second." % slug)
 
@@ -157,11 +166,11 @@ def handle_slug_question(message):
                 reply += '\n' + '*<%s|%s>*' % (story.url, story.name.strip())
 
             # Get linger rate data
-            linger_rows = analytics.get_linger_rows(slug)
+            linger_rows = analytics.get_linger_rows(team=team, slug=slug)
             linger_histogram_url = ChartTools.linger_histogram_link(linger_rows, median)
 
-            all_graphics_rows = analytics.get_linger_rows()
-            all_graphics_median = analytics.get_linger_rate()
+            all_graphics_rows = analytics.get_linger_rows(team=team)
+            all_graphics_median = analytics.get_linger_rate(team=team)
             all_histogram = ChartTools.linger_histogram_link(all_graphics_rows, all_graphics_median)
 
             attachments = [
@@ -180,7 +189,7 @@ def handle_slug_question(message):
             ]
 
             # Get scroll data, if any.
-            scroll_depth_rows = analytics.get_depth_rate(slug)
+            scroll_depth_rows = analytics.get_depth_rate(team=team, slug=slug)
             if scroll_depth_rows:
                 scroll_histogram_url = ChartTools.scroll_histogram_link(scroll_depth_rows)
 

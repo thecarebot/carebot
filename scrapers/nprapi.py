@@ -1,4 +1,3 @@
-import copytext
 from dateutil.parser import parse
 import json
 import logging

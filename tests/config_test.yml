@@ -1,8 +1,13 @@
 teams:
+  default:
+    channel: "default-channel"
+    ga_org_id: "DEFAULT-ID"
   viz:
     channel: "visuals-graphics"
+    ga_org_id: "visuals-sample-id"
   carebot:
     channel: "carebot-dev"
+    ga_org_id: "sample"
 sources:
   -
     team: "viz"

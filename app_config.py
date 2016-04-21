@@ -26,6 +26,7 @@ REPOSITORY_NAME = 'carebot'
 GITHUB_USERNAME = 'thecarebot'
 REPOSITORY_URL = 'https://github.com/%s/%s.git' % (GITHUB_USERNAME, REPOSITORY_NAME)
 REPOSITORY_ALT_URL = None # 'git@bitbucket.org:nprapps/%s.git' % REPOSITORY_NAME'
+DEFAULT_CONFIG_PATH = 'config.yml'
 
 # What to call the database
 DATABASE_NAME = 'carebot.db'
@@ -35,7 +36,6 @@ S3_BUCKET = os.environ.get('S3_BUCKET')
 
 # Slack info
 SLACK_KEY = os.environ.get('SLACKBOT_API_TOKEN')
-DEFAULT_CHANNEL = os.environ.get('SLACK_CHANNEL')
 
 # Dailygraphics archive
 COPY_GOOGLE_DOC_KEY = '0Ak3IIavLYTovdGdpcXlFS1lBaVE5aEJqcG1nMUFTVWc'
@@ -52,7 +52,6 @@ Google analytics
 118286276 = carebot
 100688391 = viz
 """
-GA_ORGANIZATION_ID = '100688391'
 GA_SAMPLING_LEVEL = 'HIGHER_PRECISION'
 GA_RESULT_SIZE = 10000
 GA_METRICS = ['sessions', 'pageviews']

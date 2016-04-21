@@ -1,4 +1,3 @@
-import copytext
 from dateutil.parser import parse
 import logging
 import requests
@@ -12,12 +11,15 @@ logger.setLevel(logging.INFO)
 
 s3 = Uploader()
 
-class Screnshotter:
-    """
-    Given a story URL, get a screenshot
-    """
-    def get_story_image(self, story_url):
-        url = "http://carebot-capture.herokuapp.com/api/image?id=%s&url=%s" % ('storytext', story_url)
+class Screenshotter:
+    def get_story_image(self, story_url, article_id='storytext'):
+        """
+        Get a screenshot of a story
+
+       :param str story_url The URL of the story
+       :param str article_id The CSS ID of the element that contains the story
+        """
+        url = "http://carebot-capture.herokuapp.com/api/image?id=%s&url=%s" % (article_id, story_url)
         r = requests.get(url)
 
         if r.status_code == 200:

@@ -18,14 +18,14 @@ from util.config import Config
 from scrapers.analytics import GoogleAnalyticsScraper
 from scrapers.nprapi import NPRAPIScraper
 from scrapers.rss import RSSScraper
-from scrapers.screenshot import Screnshotter
+from scrapers.screenshot import Screenshotter
 from scrapers.spreadsheet import SpreadsheetScraper
 
 env.user = app_config.SERVER_USER
 env.hosts = app_config.SERVERS
 env.slug = app_config.PROJECT_SLUG
 
-screenshotter = Screnshotter()
+screenshotter = Screenshotter()
 slackTools = SlackTools()
 uploader = Uploader()
 
@@ -105,14 +105,6 @@ def app(port='8000'):
 Data tasks
 """
 
-@task
-def test_upload():
-    uploader = Uploader()
-    data = open('./test.gif', 'rb')
-    f = uploader.upload(data)
-    print f
-
-
 def load_spreadsheet(source):
     get_document(source['doc_key'], app_config.STORIES_PATH)
     scraper = SpreadsheetScraper()
@@ -129,6 +121,9 @@ def load_rss(source):
 
 @task
 def load_new_stories():
+    """
+    Goes through your configured sources and scrapes any new articles.
+    """
     sources = config.get_sources()
     for source in sources:
         if source['type'] == 'spreadsheet':
@@ -139,12 +134,6 @@ def load_new_stories():
 
         for story in stories:
             slackTools.send_tracking_started_message(story)
-
-
-@task
-def get_linger_rate():
-    scraper = GoogleAnalyticsScraper()
-    stats = scraper.get_linger_rate('space-time-stepper-20160208')
 
 def seconds_since(a):
     now = datetime.datetime.now(pytz.timezone('US/Eastern'))
@@ -200,19 +189,21 @@ def time_bucket(t):
     return False
 
 @task
-def add_story_screenshots(regenerate=False):
+def add_story_screenshots(regenerate=False, article_id='storytext'):
     if regenerate:
         for story in Story.select():
             logger.info("About to check %s" % (story.name))
 
-            story.screenshot = screenshotter.get_story_image(story.url)
+            story.screenshot = screenshotter.get_story_image(story_url=story.url,
+                article_id=article_id)
             story.save()
 
     else:
         for story in Story.select().where(Story.screenshot == None):
             logger.info("About to check %s" % (story.name))
 
-            story.screenshot = screenshotter.get_story_image(story.url)
+            story.screenshot = screenshotter.get_story_image(story_url=story.url,
+                article_id=article_id)
             story.save()
 
 @task
