@@ -1,4 +1,4 @@
-[Carebot](http://thecarebot.github.io) is an effort in thinking about alternative ways to look at analytics for journalism: both the measures and indicators used to understand story impact, and the way which analytics data is used in the newsroom. 
+[Carebot](http://thecarebot.github.io) is an effort in thinking about alternative ways to look at analytics for journalism: both the measures and indicators used to understand story impact, and the way which analytics data is used in the newsroom.
 
 ##Quick Start Guide
 To get Carebot up and running you will need to:
@@ -118,10 +118,9 @@ Google account.
 First, you'll need to create a Google API project via the [Google developer
 console](http://console.developers.google.com).
 
-Enable the Drive and Analytics APIs for your project and create a "web
-application" client ID.
+Then, enable the Drive and Analytics APIs for your project.
 
-For the redirect URIs use:
+Finally, create a "web application" client ID. For the redirect URIs use:
 
 * `http://localhost:8000/authenticate/`
 * `http://127.0.0.1:8000/authenticate`
