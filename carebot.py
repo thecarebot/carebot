@@ -383,6 +383,7 @@ def reply(message, text):
 
 def main():
     bot = Bot()
+    print "Carebot is running. Invite it to a channel to begin."
     bot.run()
 
 if __name__ == "__main__":
