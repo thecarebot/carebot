@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # http://stackoverflow.com/questions/10277397/python-mock-patch-a-function-within-another-function
 
+import app_config
+app_config.DATABASE_NAME = 'carebot_test.db'
+app_config.DEFAULT_CONFIG_PATH = 'tests/config_test.yml'
+
 try:
     import unittest2 as unittest
 except ImportError:
@@ -10,13 +14,11 @@ from datetime import date
 from mock import patch
 from mock import ANY
 
-import app_config
 from fabfile import get_story_stats
 from scrapers.spreadsheet import SpreadsheetScraper
 from util.models import Story
 from tests.test_util.db import clear_stories
 
-app_config.DATABASE_NAME = 'carebot_test.db'
 
 class TestGetStoryStats(unittest.TestCase):
 

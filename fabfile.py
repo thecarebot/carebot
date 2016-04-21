@@ -194,7 +194,7 @@ def add_story_screenshots(regenerate=False, article_id='storytext'):
         for story in Story.select():
             logger.info("About to check %s" % (story.name))
 
-            story.screenshot = screenshotter.get_story_image(story=story,
+            story.screenshot = screenshotter.get_story_image(story_url=story.url,
                 article_id=article_id)
             story.save()
 
@@ -202,7 +202,7 @@ def add_story_screenshots(regenerate=False, article_id='storytext'):
         for story in Story.select().where(Story.screenshot == None):
             logger.info("About to check %s" % (story.name))
 
-            story.screenshot = screenshotter.get_story_image(story=story,
+            story.screenshot = screenshotter.get_story_image(story_url=story.url,
                 article_id=article_id)
             story.save()
 

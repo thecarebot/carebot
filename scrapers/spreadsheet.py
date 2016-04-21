@@ -22,31 +22,38 @@ class SpreadsheetScraper:
     """
     From https://github.com/tarbell-project/tarbell/blob/1.0.5/tarbell/app.py#L251
     """
-    def parse_date(self, value):
+
+    @staticmethod
+    def parse_date(value):
+        """
+        Attemts to parse a date from Excel into something the rest of the world
+        can use.
+        """
         value = float(value)
         seconds = (value - 25569) * 86400.0
         parsed = datetime.datetime.utcfromtimestamp(seconds).date()
         return parsed
 
-    """
-    Scrape the NPR Visuals 'did we touch it?' spreadsheet
-    """
     def scrape_spreadsheet(self, filename):
+        """
+        Scrape the NPR Visuals 'did we touch it?' spreadsheet
+        """
+
         stories = []
         spreadsheet = copytext.Copy(filename)
         data = spreadsheet['published']
         for row in data:
             if str(row['graphic_slug']) is not '' and str(row['date']) is not '':
-                if self.parse_date(row['date']) > MAGIC_DATE_CUTOFF:
+                if SpreadsheetScraper.parse_date(row['date']) > MAGIC_DATE_CUTOFF:
                     stories.append(row)
             else:
                 logger.info('Not adding %s to database: missing slug or date' % (row['story_headline']))
         return stories
 
-    """
-    Save rows to the database
-    """
     def write(self, stories, team=None):
+        """
+        Save rows to the database
+        """
         new_stories = []
         for story in stories:
             info_from_api = npr_api_scraper.get_story_details(story['story_url'])
@@ -61,7 +68,7 @@ class SpreadsheetScraper:
 
             else:
                 try:
-                    screenshot_url = screenshotter.get_story_image(story=story)
+                    screenshot_url = screenshotter.get_story_image(story_url=story['story_url'])
                     story = Story.create(
                         name = story['story_headline'].strip(),
                         slug = story['graphic_slug'].strip(),

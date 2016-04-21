@@ -5,13 +5,13 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+import app_config
+
 
 class Config:
-    _DEFAULT_PATH = 'config.yml'
-
     def __init__(self, path=None):
         if not path:
-            path = self._DEFAULT_PATH
+            path = app_config.DEFAULT_CONFIG_PATH
 
         with open(path, 'r') as yaml_file:
             data = yaml.load(yaml_file)
