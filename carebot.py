@@ -101,7 +101,7 @@ def handle_scroll_slug_question(message):
     if slug:
         stories = Story.select().where(Story.slug.contains(slug))
 
-        team = config.get_team_for_story(story)
+        team = config.get_team_for_story(stories[0])
         rows = analytics.get_depth_rate(team=team, slug=slug)
 
         if rows:
