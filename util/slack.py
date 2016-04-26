@@ -118,50 +118,20 @@ class SlackTools:
                 time
             )
 
-        if time_bucket == 'hour 8':
-            message = ("%s hours in and _%s_ had users spending about *%s* "
-                "interacting with the graphic.") % (
-                hours_since,
-                story.name,
-                time
-            )
-
-        if time_bucket == 'hour 12':
-            message = ("So far, users have spent an average of *%s* viewing the "
-                "graphic on _%s_.") % (
-                time,
-                story.name
-            )
-
-        if time_bucket == 'day 1 hour 10':
-            message = ("It's been %s hours since publishing _%s_ and users have"
-                " spent, on average, *%s* studying the graphic.") % (
-                hours_since,
-                story.name,
-                time
-            )
-
-        if time_bucket == 'day 1 hour 15':
-            message = ("_%s_ has had users study the graphic for *%s*, on average.") % (
-                story.name,
-                time
-            )
-
-        if time_bucket == 'day 2 hour 10':
-            message = ("After 2 days, _%s_ users have spent, on average, *%s* "
-                "studying the graphic.") % (
-                story.name,
-                time
-                )
-
-        if time_bucket == 'day 2 hour 15':
-            message = ("_%s_ users have viewed the graphic for *%s*, on average."
+        if time_bucket == 'Two and a half days':
+            message = ("%s in, users viewed the graphic on _%s_ for an average *%s*."
                 "\n\n"
-                "I'll keep tracking _%s_ but won't ping you again with updates."
-                " Let me know if this has been useful. <3") % (
+                "I'll keep tracking this story but won't ping you again with updates.") % (
+                hours_since,
+                story.name,
+                time
+            )
+
+        else:
+            message = ("%s in, users viewed the graphic on _%s_ for an average *%s*.") % (
+                hours_since,
                 story.name,
                 time,
-                story.name
             )
 
 

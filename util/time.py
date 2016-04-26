@@ -36,10 +36,10 @@ class TimeTools:
         seconds_since_second_day = TimeTools.seconds_since(second_day_midnight_after_publishing)
 
         if seconds_since_second_day > 15 * 60 * 60: # 15 hours
-            return 'day 2 hour 15'
+            return 'Two and a half days'
 
         if seconds_since_second_day > 10 * 60 * 60: # 10 hours
-            return 'day 2 hour 10'
+            return 'Two days'
 
         # 5th message, 1st day midnight + 10 hours
         # 6th message, 1st day midnight + 15 hours
@@ -48,22 +48,22 @@ class TimeTools:
         seconds_since_first_day = TimeTools.seconds_since(midnight_after_publishing)
 
         if seconds_since_second_day > 10 * 60 * 60: # 15 hours
-            return 'day 1 hour 15'
+            return 'A day and a half'
 
         if seconds_since_second_day > 10 * 60 * 60: # 10 hours
-            return 'day 1 hour 10'
+            return 'A day'
 
         # 2nd message, tracking start + 4 hours
         # 3rd message, tracking start + 8 hours
         # 4th message, tracking start + 12 hours
         if seconds > 12 * 60 * 60: # 12 hours
-            return 'hour 12'
+            return '12 hours'
 
         if seconds > 8 * 60 * 60: # 8 hours
-            return 'hour 8'
+            return '8 hours'
 
         if seconds > 4 * 60 * 60: # 4 hours
-            return 'hour 4'
+            return '4 hours'
 
         # Too soon to check
         return False
