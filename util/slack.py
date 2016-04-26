@@ -5,6 +5,8 @@ import pytz
 from slacker import Slacker
 import app_config
 
+from util.chart import ChartTools
+
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -176,3 +178,45 @@ class SlackTools:
 
         logger.info(message)
         self.slack.chat.post_message(channel, message, as_user=True, parse='full', attachments=attachments)
+
+    def send_scroll_depth_update(self, story, data, time_bucket):
+        channel = story.channel()
+
+        message = ("%s hours in and here's what I know about the graphics on _%s_:") % (
+            self.hours_since(story.date),
+            story.name,
+        )
+
+        # remove `Baseline` from data
+        data = data[1:]
+
+        histogram_url = ChartTools.scroll_histogram_link(data, labels=(
+            '100%', '75%', '50%', '25%',))
+
+        if story.screenshot:
+            histogram_url = ChartTools.add_screenshot_to_chart(
+                story.screenshot, histogram_url)
+
+        fields = []
+
+        for row in data:
+            fields.append({
+                "title": row[0],
+                "value": row[2],
+                "short": True,
+            })
+
+        attachments = [
+            {
+                "fallback": story.name + " update",
+                "color": "#eeeeee",
+                "title": story.name,
+                "title_link": story.url,
+                "fields": fields,
+                "image_url": histogram_url,
+            }
+        ]
+
+        self.slack.chat.post_message(
+            channel, message, as_user=True, parse='full',
+            attachments=attachments)

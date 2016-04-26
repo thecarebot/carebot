@@ -231,11 +231,16 @@ def get_story_stats():
             logger.info("Story is too new; skipping for now")
             continue
 
+        # Get linger data for a story
         # Some stories have multiple slugs
         stats_per_slug = analytics.get_linger_data_for_story(story)
-
         if len(stats_per_slug) is not 0:
             slackTools.send_linger_time_update(story, stats_per_slug, story_time_bucket)
+
+        # Get scroll depth data for a story
+        stats_per_slug = analytics.get_depth_rate_for_story(story)
+        if len(stats_per_slug) is not 0:
+            slackTools.send_scroll_depth_update(story, stats_per_slug, story_time_bucket)
 
         # Mark the story as checked
         story.last_checked = datetime.datetime.now(pytz.timezone(app_config.PROJECT_TIMEZONE))

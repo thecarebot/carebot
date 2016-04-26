@@ -23,13 +23,17 @@ from tests.test_util.db import clear_stories
 class TestGetStoryStats(unittest.TestCase):
 
     @patch('scrapers.analytics.GoogleAnalyticsScraper.get_linger_data_for_story')
+    @patch('scrapers.analytics.GoogleAnalyticsScraper.get_depth_rate_for_story')
     @patch('util.slack.SlackTools.send_linger_time_update')
+    @patch('util.slack.SlackTools.send_scroll_depth_update')
     @patch('util.s3.Uploader.upload')
     @patch('fabfile.time_bucket')
     def test_get_story_stats(self,
                              mock_time_bucket,
                              mock_upload,
-                             mock_update,
+                             mock_depth_update,
+                             mock_linger_update,
+                             mock_depth,
                              mock_linger,
                             ):
 
@@ -43,10 +47,27 @@ class TestGetStoryStats(unittest.TestCase):
                 'seconds': 30
             }
         }]
-        mock_upload.return_value = 'http://image-url-here'
         mock_linger.return_value = linger_data
+        depth_data =  [{
+            'slug': 'slug-here',
+            'stats': [
+                [
+                    10, # Percent on page
+                    1000, # Total users
+                    13, # Seconds on page
+                    100 # Percent of users
+                ],
+                [
+                    100, # Percent on page
+                    150, # Total users
+                    26, # Seconds on page
+                    15 # Percent of users
+                ]
+            ]
+        }]
+        mock_depth.return_value = depth_data
+        mock_upload.return_value = 'http://image-url-here'
         mock_time_bucket.return_value = 'time bucket'
-
 
         # Load a fake story
         clear_stories()
@@ -57,5 +78,6 @@ class TestGetStoryStats(unittest.TestCase):
         get_story_stats()
 
         # Check the updater
-        mock_update.assert_called_once_with(stories[0], linger_data, 'time bucket')
+        mock_linger_update.assert_called_once_with(stories[0], linger_data, 'time bucket')
+        mock_depth_update.assert_called_once_with(stories[0], depth_data, 'time bucket')
 

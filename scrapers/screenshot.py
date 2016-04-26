@@ -28,5 +28,3 @@ class Screenshotter:
 
         logger.info("Error % getting screenshot via %s" % (r.status_code, url))
         return None
-
-
