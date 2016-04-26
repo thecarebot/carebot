@@ -273,8 +273,8 @@ who viewed it.
 story.
 
 Lately I have been focusing on graphics-only stories. I start tracking a story \
-when it is published on npr.org. I start posting notifications when someone \
-adds the story to the graphics spreadsheet. You'll hear from me every \
+when it is published. I start posting notifications when someone \
+adds the story to an RSS feed or story spreadsheet. You'll hear from me every \
 4 hours on the first day and twice daily for days two and and three.
 
 If you ask me about a specific graphic, I'll give you the most up to date \
