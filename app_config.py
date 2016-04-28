@@ -32,6 +32,11 @@ DEFAULT_CONFIG_PATH = 'config.yml'
 # What to call the database
 DATABASE_NAME = 'carebot.db'
 
+# Admin login
+SECRET_KEY = os.environ.get('SECRET_KEY')
+ADMIN_USER = os.environ.get('ADMIN_USER')
+ADMIN_PASS = os.environ.get('ADMIN_PASS')
+
 # S3 info
 S3_BUCKET = os.environ.get('S3_BUCKET')
 

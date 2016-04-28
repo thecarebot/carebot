@@ -10,6 +10,8 @@ et-xmlfile==1.0.1
 Fabric==1.4.3
 feedparser==5.2.1
 Flask==0.9
+Flask-Admin==1.4.0
+Flask-BasicAuth==0.2.0
 funcsigs==1.0.0
 futures==3.0.5
 google-api-python-client==1.4.2
@@ -53,3 +55,4 @@ ssh==1.8.0
 uritemplate==0.6
 websocket-client==0.35.0
 Werkzeug==0.8.3
+wtf-peewee==0.2.6
