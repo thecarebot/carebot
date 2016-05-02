@@ -6,7 +6,7 @@ from slackbot.bot import listen_to
 
 # Import the various chat plugins
 from plugins.npr.help import NPRHelp
-from plugins.npr.scrolldepth import NPRScrolldepth
+from plugins.npr.scrolldepth import NPRScrollDepth
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ logger.setLevel(logging.INFO)
 
 PLUGINS = [
     NPRHelp(),
-    NPRScrolldepth()
+    NPRScrollDepth(),
 ]
 
 """

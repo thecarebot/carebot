@@ -3,13 +3,13 @@ from util.config import Config
 from plugins.base import CarebotPlugin
 
 
-class NPRScrolldepth(CarebotPlugin):
+class NPRScrollDepth(CarebotPlugin):
     """
     Get scroll depth stats on NPR stories
     """
 
     def __init__(self, *args, **kwargs):
-        super(NPRScrolldepth, self).__init__(*args, **kwargs)
+        super(NPRScrollDepth, self).__init__(*args, **kwargs)
 
 
     def get_slug_query_params(self, slug):
