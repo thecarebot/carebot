@@ -6,15 +6,17 @@ import app_config
 from oauth import get_credentials
 from util.config import Config
 
+
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 config = Config()
 
-class GoogleAnalyticsScraper:
+class GoogleAnalytics:
     def __init__(self):
         self.run_time = datetime.utcnow()
+
 
     @staticmethod
     def median(lst):
@@ -26,6 +28,7 @@ class GoogleAnalyticsScraper:
             return sorted_lst[index]
         else:
             return (sorted_lst[index] + sorted_lst[index + 1])/2.0
+
 
     @staticmethod
     def median_of_time_buckets(time_buckets):
@@ -42,12 +45,14 @@ class GoogleAnalyticsScraper:
         median = GoogleAnalyticsScraper.median(lst)
         return int(median)
 
-    def query_ga(self, params):
+    @staticmethod
+    def query_ga(params):
         api_url = 'https://www.googleapis.com/analytics/v3/data/ga'
         credentials = get_credentials()
         resp = app_config.authomatic.access(credentials, api_url, params=params)
         data = resp.data
         return data
+
 
     def get_user_data(self, team, start_date=None):
 
@@ -67,6 +72,7 @@ class GoogleAnalyticsScraper:
         }
 
         return self.query_ga(params)
+
 
     # based on http://scrolldepth.parsnip.io/ event data
     def get_scroll_depth_depth_data(self, slug=None):
@@ -250,6 +256,7 @@ class GoogleAnalyticsScraper:
 
         return data
 
+
     def process_scroll_depth_data(self, data):
         rows = []
 
@@ -270,6 +277,7 @@ class GoogleAnalyticsScraper:
 
         truncated = rows[:10]
         return truncated
+
 
     def process_depth_data(self, data):
         rows = []
@@ -293,6 +301,7 @@ class GoogleAnalyticsScraper:
         truncated = rows[:10]
         return truncated
 
+
     def get_depth_rate(self, team, slug=None):
         data = self.get_depth_data(team=team, slug=slug)
 
@@ -303,40 +312,42 @@ class GoogleAnalyticsScraper:
         rows = self.process_scroll_depth_data(data.get('rows'))
         return rows
 
-    def get_depth_rate_for_story(self, story):
-        """
-        Get the scroll depth stats for a story.
-        Returns a list of stats per slug in the format
-        [{
-            slug: my-slug-here,
-            stats: [
-                [
-                    Percent depth on page,
-                    Total users,
-                    Seconds on page,
-                    Percentage of users
-                ], ...
-            ]
-        }, ...]
-        """
-        story_slugs = story.slug_list()
-        stats_per_slug = []
 
-        team = config.get_team_for_story(story)
+    # def get_depth_rate_for_story(self, story):
+    #     """
+    #     Get the scroll depth stats for a story.
+    #     Returns a list of stats per slug in the format
+    #     [{
+    #         slug: my-slug-here,
+    #         stats: [
+    #             [
+    #                 Percent depth on page,
+    #                 Total users,
+    #                 Seconds on page,
+    #                 Percentage of users
+    #             ], ...
+    #         ]
+    #     }, ...]
+    #     """
+    #     story_slugs = story.slug_list()
+    #     stats_per_slug = []
+#
+    #     team = config.get_team_for_story(story)
+#
+    #     # Get the linger rate for each slug
+    #     for slug in story_slugs:
+    #         stats = self.get_depth_rate(team=team, slug=slug)
+    #         if stats:
+    #             stats_per_slug.append({
+    #                 "slug": slug,
+    #                 "stats": stats
+    #             })
+#
+    #         else:
+    #             logger.info("No stats found for %s" % (slug))
+#
+    #     return stats_per_slug
 
-        # Get the linger rate for each slug
-        for slug in story_slugs:
-            stats = self.get_depth_rate(team=team, slug=slug)
-            if stats:
-                stats_per_slug.append({
-                    "slug": slug,
-                    "stats": stats
-                })
-
-            else:
-                logger.info("No stats found for %s" % (slug))
-
-        return stats_per_slug
 
     @staticmethod
     def sort_scroll_depth(data):
