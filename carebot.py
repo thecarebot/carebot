@@ -7,14 +7,19 @@ from slackbot.bot import listen_to
 # Import the various chat plugins
 from plugins.npr.help import NPRHelp
 from plugins.npr.scrolldepth import NPRScrollDepth
+from plugins.npr.linger import NPRLingerRate
+from util.slack import SlackTools
+
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+slackTools = SlackTools()
 
 PLUGINS = [
     NPRHelp(),
     NPRScrollDepth(),
+    NPRLingerRate(),
 ]
 
 """
@@ -36,16 +41,22 @@ def response_dispatcher(message, text=None):
     if not text:
         text = message.body['text']
 
-
+    any_match = False
     for listener in listeners:
         match = listener[1].findall(text)
         if match:
             logger.info("Dispatching to %s with message %s" % (listener[0], message.body['text']))
+            any_match = True
             reply = listener[2](message)
-            message.reply(reply)
-            return # Stop at the first match.
 
-    message.reply("Hi! I got your message, but I don't know enough yet to respond to it.")
+            slackTools.send_message(
+                message.body['channel'],
+                reply['text'],
+                reply.get('attachments', None)
+            )
+
+    if not any_match:
+        message.reply("Hi! I got your message, but I don't know enough yet to respond to it.")
 
 
 @listen_to('^@*[Cc]arebot[:|,]\s*(.*)', re.IGNORECASE)

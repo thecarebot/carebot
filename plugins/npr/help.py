@@ -1,7 +1,6 @@
 import re
 
 from util.analytics import GoogleAnalytics
-from util.config import Config
 from plugins.base import CarebotPlugin
 
 
@@ -52,6 +51,8 @@ Just mention me with the word "slug" followed by your slug:
 I am learning to answer questions so if you have them, please send them over and \
 I'll get cracking!
 """
-        return text
-        #     slackTools.send_message(message.body['channel'], text)
+
+        return {
+            'text': text
+        }
 

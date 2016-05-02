@@ -17,34 +17,6 @@ class GoogleAnalytics:
     def __init__(self):
         self.run_time = datetime.utcnow()
 
-
-    @staticmethod
-    def median(lst):
-        sorted_lst = sorted(lst)
-        list_len = len(lst)
-        index = (list_len - 1) // 2
-
-        if list_len % 2:
-            return sorted_lst[index]
-        else:
-            return (sorted_lst[index] + sorted_lst[index + 1])/2.0
-
-
-    @staticmethod
-    def median_of_time_buckets(time_buckets):
-        lst = []
-
-        # Flatten the [seconds, count] tuples
-        # This is a really bad way to do this!
-        # Yuuuuge number of objects created!
-        # TODO: calculate bucket quickly :-)
-        for bucket in time_buckets:
-            for _ in range(bucket[1]):
-                lst.append(bucket[0])
-
-        median = GoogleAnalyticsScraper.median(lst)
-        return int(median)
-
     @staticmethod
     def query_ga(params):
         api_url = 'https://www.googleapis.com/analytics/v3/data/ga'
@@ -52,7 +24,6 @@ class GoogleAnalytics:
         resp = app_config.authomatic.access(credentials, api_url, params=params)
         data = resp.data
         return data
-
 
     def get_user_data(self, team, start_date=None):
 
@@ -119,29 +90,6 @@ class GoogleAnalytics:
 
         return self.query_ga(params)
 
-    def get_linger_data(self, team, slug=None, start_date=None):
-        if slug:
-            filters = 'ga:eventCategory==%s;ga:eventAction==on-screen;ga:eventLabel==10s,ga:eventLabel==20s,ga:eventLabel==30s,ga:eventLabel==40s,ga:eventLabel==50s,ga:eventLabel==1m,ga:eventLabel==2m,ga:eventLabel==3m,ga:eventLabel==4m,ga:eventLabel==5m,ga:eventLabel==10m' % slug
-        else:
-            filters = 'ga:eventAction==on-screen;ga:eventLabel==10s,ga:eventLabel==20s,ga:eventLabel==30s,ga:eventLabel==40s,ga:eventLabel==50s,ga:eventLabel==1m,ga:eventLabel==2m,ga:eventLabel==3m,ga:eventLabel==4m,ga:eventLabel==5m,ga:eventLabel==10m'
-
-        if not start_date:
-            start_date = '90daysAgo'
-
-        params = {
-            'ids': 'ga:{0}'.format(team['ga_org_id']),
-            'start-date': start_date, # start_date.strftime('%Y-%m-%d'),
-            'end-date': 'today',
-            'metrics': 'ga:totalEvents',
-            'dimensions': 'ga:eventLabel',
-            'sort': '-ga:totalEvents',
-            'filters': filters,
-            'max-results': app_config.GA_RESULT_SIZE,
-            'samplingLevel': app_config.GA_SAMPLING_LEVEL,
-            'start-index': 1,
-        }
-
-        return self.query_ga(params)
 
     def get_linger_data_for_story(self, story):
         story_slugs = story.slug_list()
@@ -163,78 +111,6 @@ class GoogleAnalytics:
 
         return stats_per_slug
 
-    def linger_data_to_rows(self, data):
-        rows = []
-        for row in data['rows']:
-            time = row[0]
-            seconds = 0
-            if 'm' in time:
-                time = time[:-1] # remove 'm' from the end
-                seconds = int(time) * 60
-            else:
-                time = time[:-1] # remove 's'
-                seconds = int(time)
-
-            row[0] = seconds
-            row[1] = int(row[1])
-            rows.append(row)
-
-        # Calculate the number of visitors in each bucket
-        for index, row in enumerate(rows):
-            if index == len(rows) - 1:
-                continue
-
-            next_row = rows[index + 1]
-            row[1] = row[1] - next_row[-1]
-
-        # Exclude everybody in the last bucket
-        # (they've been lingering for way too long -- 10+ minutes)
-        rows = rows[:-1]
-        return rows
-
-    def get_linger_rate(self, team, slug=None, start_date=None):
-        if slug:
-            data = self.get_linger_data(team=team, slug=slug, start_date=start_date)
-        else:
-            data = self.get_linger_data(team=team, start_date=start_date)
-
-        if not data.get('rows'):
-            logger.info('No rows found, done.')
-            return False
-
-        rows = self.linger_data_to_rows(data)
-
-        # Get the average number of seconds
-        total_seconds = 0
-        total_people = 0
-        for row in rows:
-            total_seconds = total_seconds + (row[0] * row[1])
-            total_people = total_people + row[1]
-        # average_seconds = total_seconds/total_people
-
-        average_seconds = self.median_of_time_buckets(rows)
-        minutes = int(average_seconds / 60)
-        seconds = average_seconds % 60
-
-        return {
-            'total_people': total_people,
-            'raw_avg_seconds': average_seconds,
-            'minutes': minutes,
-            'seconds': seconds
-        }
-
-    def get_linger_rows(self, team, slug=None, start_date=None):
-        if slug:
-            data = self.get_linger_data(team=team, slug=slug, start_date=start_date)
-        else:
-            data = self.get_linger_data(team=team, start_date=start_date)
-
-        if not data.get('rows'):
-            logger.info('No rows found, done.')
-            return False
-
-        rows = self.linger_data_to_rows(data)
-        return rows
 
     """
     Given a list of [percent_depth, total_users, seconds]
