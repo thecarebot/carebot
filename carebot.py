@@ -11,7 +11,7 @@ from util.slack import SlackTools
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-slackTools = SlackTools()
+slack_tools = SlackTools()
 
 """
 Go through the plugins and add any listeners we need
@@ -41,7 +41,7 @@ def response_dispatcher(message, text=None):
             reply = listener[2](message)
 
             if reply:
-                slackTools.send_message(
+                slack_tools.send_message(
                     message.body['channel'],
                     reply['text'],
                     reply.get('attachments', None)

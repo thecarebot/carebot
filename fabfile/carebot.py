@@ -19,7 +19,7 @@ from scrapers.npr_spreadsheet import SpreadsheetScraper
 
 config = Config()
 screenshotter = Screenshotter()
-slackTools = SlackTools()
+slack_tools = SlackTools()
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -66,7 +66,7 @@ def load_new_stories():
             stories = load_rss(source)
 
         for story in stories:
-            slackTools.send_tracking_started_message(story)
+            slack_tools.send_tracking_started_message(story)
 
 def seconds_since(a):
     """
@@ -193,7 +193,7 @@ def get_story_stats():
             try:
                 message = plugin.get_update_message(story)
                 if message:
-                    slackTools.send_message(
+                    slack_tools.send_message(
                         team['channel'],
                         message['text'],
                         message.get('attachments', None)

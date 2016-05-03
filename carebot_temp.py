@@ -25,7 +25,7 @@ inflector = inflect.engine()
 analytics = GoogleAnalyticsScraper()
 
 
-slackTools = SlackTools()
+slack_tools = SlackTools()
 npr_api_scraper = NPRAPIScraper()
 config = Config()
 
@@ -36,60 +36,7 @@ logger.setLevel(logging.INFO)
 LINGER_RATE_REGEX = re.compile(ur'slug ((\w*-*)+)')
 SCROLL_RATE_REGEX = re.compile(ur'scroll ((\w*-*)+)')
 GRUBER_URLINTEXT_PAT = re.compile(ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
-START_TRACKING_REGEX = re.compile(ur'[Tt]rack (((\w*-*)+,?)+)')
 HELLO_REGEX = re.compile(ur'Hello', re.IGNORECASE)
-
-
-START_TRACKING_REGEX = re.compile(ur'[Tt]rack (((\w*-*)+,?)+)')
-
-def start_tracking(message):
-    m = re.search(START_TRACKING_REGEX, message.body['text'])
-
-    if not m:
-        return False
-
-    slug = m.group(1)
-
-    if slug:
-        # Check if the slug is in the database.
-        try:
-            story = Story.select().where(Story.slug.contains(slug)).get()
-            message.reply("Thanks! I'm already tracking `%s`, and you should start seeing results within a couple hours." % slug)
-        except Story.DoesNotExist:
-
-            # If it's not in the database, start tracking it.
-            url = re.search(GRUBER_URLINTEXT_PAT, message.body['text'])
-
-            if not url:
-                logger.error("Couldn't find story URL in message %s", message.body['text'])
-                message.reply("Sorry, I need a story URL to start tracking.")
-                return
-
-            details = npr_api_scraper.get_story_details(url.group(1))
-
-            if not details:
-                logger.error("Couldn't find story in API for URL %s", url.group(1))
-                message.reply("Sorry, I wasn't able to find that story in the API, so I couldn't start tracking it.")
-                return
-
-            # Find out what team we need to save this story to
-            channel = slackTools.get_channel_name(message.body['channel'])
-            team = config.get_team_for_channel(channel)
-
-            # Create the story
-            story = Story.create(name=details['title'],
-                                 slug=slug,
-                                 date=details['date'],
-                                 url=url.group(1),
-                                 image=details['image'],
-                                 team=team
-                                )
-            story.save()
-            message.reply("Ok, I've started tracking `%s`. The first stats should arrive in 4 hours or less." % slug)
-
-    else:
-        message.reply("Sorry, I wasn't able to start tracking `%s` right now." % slug)
-
 
 def handle_overview_question(message):
     message.reply("Let me check what's been happening. This may take a second.")
@@ -119,8 +66,8 @@ def handle_overview_question(message):
         "image_url": linger_histogram_url
     }]
 
-    slackTools.send_message(message.body['channel'], "In the past 7 days, I've tracked %s stories and %s graphics." % (len(stories), len(slugs)))
-    slackTools.send_message(message.body['channel'], "%s people looked at graphics on those stories. Here's how much time they spent:" % total_users, attachments, unfurl_links=False)
+    slack_tools.send_message(message.body['channel'], "In the past 7 days, I've tracked %s stories and %s graphics." % (len(stories), len(slugs)))
+    slack_tools.send_message(message.body['channel'], "%s people looked at graphics on those stories. Here's how much time they spent:" % total_users, attachments, unfurl_links=False)
 
     fields = []
     for story in stories:
@@ -138,7 +85,7 @@ def handle_overview_question(message):
         "fields": fields
     }]
 
-    slackTools.send_message(message.body['channel'], "Here's everything:", attachments, unfurl_links=False)
+    slack_tools.send_message(message.body['channel'], "Here's everything:", attachments, unfurl_links=False)
 
 
 def handle_scroll_slug_question(message):
@@ -179,7 +126,7 @@ def handle_scroll_slug_question(message):
                 }
             ]
 
-            slackTools.send_message(message.body['channel'], reply, attachments, unfurl_links=False)
+            slack_tools.send_message(message.body['channel'], reply, attachments, unfurl_links=False)
 
         else:
             message.reply("I wasn't able to find scroll data for %s" % slug)
@@ -255,7 +202,7 @@ def handle_slug_question(message):
                 })
 
 
-            slackTools.send_message(message.body['channel'], reply, attachments, unfurl_links=False)
+            slack_tools.send_message(message.body['channel'], reply, attachments, unfurl_links=False)
 
         else:
             message.reply("I wasn't able to figure out the linger rate of %s" % slug)
@@ -309,4 +256,4 @@ def handle_linger_update(message):
 
         # Use send_message instead of message.reply, otherwise we lose
         # the bot icon.
-        slackTools.send_message(message.body['channel'], reply, attachments)
+        slack_tools.send_message(message.body['channel'], reply, attachments)

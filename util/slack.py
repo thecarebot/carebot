@@ -33,6 +33,9 @@ class SlackTools:
             self.slack.chat.post_message(channel, message, as_user=True, unfurl_links=unfurl_links)
 
     def get_channel_name(self, channel_id):
+        """
+        Given a Channel ID, get the name of the channel from the Slack API
+        """
         try:
             results = self.slack.channels.info(channel_id)
             results['name']
@@ -56,33 +59,12 @@ class SlackTools:
                 "image_url": story.image
             }
         ]
-
         channel = story.channel()
-
         self.slack.chat.post_message(channel, "", as_user=True, attachments=attachments)
         logger.info("Started tracking %s with image %s" % (story.name, story.image))
 
-    def humanist_time_bucket(self, linger):
-        time = ''
-        if linger['minutes'] > 0:
-            time += str(linger['minutes'])
-            if linger['minutes'] == 1:
-                time += ' minute'
-            else:
-                time += ' minutes'
 
-        if linger['seconds'] > 0:
-            if linger['minutes'] > 0:
-                time += ' '
-
-            time += str(linger['seconds'])
-            if linger['seconds'] == 1:
-                time += ' second'
-            else:
-                time += ' seconds'
-
-        return time
-
+    """
     def send_scroll_depth_update(self, story, data, time_bucket):
         channel = story.channel()
 
@@ -124,3 +106,4 @@ class SlackTools:
         self.slack.chat.post_message(
             channel, message, as_user=True, parse='full',
             attachments=attachments)
+    """
