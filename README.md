@@ -292,8 +292,16 @@ The `CarebotPlugin` base class in `/plugins/base.py`.
 
 To enable a plugin, include it in `registry.py` and add it to the `PLUGINS`
 list in that same file. This will automatically register any listeners and
-regular updates (`get_listeners` and `get_update_message` functions in your
-plugin)
+regular updates.
+
+The optional `get_listeners` funciton should return a list of regular
+expressions and  corresponding handler functions that will match and respond to
+incoming slack messages.
+
+Carebot will regularly check every story in the database. If the story has not
+been checked recently, the optional `get_update_message` function of each plugin
+will be called. You can return a mesage and attachments, for example with the
+latest stat for the article.
 
 ### Tests
 
