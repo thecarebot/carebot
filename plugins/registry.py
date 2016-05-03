@@ -6,8 +6,8 @@ from plugins.npr.start_tracking import NPRStartTracking
 # Set up the plugins carebot will use
 PLUGINS = [
     NPRHelp(),
-    NPRScrollDepth(),
     NPRLingerRate(),
-    NPRStartTracking()
+    NPRScrollDepth(),
+    NPRStartTracking(),
 ]
 
