@@ -217,7 +217,7 @@ sources:
 This is usually run via a cronjob, but you can fire it manually to test it out:
 
 ```
-fab load_new_stories
+fab carebot.load_new_stories
 ```
 
 ### Get stats on stories
@@ -226,7 +226,7 @@ This is usually run via a cronjob after `load_new_stories`, but you can fire it
 manually:
 
 ```
-fab get_story_stats
+fab carebot.get_story_stats
 ```
 
 ## Carebot in production
