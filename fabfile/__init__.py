@@ -1,14 +1,16 @@
 import app_config
 import copy
-import datetime
-from dateutil.parser import parse
 from fabric.api import *
 from fabric.state import env
 from jinja2 import Template
 import logging
-import pytz
-from slacker import Slacker
 
+import carebot
+
+
+"""
+General configuration
+"""
 
 env.user = app_config.SERVER_USER
 env.hosts = app_config.SERVERS
@@ -18,27 +20,12 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-"""
-Base configuration
-"""
 env.user = app_config.SERVER_USER
 env.forward_agent = True
 
 env.hosts = []
 env.settings = None
 
-slack = Slacker(app_config.SLACK_KEY)
-
-SECONDS_BETWEEN_CHECKS = 1 * 60 * 60 # 1 hour
-MAX_SECONDS_SINCE_POSTING = 3 * 24 * 60 * 60 # 2 days
-
-"""
-MINUTES_BETWEEN_CHECKS = 15
-MINUTES_BETWEEN_REPORTS = [
-    240,  # 4 hours
-    480   # 8 hours
-]
-"""
 
 """
 Configuration

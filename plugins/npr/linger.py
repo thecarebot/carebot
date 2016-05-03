@@ -240,33 +240,82 @@ class NPRLingerRate(CarebotPlugin):
         url = s3.upload(f)
         return url
 
+    def get_stats_for_slug(self, team, slug):
+        # Query Google Analytics
+        linger_rows = self.get_linger_data(team=team, slug=slug)
+
+        if not linger_rows:
+            return False
+
+        median = self.get_median(linger_rows)
+        return {
+            'median': median,
+            'people': "{:,}".format(median['total_people']),
+            'time_text': TimeTools.humanist_time_bucket(median)
+        }
+
     def get_update_message(self, story):
         """
-        TODO
         Handle periodic checks on the metric.
         For each slug in the story, get the analytics we need, and craft
         an relevant update message.
         """
-        story_slugs = self.story.slug_list()
+        story_slugs = story.slug_list()
+        team = config.get_team_for_story(story)
+        hours_since = TimeTools.hours_since(story.date)
+
         messages = []
 
-        for slug in story_slugs:
-            # Query Google Analytics
-            params = self.get_query_params(slug=slug, team=team)
-            data = GoogleAnalytics.query_ga(params)
+        if len(story_slugs) > 1:
+            # Some stories have many slugs.
+            # We break out the stats into a nice little grid so they're
+            # easier to hear.
+            message = ("%s hours in and here's what I know about the graphics on _%s_:") % (
+                hours_since,
+                story.name
+            )
 
-            if not data.get('rows'):
-                logger.info('No rows found for slug %s' % slug)
+            fields = []
+            for slug in story_slugs:
+                stats = self.get_stats_for_slug(team=team, slug=slug)
+                if stats:
+                    fields.append({
+                        "title": slug,
+                        "value": stats['time_text'],
+                        "short": True
+                    })
+            attachments = [
+                {
+                    "fallback": story.name + " update",
+                    "color": "#eeeeee",
+                    "title": story.name,
+                    "title_link": story.url,
+                    "fields": fields
+                }
+            ]
 
-            # Clean up the data
-            clean_data = self.clean_data(data)
-            median = self.get_median(clean_data)
-            total_people = self.get_total_people(clean_data)
-            friendly_people = "{:,}".format(total_people) # Comma-separated #s
+            return {
+                'text': message,
+                'attachments': attachments
+            }
 
-            # Craft the message
-            message = "%s hours in and %s have spent a median %s hours on the graphic" % hours, people, median
-            return message
+        else:
+            # For stories with only one slug, we have a slightly different
+            # message:
+            stats = self.get_stats_for_slug(team=team, slug=story_slugs[0])
+            if stats:
+                message = "%s hours in, *%s users* have spent a median *%s* on _%s_ (`%s`)" % (
+                    hours_since,
+                    stats['people'],
+                    stats['time_text'],
+                    story.name,
+                    story_slugs[0]
+                )
+
+                return {
+                    'text': message
+                }
+
 
     def respond(self, message):
         """

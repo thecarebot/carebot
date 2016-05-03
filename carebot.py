@@ -4,7 +4,6 @@ from slackbot.bot import Bot
 from slackbot.bot import respond_to
 from slackbot.bot import listen_to
 
-# Import the various chat plugins
 from plugins.registry import PLUGINS
 from util.slack import SlackTools
 
@@ -41,11 +40,12 @@ def response_dispatcher(message, text=None):
             any_match = True
             reply = listener[2](message)
 
-            slackTools.send_message(
-                message.body['channel'],
-                reply['text'],
-                reply.get('attachments', None)
-            )
+            if reply:
+                slackTools.send_message(
+                    message.body['channel'],
+                    reply['text'],
+                    reply.get('attachments', None)
+                )
 
     if not any_match:
         message.reply("Hi! I got your message, but I don't know enough yet to respond to it.")

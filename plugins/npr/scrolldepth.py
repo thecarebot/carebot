@@ -1,7 +1,15 @@
+import logging
+
+import app_config
 from util.analytics import GoogleAnalytics
 from util.config import Config
 from plugins.base import CarebotPlugin
 
+config = Config()
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 class NPRScrollDepth(CarebotPlugin):
     """
@@ -12,7 +20,7 @@ class NPRScrollDepth(CarebotPlugin):
         super(NPRScrollDepth, self).__init__(*args, **kwargs)
 
 
-    def get_slug_query_params(self, slug):
+    def get_slug_query_params(self, team, slug=None):
         """
         Given a slug, get parameters needed to query google analytics for the
         scroll depth
@@ -20,7 +28,7 @@ class NPRScrollDepth(CarebotPlugin):
         filters = 'ga:eventCategory==%s;ga:eventAction==scroll-depth' % slug
 
         params = {
-            'ids': 'ga:{0}'.format(self.team['ga_org_id']),
+            'ids': 'ga:{0}'.format(team['ga_org_id']),
             'start-date': '90daysAgo', # start_date.strftime('%Y-%m-%d'),
             'end-date': 'today',
             'metrics': 'ga:users,ga:eventValue',
@@ -41,6 +49,7 @@ class NPRScrollDepth(CarebotPlugin):
         """
         rows = []
         for row in data:
+            print row
             row[0] = int(row[0]) # Percent depth on page
             row[1] = int(row[1]) # Total users
             row[2] = int(row[2]) # Seconds on page
@@ -81,20 +90,22 @@ class NPRScrollDepth(CarebotPlugin):
         pass
 
 
-    def get_update_message(self):
+    def get_update_message(self, story):
         """
         For each slug in the story, get the analytics we need, and craft
         an update message for each.
         """
-        story_slugs = self.story.slug_list()
+        story_slugs = story.slug_list()
+        team = config.get_team_for_story(story)
         messages = []
 
         for slug in story_slugs:
             # Query Google Analytics
-            params = self.get_slug_query_params(slug=slug)
+            params = self.get_slug_query_params(team=team, slug=slug)
             data = GoogleAnalytics.query_ga(params)
             if not data.get('rows'):
                 logger.info('No rows found for slug %s' % slug)
+                return
 
             # Clean up the data
             clean_data = self.clean_data(data)
@@ -105,7 +116,9 @@ class NPRScrollDepth(CarebotPlugin):
             # Craft the mssages
             message = "%s people got a median of %s% down the page" % people, median
 
-
+        return {
+            'text': message
+        }
 
     # def responds_to(self, story):
 

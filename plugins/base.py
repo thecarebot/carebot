@@ -14,6 +14,15 @@ class CarebotPlugin(object):
 
         This will likely implement a "get_story_stats" method that pulls the
         appropriate stats for each slug in the story.
+
+        Should return a message in the format
+        {
+            'text': 'Update text here',
+            'attachments': [
+                (optional) slack attachments, see slack documentation:
+                https://api.slack.com/docs/attachments
+            ]
+        }
         """
         raise NotImplementedError("Update message is not implmeneted")
 

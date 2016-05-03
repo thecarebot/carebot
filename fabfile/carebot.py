@@ -1,5 +1,13 @@
+
+import datetime
+from dateutil.parser import parse
+from fabric.api import task
+import logging
+import pytz
+
 import app_config
 from oauth import get_document
+from plugins.registry import PLUGINS
 from util.models import Story
 from util.slack import SlackTools
 from util.config import Config
@@ -8,10 +16,14 @@ from scrapers.rss import RSSScraper
 from scrapers.screenshot import Screenshotter
 from scrapers.npr_spreadsheet import SpreadsheetScraper
 
+
 config = Config()
 screenshotter = Screenshotter()
 slackTools = SlackTools()
-uploader = Uploader()
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 """
 Data tasks
@@ -160,6 +172,7 @@ def get_story_stats():
     for story in Story.select():
         logger.info("About to check %s" % (story.name))
 
+        team = config.get_team_for_story(story)
         story_time_bucket = time_bucket(story.date)
         last_bucket = story.last_bucket
 
@@ -170,26 +183,24 @@ def get_story_stats():
             # And stories that are too old.
             if (last_bucket == story_time_bucket):
                 logger.info("Checked recently. Bucket is still %s" % (story_time_bucket))
-                continue
+                # continue
 
         if not story_time_bucket:
             logger.info("Story is too new; skipping for now")
-            continue
+            # continue
 
-        """
-        # TODO replace this part with the new auto-register code
-        # Get linger data for a story
-        # Some stories have multiple slugs
-        stats_per_slug = analytics.get_linger_data_for_story(story)
-        if len(stats_per_slug) is not 0:
-            slackTools.send_linger_time_update(story, stats_per_slug, story_time_bucket)
+        for plugin in PLUGINS:
+            try:
+                message = plugin.get_update_message(story)
+                if message:
+                    slackTools.send_message(
+                        team['channel'],
+                        message['text'],
+                        message.get('attachments', None)
+                    )
 
-        # Get scroll depth data for a story
-        stats_per_slug = analytics.get_depth_rate_for_story(story)
-        if len(stats_per_slug) is not 0:
-            slackTools.send_scroll_depth_update(story, stats_per_slug, story_time_bucket)
-        """
-
+            except NotImplementedError:
+                pass
 
         # Mark the story as checked
         story.last_checked = datetime.datetime.now(pytz.timezone(app_config.PROJECT_TIMEZONE))
