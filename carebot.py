@@ -44,7 +44,8 @@ def response_dispatcher(message, text=None):
                 slack_tools.send_message(
                     message.body['channel'],
                     reply['text'],
-                    reply.get('attachments', None)
+                    reply.get('attachments', None),
+                    unfurl_links=False,
                 )
 
     if not any_match:
