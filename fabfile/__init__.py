@@ -1,62 +1,31 @@
 import app_config
 import copy
-import datetime
-from dateutil.parser import parse
 from fabric.api import *
 from fabric.state import env
 from jinja2 import Template
 import logging
-import pytz
-from slacker import Slacker
 
-import app_config
-from oauth import get_document
-from util.models import Story
-from util.slack import SlackTools
-from util.s3 import Uploader
-from util.config import Config
-from scrapers.analytics import GoogleAnalyticsScraper
-from scrapers.nprapi import NPRAPIScraper
-from scrapers.rss import RSSScraper
-from scrapers.screenshot import Screenshotter
-from scrapers.spreadsheet import SpreadsheetScraper
+import carebot
+
+
+"""
+General configuration
+"""
 
 env.user = app_config.SERVER_USER
 env.hosts = app_config.SERVERS
 env.slug = app_config.PROJECT_SLUG
 
-screenshotter = Screenshotter()
-slackTools = SlackTools()
-uploader = Uploader()
-
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-config = Config()
-
-
-"""
-Base configuration
-"""
 env.user = app_config.SERVER_USER
 env.forward_agent = True
 
 env.hosts = []
 env.settings = None
 
-slack = Slacker(app_config.SLACK_KEY)
-
-SECONDS_BETWEEN_CHECKS = 1 * 60 * 60 # 1 hour
-MAX_SECONDS_SINCE_POSTING = 3 * 24 * 60 * 60 # 2 days
-
-"""
-MINUTES_BETWEEN_CHECKS = 15
-MINUTES_BETWEEN_REPORTS = [
-    240,  # 4 hours
-    480   # 8 hours
-]
-"""
 
 """
 Configuration
@@ -102,152 +71,6 @@ def app(port='8000'):
 
 
 """
-Data tasks
-"""
-
-def load_spreadsheet(source):
-    get_document(source['doc_key'], app_config.STORIES_PATH)
-    scraper = SpreadsheetScraper()
-    stories = scraper.scrape_spreadsheet(app_config.STORIES_PATH)
-    new_stories = scraper.write(stories, team=source['team'])
-    return new_stories
-
-
-def load_rss(source):
-    scraper = RSSScraper(source)
-    raw_stories = scraper.scrape()
-    stories = scraper.write(raw_stories, team=source['team'])
-    return stories
-
-@task
-def load_new_stories():
-    """
-    Goes through your configured sources and scrapes any new articles.
-    """
-    sources = config.get_sources()
-    for source in sources:
-        if source['type'] == 'spreadsheet':
-            stories = load_spreadsheet(source)
-
-        elif source['type'] == 'rss':
-            stories = load_rss(source)
-
-        for story in stories:
-            slackTools.send_tracking_started_message(story)
-
-def seconds_since(a):
-    now = datetime.datetime.now(pytz.timezone(app_config.PROJECT_TIMEZONE))
-    return (now - a).total_seconds()
-
-def time_bucket(t):
-    if not t:
-        return False
-
-    # For some reason, dates with timezones tend to be returned as unicode
-    if type(t) is not datetime.datetime:
-        t = parse(t)
-
-    seconds = seconds_since(t)
-
-    # 7th message, 2nd day midnight + 10 hours
-    # 8th message, 2nd day midnight + 15 hours
-    second_day_midnight_after_publishing = t + datetime.timedelta(days=2)
-    second_day_midnight_after_publishing.replace(hour = 0, minute = 0, second=0, microsecond = 0)
-    seconds_since_second_day = seconds_since(second_day_midnight_after_publishing)
-
-    if seconds_since_second_day > 15 * 60 * 60: # 15 hours
-        return 'day 2 hour 15'
-
-    if seconds_since_second_day > 10 * 60 * 60: # 10 hours
-        return 'day 2 hour 10'
-
-    # 5th message, 1st day midnight + 10 hours
-    # 6th message, 1st day midnight + 15 hours
-    midnight_after_publishing = t + datetime.timedelta(days=1)
-    midnight_after_publishing.replace(hour = 0, minute = 0, second=0, microsecond = 0)
-    seconds_since_first_day = seconds_since(midnight_after_publishing)
-
-    if seconds_since_second_day > 10 * 60 * 60: # 15 hours
-        return 'day 1 hour 15'
-
-    if seconds_since_second_day > 10 * 60 * 60: # 10 hours
-        return 'day 1 hour 10'
-
-    # 2nd message, tracking start + 4 hours
-    # 3rd message, tracking start + 8 hours
-    # 4th message, tracking start + 12 hours
-    if seconds > 12 * 60 * 60: # 12 hours
-        return 'hour 12'
-
-    if seconds > 8 * 60 * 60: # 8 hours
-        return 'hour 8'
-
-    if seconds > 4 * 60 * 60: # 4 hours
-        return 'hour 4'
-
-    # Too soon to check
-    return False
-
-@task
-def add_story_screenshots(regenerate=False, article_id='storytext'):
-    if regenerate:
-        for story in Story.select():
-            logger.info("About to check %s" % (story.name))
-
-            story.screenshot = screenshotter.get_story_image(story_url=story.url,
-                article_id=article_id)
-            story.save()
-
-    else:
-        for story in Story.select().where(Story.screenshot == None):
-            logger.info("About to check %s" % (story.name))
-
-            story.screenshot = screenshotter.get_story_image(story_url=story.url,
-                article_id=article_id)
-            story.save()
-
-@task
-def get_story_stats():
-    analytics = GoogleAnalyticsScraper()
-
-    # TODO use a SQL query instead of app logic to exclude stories that are
-    # too old.
-    for story in Story.select():
-        logger.info("About to check %s" % (story.name))
-
-        story_time_bucket = time_bucket(story.date)
-        last_bucket = story.last_bucket
-
-        # Check when the story was last reported on
-        if last_bucket:
-
-            # Skip stories that have been checked recently
-            # And stories that are too old.
-            if (last_bucket == story_time_bucket):
-                logger.info("Checked recently. Bucket is still %s" % (story_time_bucket))
-                continue
-
-        if not story_time_bucket:
-            logger.info("Story is too new; skipping for now")
-            continue
-
-        # Get linger data for a story
-        # Some stories have multiple slugs
-        stats_per_slug = analytics.get_linger_data_for_story(story)
-        if len(stats_per_slug) is not 0:
-            slackTools.send_linger_time_update(story, stats_per_slug, story_time_bucket)
-
-        # Get scroll depth data for a story
-        stats_per_slug = analytics.get_depth_rate_for_story(story)
-        if len(stats_per_slug) is not 0:
-            slackTools.send_scroll_depth_update(story, stats_per_slug, story_time_bucket)
-
-        # Mark the story as checked
-        story.last_checked = datetime.datetime.now(pytz.timezone(app_config.PROJECT_TIMEZONE))
-        story.last_bucket = story_time_bucket
-        story.save()
-
-"""
 Environments
 """
 @task
@@ -279,7 +102,6 @@ def branch(branch_name):
     Work on any specified branch.
     """
     env.branch = branch_name
-
 
 @task
 def create_directories():

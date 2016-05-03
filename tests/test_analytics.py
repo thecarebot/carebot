@@ -12,7 +12,7 @@ except ImportError:
 import datetime
 
 from util.config import Config
-from scrapers.analytics import GoogleAnalyticsScraper
+from util.analytics import GoogleAnalytics
 
 class TestAnalytics(unittest.TestCase):
     def test_fill_in_max(self):
@@ -23,3 +23,4 @@ class TestAnalytics(unittest.TestCase):
         self.assertEqual(results[1][1], 500)
         self.assertEqual(results[2][1], 500)
         self.assertEqual(results[3][1], 200)
+

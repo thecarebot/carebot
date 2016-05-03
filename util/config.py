@@ -28,6 +28,16 @@ class Config:
 
         return teams['default']
 
+    def get_team_for_stories(self, stories):
+        """
+        Return the team of the first story in a list
+        If the collection is empty, return the default team
+        """
+        try:
+            return self.get_team_for_story(stories[0])
+        except:
+            return self.config['teams']['default']
+
     def get_default_team(self):
         teams = self.config['teams']
         print self.config['teams']
