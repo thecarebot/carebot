@@ -27,6 +27,7 @@ class NPRLingerRate(CarebotPlugin):
     """
 
     LINGER_RATE_REGEX = re.compile(ur'slug ((\w*-*)+)')
+    GRUBER_URLINTEXT_PAT = re.compile(ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
 
     def __init__(self, *args, **kwargs):
         super(NPRLingerRate, self).__init__(*args, **kwargs)
@@ -36,7 +37,8 @@ class NPRLingerRate(CarebotPlugin):
         Associate regular expression matches to the appropriate handler
         """
         return [
-            ['linger', self.LINGER_RATE_REGEX, self.respond],
+            ['linger', self.LINGER_RATE_REGEX, self.handle_slug_inquiry],
+            ['linger-url', self.GRUBER_URLINTEXT_PAT, self.handle_url_inquiry],
         ]
 
     def get_query_params(self, team, slug=None, start_date=None):
@@ -316,10 +318,34 @@ class NPRLingerRate(CarebotPlugin):
                     'text': message
                 }
 
-
-    def respond(self, message):
+    def handle_url_inquiry(self, message):
         """
-        Respond to an inquiry about the slug with more detail
+        Respond to "How is http://example.com/foo doing?"
+        """
+        if 'doing' not in message.body['text']:
+            return
+
+        match = self.GRUBER_URLINTEXT_PAT.findall(message.body['text'])
+
+        if not match[0]:
+            return
+
+        url = str(match[0][0])
+        url = url.replace('&amp;', '&')
+        logger.info("Looking for url %s" % url)
+
+        try:
+            story = Story.select().where(Story.url == url).get()
+        except:
+            return {
+                'text': "Sorry, I don't have stats for %s" % url
+            }
+
+        return self.get_update_message(story)
+
+    def handle_slug_inquiry(self, message):
+        """
+        Respond to an inquiry about the slug with stats and charts
         """
         match = re.search(self.LINGER_RATE_REGEX, message.body['text'])
         slug = match.group(1)
