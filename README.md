@@ -280,6 +280,21 @@ help.
 
 ## Developing Carebot
 
+### Tracking custom stats with plugins
+
+You can write custom plugins that:
+
+1. Pull stats regularly and announce them to a channel
+
+2. Respond to inquiries ("@carebot, help!")
+
+The `CarebotPlugin` base class in `/plugins/base.py`.
+
+To enable a plugin, include it in `registry.py` and add it to the `PLUGINS`
+list in that same file. This will automatically register any listeners and
+regular updates (`get_listeners` and `get_update_message` functions in your
+plugin)
+
 ### Tests
 
 To run tests:

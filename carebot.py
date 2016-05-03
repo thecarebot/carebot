@@ -5,9 +5,7 @@ from slackbot.bot import respond_to
 from slackbot.bot import listen_to
 
 # Import the various chat plugins
-from plugins.npr.help import NPRHelp
-from plugins.npr.scrolldepth import NPRScrollDepth
-from plugins.npr.linger import NPRLingerRate
+from plugins.registry import PLUGINS
 from util.slack import SlackTools
 
 
@@ -15,12 +13,6 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 slackTools = SlackTools()
-
-PLUGINS = [
-    NPRHelp(),
-    NPRScrollDepth(),
-    NPRLingerRate(),
-]
 
 """
 Go through the plugins and add any listeners we need
