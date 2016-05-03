@@ -26,7 +26,7 @@ class NPRLingerRate(CarebotPlugin):
     Eg '1,000 people spent a median 10 seconds studying the graphic'
     """
 
-    LINGER_RATE_REGEX = re.compile(ur'slug ((\w*-*)+)')
+    SLUG_SEARCH_REGEX = re.compile(ur'slug ((\w*-*)+)')
     GRUBER_URLINTEXT_PAT = re.compile(ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
 
     def __init__(self, *args, **kwargs):
@@ -37,7 +37,7 @@ class NPRLingerRate(CarebotPlugin):
         Associate regular expression matches to the appropriate handler
         """
         return [
-            ['linger', self.LINGER_RATE_REGEX, self.handle_slug_inquiry],
+            ['linger', self.SLUG_SEARCH_REGEX, self.handle_slug_inquiry],
             ['linger-url', self.GRUBER_URLINTEXT_PAT, self.handle_url_inquiry],
         ]
 
@@ -112,19 +112,6 @@ class NPRLingerRate(CarebotPlugin):
         rows = self.clean_data(data)
         return rows
 
-    def median(self, lst):
-        """
-        Get the median of a list of numbers
-        """
-        sorted_lst = sorted(lst)
-        list_len = len(lst)
-        index = (list_len - 1) // 2
-
-        if list_len % 2:
-            return sorted_lst[index]
-        else:
-            return (sorted_lst[index] + sorted_lst[index + 1])/2.0
-
     def median_of_time_buckets(self, time_buckets):
         """
         Take a list of [seconds, count] tuples and get the median seconds.
@@ -138,7 +125,7 @@ class NPRLingerRate(CarebotPlugin):
             for _ in range(bucket[1]):
                 lst.append(bucket[0])
 
-        median = self.median(lst)
+        median = GoogleAnalytics.median(lst)
         return int(median)
 
     def get_median(self, linger_rows):
@@ -347,7 +334,7 @@ class NPRLingerRate(CarebotPlugin):
         """
         Respond to an inquiry about the slug with stats and charts
         """
-        match = re.search(self.LINGER_RATE_REGEX, message.body['text'])
+        match = re.search(self.SLUG_SEARCH_REGEX, message.body['text'])
         slug = match.group(1)
 
         if slug:
