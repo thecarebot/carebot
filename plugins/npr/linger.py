@@ -158,7 +158,7 @@ class NPRLingerRate(CarebotPlugin):
         """
         r = range(1, len(rows) + 1)
 
-        labels = ['10s', '20', '30', '40', '50', '1m', '2m', '3m', '4m', '5m+']
+        labels = ['10s', '20', '30', '40', '50', '1m', '2m', '3m', '4m', '5m+',]
         colors = [
             '#ffcc00',
             '#ffcc00',
@@ -230,7 +230,9 @@ class NPRLingerRate(CarebotPlugin):
         return url
 
     def get_stats_for_slug(self, team, slug):
-        # Query Google Analytics
+        """
+        Return clean stats about how long people looked at a slug
+        """
         linger_rows = self.get_linger_data(team=team, slug=slug)
 
         if not linger_rows:
@@ -258,7 +260,7 @@ class NPRLingerRate(CarebotPlugin):
         if len(story_slugs) > 1:
             # Some stories have many slugs.
             # We break out the stats into a nice little grid so they're
-            # easier to hear.
+            # easier to read.
             message = ("%s hours in and here's what I know about the graphics on _%s_:") % (
                 hours_since,
                 story.name
