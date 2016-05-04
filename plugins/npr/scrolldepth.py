@@ -180,8 +180,6 @@ class NPRScrollDepth(CarebotPlugin):
 
         chart = plt.barh(r, data, align="center")
 
-        # TODO: Set colors in one sweep
-        # Broken out for now in case we want to play with hihlighting segments
         for index, value in enumerate(data):
             chart[index].set_color('#4b7ef0')
 
