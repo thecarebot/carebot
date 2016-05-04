@@ -85,14 +85,14 @@ An easy way to add them is to use a `.env` file. Copy `sample.env` to `dev.env`.
 Fill in the values (see detailed instructions below). Then, run `source dev.env`
 to make them availabe to the app.
 
-Copy `sample.env` to `production.env` to store production keys. The appropriate
-`.env` file is copied to the server on deploy.
+Copy `sample.env` to `staging.env` and `production.env` to store keys for those
+environments. The appropriate `.env` file is copied to the server on deploy.
 
 #### Add S3 credentials
 
 Create an S3 bucket and add the bucket name, access key, and secret to your
-`.env` file. You might want to setup up a user that only has read-write access
-to that bucket; no other Amazon services are needed.
+`.env` file. You might want to set up a user that only has read-write access
+to that bucket. No other Amazon services are needed.
 
 #### Adding a slackbot integration
 
@@ -109,8 +109,7 @@ After adding the bot, add it to a slack channel. You might want to set up
 a private channel for testing. (Note that you can't make a channel private
 channel public later.)
 
-####  Add Google Analytics credentials, including `GOOGLE_OAUTH_CLIENT_ID`
-and `GOOGLE_OAUTH_CONSUMER_SECRET`:
+####  Add Google credentials, including `GOOGLE_OAUTH_CLIENT_ID` and `GOOGLE_OAUTH_CONSUMER_SECRET`:
 
 The first time you run Carebot, you'll need to authorize the app with your
 Google account.
@@ -160,7 +159,7 @@ You can [register for one here](http://www.npr.org/api/index.php).
 Scroll depth stats use an [optional screenshot tool](https://github.com/thecarebot/screenshotter) to
 take snaps of your pages. We've hardcoded in the URL to our service and you can run it on your own if
 you prefer. It runs well on Heroku or any other place you can run a Node app. However, it's totally
-optional and the bot will run just fine without it.
+optional and the bot will function just fine without it.
 
 ## Running Carebot
 
@@ -175,10 +174,10 @@ After starting the bot, make sure to invite it to the channel you set in `.env`.
 ### Configuring Carebot to load new stories
 
 Configure Carebot to pull stores from various sources by copying
- `config.sample.yml` to `config.yml` and customizin the settings.
+ `config.sample.yml` to `config.yml` and customizing the settings.
 
 Under `teams`, define team names and the channel messages for that team should
-post to. Make sure you have a default team (it can have the same properties as
+post to. Make sure you have a `default` team (it can have the same properties as
 another team).
 
 `ga_org_id` should be the ID of the team's Google Analytics account. You can
@@ -187,7 +186,12 @@ select the account, property, and view, then copy the number after `ga:` in
 the `ids` field.
 
 Under `sources`, define where content should be pulled from, and what team it
-belongs to. Here's an example:
+belongs to. There currently are two supported sources:
+
+* `spreadsheet` pulls from a google doc using its `doc_key`
+* `rss` pulls from an RSS feed via a `url`. It recognizes many typical feeds.
+
+#### Example configuration file
 
 ```
 teams:
@@ -302,6 +306,11 @@ Carebot will regularly check every story in the database. If the story has not
 been checked recently, the optional `get_update_message` function of each plugin
 will be called. You can return a mesage and attachments, for example with the
 latest stat for the article.
+
+### Writing new scrapers
+
+You can customize your own scrapers. Scraper code is located in `/scrapers` and
+called in `/fabfile/carebot.py`.
 
 ### Tests
 
