@@ -5,7 +5,7 @@ from peewee import IntegrityError
 import time
 
 from util.models import Story
-from scrapers.nprapi import NPRAPIScraper
+from scrapers.npr_api import NPRAPIScraper
 from scrapers.screenshot import Screenshotter
 
 logging.basicConfig()

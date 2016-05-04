@@ -10,7 +10,7 @@ from slackbot.bot import listen_to
 import unicodedata
 
 from scrapers.analytics import GoogleAnalyticsScraper
-from scrapers.nprapi import NPRAPIScraper
+from scrapers.npr_api import NPRAPIScraper
 from util.chart import ChartTools
 from util.time import TimeTools
 

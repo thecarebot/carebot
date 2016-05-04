@@ -8,7 +8,7 @@ except ImportError:
 from datetime import date
 
 from util.config import Config
-from scrapers.nprapi import NPRAPIScraper
+from scrapers.npr_api import NPRAPIScraper
 
 class TestNPRAPIScraper(unittest.TestCase):
     def test_get_story_id(self):

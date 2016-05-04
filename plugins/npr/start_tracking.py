@@ -1,7 +1,7 @@
 import logging
 import re
 
-from scrapers.nprapi import NPRAPIScraper
+from scrapers.npr_api import NPRAPIScraper
 from util.analytics import GoogleAnalytics
 from util.config import Config
 from util.models import Story
