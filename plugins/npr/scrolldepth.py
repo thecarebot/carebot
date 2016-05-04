@@ -139,10 +139,12 @@ class NPRScrollDepth(CarebotPlugin):
     def get_chart(self,
                   rows,
                   median=None,
-                  labels=['100%', '90%', '80%', '70%', '60%', '50%', '40%', '30%', '20%', '10%']):
+                  labels=None):
         """
         Create a scroll depth histogram
         """
+        if labels is None:
+            labels = ['100%', '90%', '80%', '70%', '60%', '50%', '40%', '30%', '20%', '10%']
         r = range(1, len(rows) + 1)
         data = []
 
