@@ -1,18 +1,22 @@
 #!/usr/bin/env python
 
 from datetime import datetime, timedelta
+import pytz
 
 try:
     import unittest2 as unittest
 except ImportError:
     import unittest
 
+import app_config
 from util.time import TimeTools
 
 class TestTimeTools(unittest.TestCase):
     def test_time_bucket(self):
-        five_hours_ago = datetime.today() - timedelta(hours=5)
-        ten_hours_ago = datetime.today() - timedelta(hours=10)
+        # pytz.timezone(app_config.PROJECT_TIMEZONE)
+        now = datetime.now(pytz.timezone(app_config.PROJECT_TIMEZONE))
+        five_hours_ago = now - timedelta(hours=5)
+        ten_hours_ago = now - timedelta(hours=10)
         bucket = TimeTools.time_bucket(five_hours_ago)
         self.assertEqual(bucket, '4 hours')
 
