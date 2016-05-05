@@ -112,7 +112,8 @@ class NPRLingerRate(CarebotPlugin):
         rows = self.clean_data(data)
         return rows
 
-    def median_of_time_buckets(self, time_buckets):
+    @staticmethod
+    def median_of_time_buckets(time_buckets):
         """
         Take a list of [seconds, count] tuples and get the median seconds.
         """
@@ -128,7 +129,8 @@ class NPRLingerRate(CarebotPlugin):
         median = GoogleAnalytics.median(lst)
         return int(median)
 
-    def get_median(self, linger_rows):
+    @staticmethod
+    def get_median(linger_rows):
         """
         Get the median number of seconds spent on the data in nice, easy
         to consume formats.
@@ -141,7 +143,7 @@ class NPRLingerRate(CarebotPlugin):
             total_people = total_people + row[1]
 
         # average_seconds = total_seconds/total_people # average
-        average_seconds = self.median_of_time_buckets(linger_rows) # median
+        average_seconds = NPRLingerRate.median_of_time_buckets(linger_rows) # median
         minutes = int(average_seconds / 60)
         seconds = average_seconds % 60
 
@@ -238,7 +240,7 @@ class NPRLingerRate(CarebotPlugin):
         if not linger_rows:
             return False
 
-        median = self.get_median(linger_rows)
+        median = NPRLingerRate.get_median(linger_rows)
         return {
             'median': median,
             'people': "{:,}".format(median['total_people']),
@@ -354,7 +356,7 @@ class NPRLingerRate(CarebotPlugin):
                     'text': "Sorry, I wasn't able to find linger rate stats for %s" % slug
                 }
 
-            median = self.get_median(linger_rows)
+            median = NPRLingerRate.get_median(linger_rows)
             people = "{:,}".format(median['total_people'])
             time_text = TimeTools.humanist_time_bucket(median)
 
@@ -369,7 +371,7 @@ class NPRLingerRate(CarebotPlugin):
             # Get linger rate data for charting.
 
             all_graphics_rows = self.get_linger_data(team=team)
-            all_graphics_median = self.get_median(all_graphics_rows)
+            all_graphics_median = NPRLingerRate.get_median(all_graphics_rows)
 
             attachments = [
                 {
