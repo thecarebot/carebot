@@ -15,7 +15,7 @@ class TestRSS(unittest.TestCase):
         fake_source = {
             'team': "carebot",
             'type': "rss",
-            'url': "https://thecarebot.github.io/feed.xml",
+            'url': "http://thecarebot.github.io/sample.feed.xml",
             'date_field': 'published',
             'url_field': 'id',
             'title_field':'title'
