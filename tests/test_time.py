@@ -13,7 +13,6 @@ from util.time import TimeTools
 
 class TestTimeTools(unittest.TestCase):
     def test_time_bucket(self):
-        # pytz.timezone(app_config.PROJECT_TIMEZONE)
         now = datetime.now(pytz.timezone(app_config.PROJECT_TIMEZONE))
         five_hours_ago = now - timedelta(hours=5)
         ten_hours_ago = now - timedelta(hours=10)

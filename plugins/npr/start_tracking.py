@@ -32,30 +32,34 @@ class NPRStartTracking(CarebotPlugin):
 
     def respond(self, message):
         m = re.search(self.START_TRACKING_REGEX, message.body['text'])
+        url = re.search(self.GRUBER_URLINTEXT_PAT, message.body['text'])
 
         if not m:
             return False
 
         slug = m.group(1)
+        url = url.group(1)
 
         if slug:
             # Check if the slug is in the database.
             try:
-                story = Story.select().where(Story.slug.contains(slug)).get()
-                text = "Thanks! I'm already tracking `%s`, and you should start seeing results within a couple hours." % slug
+                story = Story.select().where(Story.url.contains(url)).get()
+                story.slug = slug
+                story.save()
+
+                text = "Ok! I'm already tracking `%s`, and I've updated the slug." % url
+
             except Story.DoesNotExist:
                 # If it's not in the database, start tracking it.
-                url = re.search(self.GRUBER_URLINTEXT_PAT, message.body['text'])
-
                 if not url:
                     logger.error("Couldn't find story URL in message %s", message.body['text'])
                     text = "Sorry, I need a story URL to start tracking."
                     return
 
-                details = npr_api_scraper.get_story_details(url.group(1))
+                details = npr_api_scraper.get_story_details(url)
 
                 if not details:
-                    logger.error("Couldn't find story in API for URL %s", url.group(1))
+                    logger.error("Couldn't find story in API for URL %s", url)
                     text = "Sorry, I wasn't able to find that story in the API, so I couldn't start tracking it."
                     return
 
@@ -67,12 +71,12 @@ class NPRStartTracking(CarebotPlugin):
                 story = Story.create(name=details['title'],
                                      slug=slug,
                                      date=details['date'],
-                                     url=url.group(1),
+                                     url=url,
                                      image=details['image'],
                                      team=team
                                     )
                 story.save()
-                text = "Ok, I've started tracking `%s`. The first stats should arrive in 4 hours or less." % slug
+                text = "Ok, I've started tracking `%s` on %s. The first stats should arrive in 4 hours or less." % (slug, url)
 
         else:
             text = "Sorry, I wasn't able to start tracking `%s` right now." % slug
