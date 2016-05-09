@@ -10,12 +10,15 @@ from mock import patch
 import app_config
 app_config.DATABASE_NAME = 'carebot_test.db'
 
-from scrapers.spreadsheet import SpreadsheetScraper
+from scrapers.npr_spreadsheet import SpreadsheetScraper
 from util.models import Story
 from tests.test_util.db import clear_stories
 
 class TestSpreadsheet(unittest.TestCase):
     def test_scrape_spreadsheet(self):
+        """
+        Make sure we grab the right data from spredsheets
+        """
         scraper = SpreadsheetScraper()
         stories = scraper.scrape_spreadsheet('tests/data/stories.xlsx')
         self.assertEqual(len(stories), 4)
@@ -36,6 +39,10 @@ class TestSpreadsheet(unittest.TestCase):
 
     @patch('util.s3.Uploader.upload')
     def test_write_spreadsheet(self, mock_upload):
+        """
+        Make sure we save the stories to the database when scraping from a
+        spreadsheet
+        """
         mock_upload.return_value = 'http://image-url-here'
 
         clear_stories()
@@ -54,6 +61,9 @@ class TestSpreadsheet(unittest.TestCase):
 
     @patch('util.s3.Uploader.upload')
     def test_write_spreadsheet_duplicates(self, mock_upload):
+        """
+        Make sure stories don't get inserted more than once
+        """
         mock_upload.return_value = 'http://image-url-here'
 
         clear_stories()

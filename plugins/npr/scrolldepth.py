@@ -62,7 +62,8 @@ class NPRScrollDepth(CarebotPlugin):
 
         return params
 
-    def fill_in_max(self, data):
+    @staticmethod
+    def fill_in_max(data):
         """
         Sometime people start at 20, 30, 40% of the article read because their
         screens are lare or the article is short.
@@ -102,7 +103,7 @@ class NPRScrollDepth(CarebotPlugin):
         # Sort the row data from 10% => 100%
         rows.sort(key=lambda tup: tup[0])
 
-        rows = self.fill_in_max(rows)
+        rows = NPRScrollDepth.fill_in_max(rows)
 
         # Only take the first 10 rows.
         truncated = rows[:10]

@@ -27,7 +27,7 @@ REPOSITORY_NAME = 'carebot'
 GITHUB_USERNAME = 'thecarebot'
 REPOSITORY_URL = 'https://github.com/%s/%s.git' % (GITHUB_USERNAME, REPOSITORY_NAME)
 REPOSITORY_ALT_URL = None # 'git@bitbucket.org:nprapps/%s.git' % REPOSITORY_NAME'
-DEFAULT_CONFIG_PATH = 'config.yml'
+DEFAULT_CONFIG_PATH = os.environ.get('CONFIG_PATH', 'config.yml')
 
 # What to call the database
 DATABASE_NAME = 'carebot.db'

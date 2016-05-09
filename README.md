@@ -317,8 +317,10 @@ called in `/fabfile/carebot.py`.
 To run tests:
 
 ```
-nosetests
+CONFIG_PATH=tests/config_test.yml
 ```
+
+Note that you need to manually set the path of the test `config.yml` file.
 
 ### Migrations
 If you make changes to existing models in `models.py`, you will need to [write
