@@ -3,6 +3,7 @@ import re
 from slackbot.bot import Bot
 from slackbot.bot import respond_to
 from slackbot.bot import listen_to
+import sys
 
 from plugins.registry import PLUGINS
 from util.slack import SlackTools
@@ -69,4 +70,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print "Thanks for caring! See you next time."
+        sys.exit()
