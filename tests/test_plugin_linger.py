@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-import app_config
-app_config.DATABASE_NAME = 'carebot_test.db'
-app_config.DEFAULT_CONFIG_PATH = 'tests/config_test.yml'
-
 import datetime
 try:
     import unittest2 as unittest
@@ -12,6 +8,10 @@ except ImportError:
 
 from mock import patch
 from mock import ANY
+
+import app_config
+app_config.DATABASE_NAME = 'carebot_test.db'
+
 from plugins.npr.linger import NPRLingerRate
 from util.config import Config
 from util.models import Story
