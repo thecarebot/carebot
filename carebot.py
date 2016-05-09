@@ -37,7 +37,8 @@ def response_dispatcher(message, text=None):
     for listener in listeners:
         match = listener[1].findall(text)
         if match:
-            logger.info("Dispatching to %s with message %s" % (listener[0], message.body['text']))
+            logger.info("Recognized message: {0}").format(message.body['text'])
+            logger.info("Dispatching to message: {0}").format(listener[0])
             any_match = True
             reply = listener[2](message)
 
@@ -50,6 +51,7 @@ def response_dispatcher(message, text=None):
                 )
 
     if not any_match:
+        logger.info("Did not recognize message: {0}").format(message.body['text'])
         message.reply("Hi! I got your message, but I don't know enough yet to respond to it.")
 
 
