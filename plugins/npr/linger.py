@@ -3,6 +3,7 @@ import logging
 import matplotlib
 import matplotlib.pyplot as plt
 import re
+import tempfile
 
 import app_config
 from plugins.base import CarebotPlugin
@@ -224,10 +225,11 @@ class NPRLingerRate(CarebotPlugin):
             )
 
         # TODO: Save to a better temp path.
-        plt.savefig('tmp.png', bbox_inches='tight')
-        f = open('tmp.png', 'rb')
-        url = s3.upload(f)
-        return url
+        with tempfile.TemporaryFile(suffix=".png") as tmpfile:
+            plt.savefig(tmpfile, bbox_inches='tight')
+            tmpfile.seek(0) # Rewind the file to the beginning
+            url = s3.upload(tmpfile)
+            return url
 
     def get_stats_for_slug(self, team, slug):
         """

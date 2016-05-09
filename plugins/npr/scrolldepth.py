@@ -5,6 +5,7 @@ from PIL import Image
 import re
 import requests
 import StringIO
+import tempfile
 
 import app_config
 from util.analytics import GoogleAnalytics
@@ -200,10 +201,11 @@ class NPRScrollDepth(CarebotPlugin):
         #             fontsize=8
         #         )
 
-        plt.savefig('tmp.png', bbox_inches='tight')
-        f = open('tmp.png', 'rb')
-        url = s3.upload(f)
-        return url
+        with tempfile.TemporaryFile(suffix=".png") as tmpfile:
+            plt.savefig(tmpfile, bbox_inches='tight')
+            tmpfile.seek(0) # Rewind the file to the beginning
+            url = s3.upload(tmpfile)
+            return url
 
     def get_slug_message(self, slug, story=None):
         # Try to match the story to a slug to accurately get a team
