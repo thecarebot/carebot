@@ -357,6 +357,8 @@ class NPRLingerRate(CarebotPlugin):
                 }
 
             median = NPRLingerRate.get_median(linger_rows)
+            print "Got median"
+            print median
             people = "{:,}".format(median['total_people'])
             time_text = TimeTools.humanist_time_bucket(median)
 
