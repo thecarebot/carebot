@@ -40,9 +40,11 @@ class TestAnalytics(unittest.TestCase):
         self.assertEqual(median['seconds'], 30)
 
     @patch('plugins.npr.linger.NPRLingerRate.get_linger_data')
+    @patch('plugins.npr.linger.NPRLingerRate.get_histogram_url')
     @patch('util.s3.Uploader.upload')
     def test_handle_slug_inquiry(self,
                                  mock_upload,
+                                 mock_histogram,
                                  mock_linger,
                                 ):
 
@@ -60,6 +62,7 @@ class TestAnalytics(unittest.TestCase):
             [300, 10],
         ]
         mock_linger.return_value = linger_data
+        mock_histogram.return_value = 'http://image-url-here'
         mock_upload.return_value = 'http://image-url-here'
 
         slug = 'x-y-z'
