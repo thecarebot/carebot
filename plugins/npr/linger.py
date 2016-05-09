@@ -7,12 +7,10 @@ import re
 import app_config
 from plugins.base import CarebotPlugin
 from util.analytics import GoogleAnalytics
-from util.config import Config
 from util.models import Story
 from util.s3 import Uploader
 from util.time import TimeTools
 
-config = Config()
 inflector = inflect.engine()
 s3 = Uploader()
 
@@ -254,7 +252,7 @@ class NPRLingerRate(CarebotPlugin):
         an relevant update message.
         """
         story_slugs = story.slug_list()
-        team = config.get_team_for_story(story)
+        team = self.config.get_team_for_story(story)
         hours_since = TimeTools.hours_since(story.date)
 
         messages = []
@@ -347,7 +345,7 @@ class NPRLingerRate(CarebotPlugin):
             # The Google Analytics property ID comes from the team config
             # We use the default team if none is found
             stories = Story.select().where(Story.slug.contains(slug))
-            team = config.get_team_for_stories(stories)
+            team = self.config.get_team_for_stories(stories)
 
             linger_rows = self.get_linger_data(team=team, slug=slug)
 
