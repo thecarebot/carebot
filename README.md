@@ -252,6 +252,12 @@ You'll need a couple packages:
 * `sudo apt-get install libfreetype6-dev libxft-dev` for matplotlib
 * Any other basics: python, pip.
 
+If you have trouble running carebot with matplotlib, [this command may help](https://dev.netzob.org/issues/266):
+
+```
+echo "backend: TkAgg" > ~/.matplotlib/matplotlibrc
+```
+
 ### First deploy
 
 Make sure you have a `.env` file with your production keys (see "add
