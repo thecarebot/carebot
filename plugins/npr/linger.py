@@ -29,9 +29,6 @@ class NPRLingerRate(CarebotPlugin):
     SLUG_SEARCH_REGEX = re.compile(ur'slug ((\w*-*)+)')
     GRUBER_URLINTEXT_PAT = re.compile(ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
 
-    def __init__(self, *args, **kwargs):
-        super(NPRLingerRate, self).__init__(*args, **kwargs)
-
     def get_listeners(self):
         """
         Associate regular expression matches to the appropriate handler

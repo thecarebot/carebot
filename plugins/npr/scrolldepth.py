@@ -29,9 +29,6 @@ class NPRScrollDepth(CarebotPlugin):
 
     SLUG_SEARCH_REGEX = re.compile(ur'slug ((\w*-*)+)')
 
-    def __init__(self, *args, **kwargs):
-        super(NPRScrollDepth, self).__init__(*args, **kwargs)
-
     def get_listeners(self):
         """
         Associate regular expression matches to the appropriate handler

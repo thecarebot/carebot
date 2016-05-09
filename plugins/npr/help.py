@@ -12,9 +12,6 @@ class NPRHelp(CarebotPlugin):
     HELP_REGEX_2 = re.compile(ur'What can you do', re.IGNORECASE)
     HELP_REGEX_3 = re.compile(ur'What are you up to', re.IGNORECASE)
 
-    def __init__(self, *args, **kwargs):
-        super(NPRHelp, self).__init__(*args, **kwargs)
-
     def get_listeners(self):
         return [
             ['help', self.HELP_REGEX_1, self.respond],
