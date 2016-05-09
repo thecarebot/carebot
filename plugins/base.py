@@ -1,8 +1,9 @@
 from util.config import Config
-config = Config()
 
 class CarebotPlugin(object):
     def __init__(self, story=None):
+        self.config = Config()
+
         if story:
             self.story = story
             self.team = config.get_team_for_story(self.story)

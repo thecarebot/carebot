@@ -3,16 +3,15 @@ import logging
 import matplotlib
 import matplotlib.pyplot as plt
 import re
+import tempfile
 
 import app_config
 from plugins.base import CarebotPlugin
 from util.analytics import GoogleAnalytics
-from util.config import Config
 from util.models import Story
 from util.s3 import Uploader
 from util.time import TimeTools
 
-config = Config()
 inflector = inflect.engine()
 s3 = Uploader()
 
@@ -223,10 +222,11 @@ class NPRLingerRate(CarebotPlugin):
             )
 
         # TODO: Save to a better temp path.
-        plt.savefig('tmp.png', bbox_inches='tight')
-        f = open('tmp.png', 'rb')
-        url = s3.upload(f)
-        return url
+        with tempfile.TemporaryFile(suffix=".png") as tmpfile:
+            plt.savefig(tmpfile, bbox_inches='tight')
+            tmpfile.seek(0) # Rewind the file to the beginning
+            url = s3.upload(tmpfile)
+            return url
 
     def get_stats_for_slug(self, team, slug):
         """
@@ -251,7 +251,7 @@ class NPRLingerRate(CarebotPlugin):
         an relevant update message.
         """
         story_slugs = story.slug_list()
-        team = config.get_team_for_story(story)
+        team = self.config.get_team_for_story(story)
         hours_since = TimeTools.hours_since(story.date)
 
         messages = []
@@ -344,7 +344,7 @@ class NPRLingerRate(CarebotPlugin):
             # The Google Analytics property ID comes from the team config
             # We use the default team if none is found
             stories = Story.select().where(Story.slug.contains(slug))
-            team = config.get_team_for_stories(stories)
+            team = self.config.get_team_for_stories(stories)
 
             linger_rows = self.get_linger_data(team=team, slug=slug)
 

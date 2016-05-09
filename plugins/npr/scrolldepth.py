@@ -5,17 +5,15 @@ from PIL import Image
 import re
 import requests
 import StringIO
+import tempfile
 
 import app_config
 from util.analytics import GoogleAnalytics
-from util.config import Config
 from util.chart import ChartTools
 from util.models import Story
 from util.s3 import Uploader
 from plugins.base import CarebotPlugin
 
-
-config = Config()
 s3 = Uploader()
 
 logging.basicConfig()
@@ -200,17 +198,18 @@ class NPRScrollDepth(CarebotPlugin):
         #             fontsize=8
         #         )
 
-        plt.savefig('tmp.png', bbox_inches='tight')
-        f = open('tmp.png', 'rb')
-        url = s3.upload(f)
-        return url
+        with tempfile.TemporaryFile(suffix=".png") as tmpfile:
+            plt.savefig(tmpfile, bbox_inches='tight')
+            tmpfile.seek(0) # Rewind the file to the beginning
+            url = s3.upload(tmpfile)
+            return url
 
     def get_slug_message(self, slug, story=None):
         # Try to match the story to a slug to accurately get a team
         # The Google Analytics property ID comes from the team config
         # We use the default team if none is found
         stories = Story.select().where(Story.slug.contains(slug))
-        team = config.get_team_for_stories(stories)
+        team = self.config.get_team_for_stories(stories)
 
         params = self.get_slug_query_params(team=team, slug=slug)
         data = GoogleAnalytics.query_ga(params)
@@ -264,7 +263,7 @@ class NPRScrollDepth(CarebotPlugin):
         reporting depth data.
         """
         story_slugs = story.slug_list()
-        team = config.get_team_for_story(story)
+        team = self.config.get_team_for_story(story)
 
         return self.get_slug_message(story_slugs[0])
 

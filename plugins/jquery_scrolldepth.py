@@ -8,14 +8,11 @@ import StringIO
 
 import app_config
 from util.analytics import GoogleAnalytics
-from util.config import Config
 from util.chart import ChartTools
 from util.models import Story
 from util.s3 import Uploader
 from plugins.base import CarebotPlugin
 
-
-config = Config()
 s3 = Uploader()
 
 logging.basicConfig()
@@ -256,7 +253,7 @@ class JqueryScrollDepth(CarebotPlugin):
         # The Google Analytics property ID comes from the team config
         # We use the default team if none is found
         stories = Story.select().where(Story.slug.contains(slug))
-        team = config.get_team_for_stories(stories)
+        team = self.config.get_team_for_stories(stories)
 
         params = self.get_slug_query_params(team=team, slug=slug)
         data = GoogleAnalytics.query_ga(params)

@@ -3,7 +3,6 @@ import re
 
 from scrapers.npr_api import NPRAPIScraper
 from util.analytics import GoogleAnalytics
-from util.config import Config
 from util.models import Story
 from util.slack import SlackTools
 from plugins.base import CarebotPlugin
@@ -12,7 +11,6 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-config = Config()
 npr_api_scraper = NPRAPIScraper()
 slack_tools = SlackTools()
 
@@ -63,7 +61,7 @@ class NPRStartTracking(CarebotPlugin):
 
                 # Find out what team we need to save this story to
                 channel = slack_tools.get_channel_name(message.body['channel'])
-                team = config.get_team_for_channel(channel)
+                team = self.config.get_team_for_channel(channel)
 
                 # Create the story
                 story = Story.create(name=details['title'],
