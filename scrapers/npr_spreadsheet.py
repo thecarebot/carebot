@@ -1,9 +1,11 @@
 import copytext
 import datetime
 import logging
+from oauth import get_document
 from peewee import IntegrityError
 import time
 
+import app_config
 from util.models import Story
 from scrapers.npr_api import NPRAPIScraper
 from scrapers.screenshot import Screenshotter
@@ -22,6 +24,8 @@ class SpreadsheetScraper:
     """
     From https://github.com/tarbell-project/tarbell/blob/1.0.5/tarbell/app.py#L251
     """
+    def __init__(self, source):
+        self.source = source
 
     @staticmethod
     def parse_date(value):
@@ -34,13 +38,18 @@ class SpreadsheetScraper:
         parsed = datetime.datetime.utcfromtimestamp(seconds).date()
         return parsed
 
-    def scrape_spreadsheet(self, filename):
+    def scrape_and_load(self, path=app_config.STORIES_PATH):
+        get_document(self.source['doc_key'], path)
+        raw_stories = self.scrape_spreadsheet()
+        stories = self.write(stories=raw_stories, team=self.source['team'])
+        return stories
+
+    def scrape_spreadsheet(self, path=app_config.STORIES_PATH):
         """
         Scrape the NPR Visuals 'did we touch it?' spreadsheet
         """
-
         stories = []
-        spreadsheet = copytext.Copy(filename)
+        spreadsheet = copytext.Copy(path)
         data = spreadsheet['published']
         for row in data:
             if str(row['graphic_slug']) is not '' and str(row['date']) is not '':

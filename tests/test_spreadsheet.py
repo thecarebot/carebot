@@ -11,15 +11,20 @@ import app_config
 app_config.DATABASE_NAME = 'carebot_test.db'
 
 from scrapers.npr_spreadsheet import SpreadsheetScraper
+from util.config import Config
 from util.models import Story
 from tests.test_util.db import clear_stories
 
 class TestSpreadsheet(unittest.TestCase):
+    source = {
+        'doc_key': 'foo-bar-baz'
+    }
+
     def test_scrape_spreadsheet(self):
         """
-        Make sure we grab the right data from spredsheets
+        Make sure we grab the right data from spreadsheets
         """
-        scraper = SpreadsheetScraper()
+        scraper = SpreadsheetScraper(self.source)
         stories = scraper.scrape_spreadsheet('tests/data/stories.xlsx')
         self.assertEqual(len(stories), 4)
 
@@ -37,17 +42,15 @@ class TestSpreadsheet(unittest.TestCase):
         self.assertEqual(stories[3]['story_url'], 'http://www.npr.org/sections/thesalt/2016/04/06/472960018/big-seed-consolidation-is-shrinking-the-industry-even-further')
         self.assertEqual(stories[3]['contact'], 'Alyson Hurt')
 
-    @patch('util.s3.Uploader.upload')
+    @patch('util.s3.Uploader.upload', return_value='http://image-url-here')
     def test_write_spreadsheet(self, mock_upload):
         """
         Make sure we save the stories to the database when scraping from a
         spreadsheet
         """
-        mock_upload.return_value = 'http://image-url-here'
-
         clear_stories()
 
-        scraper = SpreadsheetScraper()
+        scraper = SpreadsheetScraper(self.source)
         stories = scraper.scrape_spreadsheet('tests/data/stories.xlsx')
 
         scraper.write(stories)
@@ -68,7 +71,7 @@ class TestSpreadsheet(unittest.TestCase):
 
         clear_stories()
 
-        scraper = SpreadsheetScraper()
+        scraper = SpreadsheetScraper(self.source)
         stories = scraper.scrape_spreadsheet('tests/data/stories.xlsx')
 
         # Insert the stories

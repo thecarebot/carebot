@@ -36,4 +36,4 @@ class TestNPRHelp(unittest.TestCase):
         to be in the help message.
         """
         message = NPRHelp().respond('example')
-        assert 'calculate' in message['text']
+        assert 'graphics on a page' in message['text']

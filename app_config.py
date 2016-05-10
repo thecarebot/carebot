@@ -32,10 +32,9 @@ DEFAULT_CONFIG_PATH = os.environ.get('CONFIG_PATH', 'config.yml')
 # What to call the database
 DATABASE_NAME = 'carebot.db'
 
-# Admin login
-SECRET_KEY = os.environ.get('SECRET_KEY')
-ADMIN_USER = os.environ.get('ADMIN_USER')
-ADMIN_PASS = os.environ.get('ADMIN_PASS')
+# Screenshotter API
+# Optional, see readme and https://github.com/thecarebot/screenshotter
+SCREENSHOT_API="http://carebot-capture.herokuapp.com/api/image?id={0}&url={1}"
 
 # S3 info
 S3_BUCKET = os.environ.get('S3_BUCKET')

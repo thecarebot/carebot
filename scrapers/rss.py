@@ -21,6 +21,11 @@ class RSSScraper:
         # We'll ignore stories older than this.
         self.magic_date_cutoff = datetime.now(pytz.timezone(app_config.PROJECT_TIMEZONE)) - timedelta(days=5)
 
+    def scrape_and_load(self):
+        raw_stories = self.scrape()
+        stories = self.write(stories=raw_stories, team=self.source['team'])
+        return stories
+
     """
     Scrape an RSS feed
     """

@@ -1,4 +1,3 @@
-
 import datetime
 from dateutil.parser import parse
 from fabric.api import task
@@ -6,7 +5,6 @@ import logging
 import pytz
 
 import app_config
-from oauth import get_document
 from plugins.registry import PLUGINS
 from util.models import Story
 from util.slack import SlackTools
@@ -29,28 +27,6 @@ logger.setLevel(logging.INFO)
 Data tasks
 """
 
-def load_spreadsheet(source):
-    """
-    Takes a spreadsheet source with a `doc_key` property (probably set in
-    `config.yml`)
-    Downloads the spreadsheet and write the stories to the database
-    """
-    get_document(source['doc_key'], app_config.STORIES_PATH)
-    scraper = SpreadsheetScraper()
-    stories = scraper.scrape_spreadsheet(app_config.STORIES_PATH)
-    new_stories = scraper.write(stories, team=source['team'])
-    return new_stories
-
-def load_rss(source):
-    """
-    Takes an RSS source with a `url` property (probably set in `config.yml`)
-    Scrapes the feed and saves each story to the database
-    """
-    scraper = RSSScraper(source)
-    raw_stories = scraper.scrape()
-    stories = scraper.write(raw_stories, team=source['team'])
-    return stories
-
 @task
 def load_new_stories():
     """
@@ -60,10 +36,10 @@ def load_new_stories():
     sources = config.get_sources()
     for source in sources:
         if source['type'] == 'spreadsheet':
-            stories = load_spreadsheet(source)
+            stories = SpreadsheetScraper(source).scrape_and_load()
 
         elif source['type'] == 'rss':
-            stories = load_rss(source)
+            stories = RSSScraper(source).scrape_and_load()
 
         for story in stories:
             slack_tools.send_tracking_started_message(story)

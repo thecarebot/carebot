@@ -1,14 +1,12 @@
 [Carebot](http://thecarebot.github.io) is an effort in thinking about alternative ways to look at analytics for journalism: both the measures and indicators used to understand story impact, and the way which analytics data is used in the newsroom.
 
-##Quick Start Guide
+## Quick Start Guide
 To get Carebot up and running you will need to:
 
 1. Add the [Carebot Tracker](http://github.com/theCarebot/carebot-tracker) to your content.
 2. Set up the [Carebot Slackbot](#what-is-this) to report data through notifications.
 
 Note: You will need accounts with [Google Analytics](http://analytics.google.com) and [Slack](http://slack.com/create).
-
-Coming soon: See the **Carebot Newsroom Analytics Guide** for a more detailed walkthrough of how to plan for analytics in the newsroom and make decisions about the right tools for the job.
 
 # Carebot: The Slackbot
 
@@ -24,7 +22,7 @@ Carebot reports data insights from [tracked metrics](http://github.com/theCarebo
 
 ## Using Carebot
 
-Here's how to work with Carebot if it's in your channels.
+Here's how to work with Carebot once you've invited it to your channels.
 
 ### Handy commands
 
@@ -115,7 +113,8 @@ The first time you run Carebot, you'll need to authorize the app with your
 Google account.
 
 First, you'll need to create a Google API project via the [Google developer
-console](http://console.developers.google.com).
+console](http://console.developers.google.com). There's a more detailed guide
+on the [NPR Apps blog](http://blog.apps.npr.org/2015/03/02/app-template-oauth.html)
 
 Then, enable the Drive and Analytics APIs for your project.
 
@@ -153,6 +152,13 @@ If you're running this internally at NPR, you'll want a key for the NPR API.
 This will be used to pull more details about articles, like primary image and a
 more accurate "published at" date.
 You can [register for one here](http://www.npr.org/api/index.php).
+
+#### Troubleshooting problems with credentials
+
+* Double check the Google Analytics organization ID you set in `config.yml`
+* Test your analytics query in the (Query Explorer](https://ga-dev-tools.appspot.com/query-explorer/)
+and make sure you get the results you expect there.
+* Review the step-by-step [oauth instructions](http://blog.apps.npr.org/2015/03/02/app-template-oauth.html) on the NPR Visuals Team blog.
 
 ### Run the optional screenshot tool
 
@@ -290,43 +296,84 @@ help.
 
 ## Developing Carebot
 
-### Tracking custom stats with plugins
+### Tracking your stats with plugins
 
-You can write custom plugins that:
+Are you collecting stats not built into Carebot? Great! You can write plugins to
+fetch and share the stats.
+
+Plugins have two functions:
 
 1. Pull stats regularly and announce them to a channel
 
 2. Respond to inquiries ("@carebot, help!")
 
-The `CarebotPlugin` base class in `/plugins/base.py`.
+Here's how to write a new plugin:
 
-To enable a plugin, include it in `registry.py` and add it to the `PLUGINS`
-list in that same file. This will automatically register any listeners and
-regular updates.
+#### Use the base class as a reference
 
-The optional `get_listeners` funciton should return a list of regular
+The `CarebotPlugin` base class is in `/plugins/base.py`. Extend `CarebotPlugin`
+to create a new plugin. You can also copy one of the existing plugins to a new
+file.
+
+#### Listen for questions
+If you want your plugin to listen for questions sent to Carebot, (for example,
+"@carebot, what should I have for lunch?") implement `get_listeners` on your
+class. The optional `get_listeners` function should return a list of regular
 expressions and  corresponding handler functions that will match and respond to
-incoming slack messages.
+incoming slack messages. For a simple example, see the `help` plugin.
 
+#### Regularly share stats about articles
 Carebot will regularly check every story in the database. If the story has not
 been checked recently, the optional `get_update_message` function of each plugin
 will be called. You can return a mesage and attachments, for example with the
-latest stat for the article.
+latest stat for the article. Check the `linger` or `scrolldepth` plugins for
+example code.
 
-### Writing new scrapers
+If you're pulling stats from Google Analytics, the [Query Explorer](https://ga-dev-tools.appspot.com/query-explorer/)
+is a helpful way to test your parameters before coding them into Carebot.
 
-You can customize your own scrapers. Scraper code is located in `/scrapers` and
-called in `/fabfile/carebot.py`.
+#### Enable your plugin
+
+To enable a plugin, import it in `registry.py` and add it to the `PLUGINS`
+list in that same file. This will automatically register any listeners and
+regular updates.
+
+### Load your stories into Carebot with scrapers
+
+Carebot regularly runs scrapers to load new stories into its database. You'll
+probably have to write or customize a scraper to get Carebot to learn about your
+stories.
+
+Scraper code is located in `/scrapers`. We've included an RSS scraper and a
+scraper that pulls articles from a Google Spreadsheet. You can copy or customize
+these to pull in your stories, or write a new scraper from scratch.
+
+Scrapers are instantiated with the `source` pulled from `config.yml`. All
+scrapers should implement a `scrape_and_load` method that returns a list of
+stories.
+
+Once you've got a scraper, register it in `/fabfile/carebot.py` in the
+`load_new_stories` method.
 
 ### Tests
 
 To run tests:
 
 ```
-CONFIG_PATH=tests/config_test.yml
+CONFIG_PATH=tests/config_test.yml nosetests
 ```
 
 Note that you need to manually set the path of the test `config.yml` file.
+
+These tests help you make sure that scrapers, plugins, and analytics tools
+are running as expected. We highly recommend writing simple tests for your
+plugins to make sure they respond correctly.
+
+### The cron file
+
+Carebot loads new stories and checks for stats regularly by running the fabfile
+via cron jobs. These are set for staggered 15-minute runs. You can configure
+them by editing the `crontab` file.
 
 ### Migrations
 If you make changes to existing models in `models.py`, you will need to [write
@@ -334,13 +381,3 @@ a migration](http://docs.peewee-orm.com/en/latest/peewee/playhouse.html#migrate)
 
 For now, migrations are not automatically run on deploy and may need to be run
 manually. Inside the environment, run `python MIGRATION_NAME.py`
-
-### Misc
-```
-Dev notes for Matt:
-Sample analytics code:
-https://github.com/google/google-api-python-client/tree/master/samples/analytics
-
-https://developers.google.com/api-client-library/python/auth/web-app
-```
-

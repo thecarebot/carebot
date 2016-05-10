@@ -19,7 +19,7 @@ class Screenshotter:
        :param str story_url The URL of the story
        :param str article_id The CSS ID of the element that contains the story
         """
-        url = "http://carebot-capture.herokuapp.com/api/image?id=%s&url=%s" % (article_id, story_url)
+        url = app_config.SCREENSHOT_API.format(article_id, story_url)
         r = requests.get(url)
 
         if r.status_code == 200:

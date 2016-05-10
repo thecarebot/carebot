@@ -26,27 +26,24 @@ graphic on their screen
 2. *Scroll depth* across a story: how far down the length of a story a user \
 scrolled.
 
-I use those to calculate two indicators:
-1. *Graphic Linger Rate*: The median visibility of a graphic across all users \
-who viewed it.
-2. *Engaged Completion Rate*: Percentage of people who start and complete the \
-story.
+Here are the commands you can run:
 
-Lately I have been focusing on graphics-only stories. I start tracking a story \
-when it is published. I start posting notifications when someone \
-adds the story to an RSS feed or story spreadsheet. You'll hear from me every \
-4 hours on the first day and twice daily for days two and and three.
-
-If you ask me about a specific graphic, I'll give you the most up to date \
-Graphic Linger Rate distribution for the graphic in a nifty histogram. I'll also show \
-how the story that graphic is in is comparing to all other graphic stories overall. \
-Just mention me with the word "slug" followed by your slug:
-
+*Find out more about a slug:*
 > @carebot, how is slug red-rackhams-treasure doing?
 > @carebot, what about slug tintin-in-tibet?
 
-I am learning to answer questions so if you have them, please send them over and \
-I'll get cracking!
+*Find out more about all graphics on a page:*
+> @carebot, how is is http://npr.org/example doing?
+
+*Get an overview of the last week:*
+> @carebot hello!
+
+*Start tracking a slug:*
+> @carebot track my-slug-here on http://npr.org/example
+
+To update a page with another slug, or remove a slug, ask carebot to track it
+again:
+> @carebot track my-slug-here,another-slug-here on http://npr.org/example
 """
 
         return {
