@@ -97,8 +97,8 @@ class NPRLingerRate(CarebotPlugin):
         rows = rows[:-1]
         return rows
 
-    def get_linger_data(self, team, slug=None):
-        params = self.get_query_params(team=team, slug=slug)
+    def get_linger_data(self, team, slug=None, start_date=None):
+        params = self.get_query_params(team=team, slug=slug, start_date=start_date)
         data = GoogleAnalytics.query_ga(params)
 
         if not data.get('rows'):

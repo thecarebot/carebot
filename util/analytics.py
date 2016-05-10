@@ -38,24 +38,3 @@ class GoogleAnalytics:
             return sorted_lst[index]
         else:
             return (sorted_lst[index] + sorted_lst[index + 1])/2.0
-
-    def get_user_data(self, team, start_date=None):
-
-        if not start_date:
-            start_date = '90daysAgo'
-
-        params = {
-            'ids': 'ga:{0}'.format(team['ga_org_id']),
-            'start-date': start_date, # start_date.strftime('%Y-%m-%d'),
-            'end-date': 'today',
-            'metrics': 'ga:users',
-            # 'dimensions': 'ga:eventLabel',
-            # 'filters': filters,
-            'max-results': app_config.GA_RESULT_SIZE,
-            'samplingLevel': app_config.GA_SAMPLING_LEVEL,
-            'start-index': 1,
-        }
-
-        return self.query_ga(params)
-
-
