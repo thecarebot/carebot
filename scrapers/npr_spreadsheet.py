@@ -88,6 +88,7 @@ class SpreadsheetScraper:
                         team = team,
                         screenshot = screenshot_url
                     )
+                    logger.info('Added {0}'.format(story.name))
                     new_stories.append(story)
                 except IntegrityError:
                     # Story probably already exists.
