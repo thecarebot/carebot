@@ -122,7 +122,7 @@ def add_story_screenshots(regenerate=False, article_id='storytext'):
     """
     if regenerate:
         for story in Story.select():
-            logger.info("About to check %s" % (story.name))
+            logger.info("About to check {0}".format(story.name))
 
             story.screenshot = screenshotter.get_story_image(story_url=story.url,
                 article_id=article_id)
@@ -130,10 +130,11 @@ def add_story_screenshots(regenerate=False, article_id='storytext'):
 
     else:
         for story in Story.select().where(Story.screenshot == None):
-            logger.info("About to check %s" % (story.name))
+            logger.info("About to check {0}".format(story.name))
 
             story.screenshot = screenshotter.get_story_image(story_url=story.url,
                 article_id=article_id)
+            logger.info("Got screenshot {0}".format(story.screenshot))
             story.save()
 
 @task
