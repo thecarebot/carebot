@@ -23,6 +23,17 @@ class GoogleAnalytics:
         credentials = get_credentials()
         resp = app_config.authomatic.access(credentials, api_url, params=params)
         data = resp.data
+
+        # Handle errors better
+        if data.get('error'):
+            try:
+                if data.get('error')['code'] == 403:
+                    logger.error("Google Analytics permissions error. Check your GA organization ID and oauth permissions.")
+            except:
+                pass
+
+            logger.error(data)
+
         return data
 
     @staticmethod
