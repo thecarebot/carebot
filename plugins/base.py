@@ -27,6 +27,14 @@ class CarebotPlugin(object):
         """
         raise NotImplementedError("Update message is not implmeneted")
 
+    def get_wait_message(self):
+        """
+        Optional.
+        Called before any listener is triggered. Use this to let the user know
+        that stats may take a minute to arrive.
+        """
+        raise NotImplementedError("Update message is not implmeneted")
+
     def get_listeners(self):
         """
         Can register one or more expressions this plugin will listen and respond
@@ -34,7 +42,7 @@ class CarebotPlugin(object):
 
         format:
         listeners = [
-            ['listener-slug', regular expression to match, handler],
+            ['listener-slug', regular expression to match, handler, get_wait_message (optional)],
             ...
         ]
         """

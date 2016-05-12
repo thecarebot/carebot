@@ -33,9 +33,12 @@ class NPRLingerRate(CarebotPlugin):
         Associate regular expression matches to the appropriate handler
         """
         return [
-            ['linger', self.SLUG_SEARCH_REGEX, self.handle_slug_inquiry],
-            ['linger-url', self.GRUBER_URLINTEXT_PAT, self.handle_url_inquiry],
+            ['linger', self.SLUG_SEARCH_REGEX, self.handle_slug_inquiry, self.get_wait_message],
+            ['linger-url', self.GRUBER_URLINTEXT_PAT, self.handle_url_inquiry, self.get_wait_message],
         ]
+
+    def get_wait_message(self):
+        return "I'm looking up the linger stats -- this may take a minute."
 
     def get_query_params(self, team, slug=None, start_date=None):
         """

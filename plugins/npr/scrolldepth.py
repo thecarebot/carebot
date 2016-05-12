@@ -32,9 +32,12 @@ class NPRScrollDepth(CarebotPlugin):
         Associate regular expression matches to the appropriate handler
         """
         return [
-            ['depth', self.SLUG_SEARCH_REGEX, self.handle_slug_inquiry],
+            ['depth', self.SLUG_SEARCH_REGEX, self.handle_slug_inquiry, self.get_wait_message],
             # ['linger-url', self.GRUBER_URLINTEXT_PAT, self.handle_url_inquiry],
         ]
+
+    def get_wait_message(self):
+        return "All right, I'm looking up the scroll depth stats."
 
     def get_slug_query_params(self, team, slug=None):
         """

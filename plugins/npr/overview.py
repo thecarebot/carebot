@@ -16,8 +16,11 @@ class NPROverview(CarebotPlugin):
 
     def get_listeners(self):
         return [
-            ['help', self.HELLO_REGEX, self.respond],
+            ['help', self.HELLO_REGEX, self.respond, self.get_wait_message],
         ]
+
+    def get_wait_message(self):
+        return "I'm getting stats for the last week. This will take a minute."
 
     def get_user_data(self, team, start_date=None):
         """

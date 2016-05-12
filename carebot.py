@@ -42,6 +42,20 @@ def response_dispatcher(message, text=None):
             logger.info("Recognized message: {0}".format(message.body['text']))
             logger.info("Dispatching to message: {0}".format(listener[0]))
             any_match = True
+
+            # Some listeners have a first message that says "hold tight, stats
+            # are coming soon":
+            try:
+                slack_tools.send_message(
+                    message.body['channel'],
+                    listener[3](),
+                    None,
+                    unfurl_links=False,
+                )
+            except:
+                pass
+
+            # Get the reply
             reply = listener[2](message)
 
             if reply:
