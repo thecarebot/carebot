@@ -70,6 +70,7 @@ CAREBOT_PLUGINS = (
     'plugins.npr.overview.NPROverview',
     'plugins.npr.scrolldepth.NPRScrollDepth',
     'plugins.npr.start_tracking.NPRStartTracking',
+    'plugins.npr.unique_visitors.NPRUniqueVisitors',
 )
 
 """

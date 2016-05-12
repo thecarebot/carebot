@@ -32,6 +32,9 @@ Here are the commands you can run:
 > @carebot, how is slug red-rackhams-treasure doing?
 > @carebot, what about slug tintin-in-tibet?
 
+*Get pageviews for a slug:*
+> @carebot, unsuck prisoners-of-the-sun
+
 *Find out more about all graphics on a page:*
 > @carebot, how is is http://npr.org/example doing?
 
@@ -39,11 +42,11 @@ Here are the commands you can run:
 > @carebot hello!
 
 *Start tracking a slug:*
-> @carebot track my-slug-here on http://npr.org/example
+> @carebot track castafiore-emerald on http://npr.org/example
 
 To update a page with another slug, or remove a slug, ask carebot to track it
 again:
-> @carebot track my-slug-here,another-slug-here on http://npr.org/example
+> @carebot track castafiore-emerald,flight-714 on http://npr.org/example
 """
 
         return {
