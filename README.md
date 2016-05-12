@@ -155,7 +155,7 @@ You can [register for one here](http://www.npr.org/api/index.php).
 
 #### Troubleshooting problems with credentials
 
-* Double check the Google Analytics organization ID you set in `config.yml`
+* Double check the Google Analytics organization IDs you set in `app_config`
 * Test your analytics query in the (Query Explorer](https://ga-dev-tools.appspot.com/query-explorer/)
 and make sure you get the results you expect there.
 * Review the step-by-step [oauth instructions](http://blog.apps.npr.org/2015/03/02/app-template-oauth.html) on the NPR Visuals Team blog.
@@ -179,10 +179,10 @@ After starting the bot, make sure to invite it to the channel you set in `.env`.
 
 ### Configuring Carebot to load new stories
 
-Configure Carebot to pull stores from various sources by copying
- `config.sample.yml` to `config.yml` and customizing the settings.
+Configure Carebot to pull stores from various sources by customizing the `TEAMS`
+and `SOURCES` in `app_config.
 
-Under `teams`, define team names and the channel messages for that team should
+Under `TEAMS`, define team names and the channel messages for that team should
 post to. Make sure you have a `default` team (it can have the same properties as
 another team).
 
@@ -191,36 +191,12 @@ find the ID you need using the [Analytics API explorer](https://ga-dev-tools.app
 select the account, property, and view, then copy the number after `ga:` in
 the `ids` field.
 
-Under `sources`, define where content should be pulled from, and what team it
+Under `SOURCES`, define where content should be pulled from, and what team it
 belongs to. There currently are two supported sources:
 
 * `spreadsheet` pulls from a google doc using its `doc_key`
 * `rss` pulls from an RSS feed via a `url`. It recognizes many typical feeds.
 
-#### Example configuration file
-
-```
-teams:
-  default:
-    channel: "visuals-graphics"
-    ga_org_id: "xxxxxxxxx"
-  viz:
-    channel: "visuals-graphics"
-    ga_org_id: "xxxxxxxxx"
-  carebot:
-    channel: "carebot-dev"
-    ga_org_id: "xxxxxxxxx"
-sources:
-  -
-    team: "viz"
-    type: "spreadsheet"
-    doc_key: "1Gcumd0uOl3eSUvc0y5CWmmHVOKwX609-js5EnE8i3lI"
-  -
-    team: "carebot"
-    type: "rss"
-    url: "https://thecarebot.github.io/feed.xml"
-
-```
 
 ### Load new stories
 
@@ -371,7 +347,7 @@ Scraper code is located in `/scrapers`. We've included an RSS scraper and a
 scraper that pulls articles from a Google Spreadsheet. You can copy or customize
 these to pull in your stories, or write a new scraper from scratch.
 
-Scrapers are instantiated with the `source` pulled from `config.yml`. All
+Scrapers are instantiated with the `SOURCES` pulled from `app_config`. All
 scrapers should implement a `scrape_and_load` method that returns a list of
 stories.
 

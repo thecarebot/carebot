@@ -31,7 +31,7 @@ Data tasks
 @task
 def load_new_stories():
     """
-    Goes through the sources you configured in `config.yml` and adds any new
+    Goes through the sources you configured in `app_config` and adds any new
     stories to the database.
     """
     for source in app_config.SOURCES:
