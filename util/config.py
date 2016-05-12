@@ -1,5 +1,3 @@
-import yaml
-
 import logging
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -10,23 +8,14 @@ import app_config
 
 class Config:
     def __init__(self, path=None):
-        if not path:
-            path = app_config.DEFAULT_CONFIG_PATH
-
-        with open(path, 'r') as yaml_file:
-            data = yaml.load(yaml_file)
-            self.config = data
-
-    def get_teams(self):
-        return self.config['teams']
+        self.teams = app_config.TEAMS
 
     def get_team_for_story(self, story):
-        teams = self.config['teams']
-        for key in teams:
+        for key in self.teams:
             if key == story.team:
-                return teams[key]
+                return self.teams[key]
 
-        return teams['default']
+        return self.teams['default']
 
     def get_team_for_stories(self, stories):
         """
@@ -36,23 +25,17 @@ class Config:
         try:
             return self.get_team_for_story(stories[0])
         except:
-            return self.config['teams']['default']
+            return self.teams['default']
 
     def get_default_team(self):
-        teams = self.config['teams']
-        print self.config['teams']
-        return teams['default']
+        return self.teams['default']
 
     def get_team_for_channel(self, channel):
-        teams = self.config['teams']
-        for key in teams:
-            print key, teams[key]['channel']
-            if teams[key]['channel'] == channel:
+        for key in self.teams:
+            print key, self.teams[key]['channel']
+            if self.teams[key]['channel'] == channel:
                 return key
 
         # Default to the first team's channel
         # Not robust, since dictionaries are not ordered.
         return 'default'
-
-    def get_sources(self):
-        return self.config['sources']

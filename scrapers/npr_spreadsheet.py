@@ -17,9 +17,6 @@ logger.setLevel(logging.INFO)
 npr_api_scraper = NPRAPIScraper()
 screenshotter = Screenshotter()
 
-# Right now, we don't care about stories before this time
-MAGIC_DATE_CUTOFF = datetime.date(2016, 02, 28)
-
 class SpreadsheetScraper:
     """
     From https://github.com/tarbell-project/tarbell/blob/1.0.5/tarbell/app.py#L251
@@ -53,8 +50,11 @@ class SpreadsheetScraper:
         data = spreadsheet['published']
         for row in data:
             if str(row['graphic_slug']) is not '' and str(row['date']) is not '':
-                if SpreadsheetScraper.parse_date(row['date']) > MAGIC_DATE_CUTOFF:
+                if SpreadsheetScraper.parse_date(row['date']) > app_config.date_cutoff:
+                    logger.info('Will add %s to database' % (row['story_headline']))
                     stories.append(row)
+                else:
+                    logger.info('Not adding %s to database: past cutoff date %s' % (row['story_headline'], SpreadsheetScraper.parse_date(row['date'])))
             else:
                 logger.info('Not adding %s to database: missing slug or date' % (row['story_headline']))
         return stories

@@ -1,3 +1,4 @@
+import importlib
 import logging
 import re
 from slackbot.bot import Bot
@@ -5,9 +6,8 @@ from slackbot.bot import respond_to
 from slackbot.bot import listen_to
 import sys
 
-from plugins.registry import PLUGINS
+import app_config
 from util.slack import SlackTools
-
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -18,7 +18,9 @@ slack_tools = SlackTools()
 Go through the plugins and add any listeners we need
 """
 listeners = []
-for plugin in PLUGINS:
+plugins = [getattr(importlib.import_module(mod), cls) for (mod, cls) in (plugin.rsplit(".", 1) for plugin in app_config.CAREBOT_PLUGINS)]
+for plugin in plugins:
+    plugin = plugin()
     try:
         listeners.extend(plugin.get_listeners())
     except NotImplementedError:

@@ -13,3 +13,5 @@ PLUGINS = [
     NPROverview(),
 ]
 
+# http://stackoverflow.com/questions/1796180/how-can-i-get-a-list-of-all-classes-within-current-module-in-python
+# http://stackoverflow.com/questions/7263101/auto-register-a-class-when-its-defined-but-without-importing-it-anywhere

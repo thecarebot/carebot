@@ -1,7 +1,7 @@
 import re
 
-from util.analytics import GoogleAnalytics
 from plugins.base import CarebotPlugin
+from util.analytics import GoogleAnalytics
 
 
 class NPRHelp(CarebotPlugin):

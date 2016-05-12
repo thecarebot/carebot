@@ -334,9 +334,32 @@ is a helpful way to test your parameters before coding them into Carebot.
 
 #### Enable your plugin
 
-To enable a plugin, import it in `registry.py` and add it to the `PLUGINS`
-list in that same file. This will automatically register any listeners and
-regular updates.
+To enable a plugin, list it in two places in `app_config.py`:
+
+1. Add the full path to the list of `CAREBOT_PLUGINS`
+
+2. Add the full path of the plugin to the `plugins` array on the teams you want
+to report that stat.
+
+Here's an example:
+
+```
+CAREBOT_PLUGINS = (
+    'plugins.npr.help.NPRHelp',
+    'plugins.npr.linger.NPRLingerRate',
+    'plugins.npr.scrolldepth.NPRScrollDepth',
+)
+
+TEAMS = {
+    'default': {
+        'channel': 'visuals-graphics',
+        'ga_org_id': '100693289',
+        'plugins': [
+            'plugins.npr.linger.NPRLingerRate',
+            'plugins.npr.scrolldepth.NPRScrollDepth',
+        ],
+    }
+```
 
 ### Load your stories into Carebot with scrapers
 
@@ -360,10 +383,8 @@ Once you've got a scraper, register it in `/fabfile/carebot.py` in the
 To run tests:
 
 ```
-CONFIG_PATH=tests/config_test.yml nosetests
+nosetests
 ```
-
-Note that you need to manually set the path of the test `config.yml` file.
 
 These tests help you make sure that scrapers, plugins, and analytics tools
 are running as expected. We highly recommend writing simple tests for your

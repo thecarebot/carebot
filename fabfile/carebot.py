@@ -1,11 +1,12 @@
 import datetime
 from dateutil.parser import parse
 from fabric.api import task
+import importlib
 import logging
+from pydoc import locate, ErrorDuringImport
 import pytz
 
 import app_config
-from plugins.registry import PLUGINS
 from util.models import Story
 from util.slack import SlackTools
 from util.config import Config
@@ -33,8 +34,7 @@ def load_new_stories():
     Goes through the sources you configured in `config.yml` and adds any new
     stories to the database.
     """
-    sources = config.get_sources()
-    for source in sources:
+    for source in app_config.SOURCES:
         if source['type'] == 'spreadsheet':
             stories = SpreadsheetScraper(source).scrape_and_load()
 
@@ -158,15 +158,18 @@ def get_story_stats():
 
             # Skip stories that have been checked recently
             # And stories that are too old.
-            if (last_bucket == story_time_bucket):
-                logger.info("Checked recently. Bucket is still %s" % (story_time_bucket))
+            if last_bucket == story_time_bucket:
+                logger.info("Checked recently. Bucket is still %s", story_time_bucket)
                 continue
 
         if not story_time_bucket:
             logger.info("Story is too new; skipping for now")
             continue
 
-        for plugin in PLUGINS:
+        plugins = [getattr(importlib.import_module(mod), cls) for (mod, cls) in (plugin.rsplit(".", 1) for plugin in team['plugins'])]
+        for plugin in plugins:
+            plugin = plugin()
+
             try:
                 message = plugin.get_update_message(story)
                 if message:

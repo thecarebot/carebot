@@ -6,6 +6,7 @@ They will be exposed to users. Use environment variables instead.
 See get_secrets() below for a fast way to access them.
 """
 
+import datetime
 import os
 
 from authomatic.providers import oauth2
@@ -22,6 +23,7 @@ PROJECT_SLUG = 'carebot'
 PROJECT_FILENAME = 'carebot'
 PROJECT_TIMEZONE = 'US/Eastern'
 
+
 # The name of the repository containing the source
 REPOSITORY_NAME = 'carebot'
 GITHUB_USERNAME = 'thecarebot'
@@ -29,7 +31,6 @@ REPOSITORY_URL = 'https://github.com/%s/%s.git' % (GITHUB_USERNAME, REPOSITORY_N
 REPOSITORY_ALT_URL = None # 'git@bitbucket.org:nprapps/%s.git' % REPOSITORY_NAME'
 DEFAULT_CONFIG_PATH = os.environ.get('CONFIG_PATH', 'config.yml')
 
-# What to call the database
 DATABASE_NAME = 'carebot.db'
 
 # Screenshotter API
@@ -42,10 +43,10 @@ S3_BUCKET = os.environ.get('S3_BUCKET')
 # Slack info
 SLACK_KEY = os.environ.get('SLACKBOT_API_TOKEN')
 
-# Dailygraphics archive
-COPY_GOOGLE_DOC_KEY = '0Ak3IIavLYTovdGdpcXlFS1lBaVE5aEJqcG1nMUFTVWc'
-COPY_PATH = 'data/copy.xlsx'
+# Don't import stories older than this
+date_cutoff = datetime.date.today() - datetime.timedelta(days=14)
 
+# Dailygraphics archive
 STORIES_GOOGLE_DOC_KEY = '1Gcumd0uOl3eSUvc0y5CWmmHVOKwX609-js5EnE8i3lI'
 STORIES_PATH = 'data/stories.xlsx'
 
@@ -53,14 +54,65 @@ STORIES_PATH = 'data/stories.xlsx'
 NPR_API_KEY = os.environ.get('NPR_API_KEY')
 
 """
-Google analytics
-118286276 = carebot
-100688391 = viz
+GOOGLE ANALYTICS
 """
 GA_SAMPLING_LEVEL = 'HIGHER_PRECISION'
 GA_RESULT_SIZE = 10000
 GA_METRICS = ['sessions', 'pageviews']
 GA_DIMENSIONS = ['pagePath', 'source', 'deviceCategory']
+
+"""
+PLUGINS
+"""
+CAREBOT_PLUGINS = (
+    'plugins.npr.help.NPRHelp',
+    'plugins.npr.linger.NPRLingerRate',
+    'plugins.npr.overview.NPROverview',
+    'plugins.npr.scrolldepth.NPRScrollDepth',
+    'plugins.npr.start_tracking.NPRStartTracking',
+)
+
+"""
+TEAMS and ARTICLE SOURCES
+"""
+TEAMS = {
+    'default': {
+        'channel': 'visuals-graphics',
+        'ga_org_id': '100693289',
+        'plugins': [
+            'plugins.npr.linger.NPRLingerRate',
+            'plugins.npr.scrolldepth.NPRScrollDepth',
+        ],
+    },
+    'viz': {
+        'channel': 'visuals-graphics',
+        'ga_org_id': '100693289',
+        'plugins': [
+            'plugins.npr.linger.NPRLingerRate',
+            'plugins.npr.scrolldepth.NPRScrollDepth',
+        ],
+    },
+    'carebot': {
+        'channel': 'carebot-dev',
+        'ga_org_id': '118286276',
+        'plugins': [
+            'plugins.npr.scrolldepth.NPRScrollDepth',
+        ],
+    }
+}
+
+SOURCES = [
+    {
+        'team': 'viz',
+        'type': 'spreadsheet',
+        'doc_key': '1Gcumd0uOl3eSUvc0y5CWmmHVOKwX609-js5EnE8i3lI'
+    }, {
+        'team': 'carebot',
+        'type': 'rss',
+        'url': 'https://thecarebot.github.io/feed.xml'
+    }
+]
+
 
 """
 OAUTH

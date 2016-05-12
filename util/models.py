@@ -34,9 +34,8 @@ class Story(Model):
     def channel(self):
         channel = '#' + config.get_default_team()['channel']
         if self.team:
-            teams = config.get_teams()
             try:
-                channel = teams[self.team]['channel']
+                channel = app_config.TEAMS[self.team]['channel']
                 channel = '#' + channel
             except:
                 pass

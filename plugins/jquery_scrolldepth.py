@@ -7,11 +7,11 @@ import requests
 import StringIO
 
 import app_config
+from plugins.base import CarebotPlugin
 from util.analytics import GoogleAnalytics
 from util.chart import ChartTools
 from util.models import Story
 from util.s3 import Uploader
-from plugins.base import CarebotPlugin
 
 s3 = Uploader()
 
@@ -19,7 +19,7 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-class JqueryScrollDepth(CarebotPlugin):
+class JqueryScrolldepth(CarebotPlugin):
     """
     Get scroll depth stats on Jquery Scroll Depth Stories
 

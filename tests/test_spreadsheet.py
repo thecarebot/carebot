@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 
+import datetime
+from mock import patch
+
 try:
     import unittest2 as unittest
 except ImportError:
     import unittest
 
-from mock import patch
-
 import app_config
 app_config.DATABASE_NAME = 'carebot_test.db'
+app_config.date_cutoff = datetime.date(1997, 1, 1)
 
 from scrapers.npr_spreadsheet import SpreadsheetScraper
 from util.config import Config
