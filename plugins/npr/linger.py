@@ -49,9 +49,6 @@ class NPRLingerRate(CarebotPlugin):
         if not start_date:
             start_date = '90daysAgo'
 
-        #TODO REMOVE
-        team['ga_org_id'] = 12345678
-
         params = {
             'ids': 'ga:{0}'.format(team['ga_org_id']),
             'start-date': start_date, # start_date.strftime('%Y-%m-%d'),
