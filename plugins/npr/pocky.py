@@ -117,16 +117,21 @@ class NPRPocky(CarebotPlugin):
 
         results = []
         for row in self.data:
-            if query in row['official flavor description'].lower():
+            if query in row['official flavor description'].lower() or query in row['name'].lower():
                 results.append(row)
 
         attachments = []
         for result in results:
             attachments.append(self.get_result_attachments(result))
 
+        if len(results) is not 0:
+            return {
+                'text': "Ok, here's what I know about {0} pocky".format(query),
+                'attachments': attachments
+            }
+
         return {
-            'text': "Ok, here's what I know about {0} pocky".format(query),
-            'attachments': attachments
+            'text': "I couldn't find anything about {0} pocky".format(query)
         }
 
     def get_update_message(self, story):
