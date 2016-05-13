@@ -101,7 +101,7 @@ TEAMS = {
         ],
     },
     'pocky': {
-        'channel': 'secret-carebot-test',
+        'channel': 'visuals-graphics',
         'plugins': ['plugins.npr.pocky.NPRPocky']
     }
 }
