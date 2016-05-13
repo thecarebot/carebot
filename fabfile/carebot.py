@@ -11,6 +11,7 @@ from util.models import Story
 from util.slack import SlackTools
 from util.config import Config
 from scrapers.npr_api import NPRAPIScraper
+from scrapers.npr_pocky import PockyScraper
 from scrapers.rss import RSSScraper
 from scrapers.screenshot import Screenshotter
 from scrapers.npr_spreadsheet import SpreadsheetScraper
@@ -49,6 +50,9 @@ def load_new_stories():
 
         elif source['type'] == 'rss':
             stories = RSSScraper(source).scrape_and_load()
+
+        if source['type'] == 'pocky':
+            stories = PockyScraper(source).scrape_and_load()
 
         for story in stories:
             slack_tools.send_tracking_started_message(story)

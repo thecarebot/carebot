@@ -67,6 +67,7 @@ CAREBOT_PLUGINS = (
     'plugins.npr.help.NPRHelp',
     'plugins.npr.linger.NPRLingerRate',
     'plugins.npr.overview.NPROverview',
+    'plugins.npr.pocky.NPRPocky',
     'plugins.npr.scrolldepth.NPRScrollDepth',
     'plugins.npr.start_tracking.NPRStartTracking',
     'plugins.npr.unique_visitors.NPRUniqueVisitors',
@@ -98,6 +99,10 @@ TEAMS = {
         'plugins': [
             'plugins.npr.scrolldepth.NPRScrollDepth',
         ],
+    },
+    'pocky': {
+        'channel': 'secret-carebot-test',
+        'plugins': ['plugins.npr.pocky.NPRPocky']
     }
 }
 
@@ -110,6 +115,9 @@ SOURCES = [
         'team': 'carebot',
         'type': 'rss',
         'url': 'https://thecarebot.github.io/feed.xml'
+    }, {
+        'team': 'pocky',
+        'type': 'pocky',
     }
 ]
 
