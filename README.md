@@ -1,4 +1,11 @@
-[Carebot](http://thecarebot.github.io) is an effort in thinking about alternative ways to look at analytics for journalism: both the measures and indicators used to understand story impact, and the way which analytics data is used in the newsroom.
+[Carebot](http://thecarebot.github.io) is an effort in thinking about
+alternative ways to look at analytics for journalism: both the measures and
+indicators used to understand story impact, and the way which analytics data is
+used in the newsroom.
+
+Carebot takes [your metrics](http://github.com/theCarebot/carebot-tracker) and
+posts them to your team's [Slack](http://slack.com) channels.
+
 
 ## Quick Start Guide
 To get Carebot up and running you will need to:
@@ -10,15 +17,10 @@ Note: You will need accounts with [Google Analytics](http://analytics.google.com
 
 # Carebot: The Slackbot
 
-* [What is this?](#what-is-this)
-* [Assumptions](#assumptions)
-* [Bootstrap the project](#bootstrap-the-project)
+* [Using Carebot](#using-carebot)
+* [Installing Carebot](#installing-carebot)
 * [Run the project](#run-the-project)
 * [Setup analytics](#setup-analytics)
-
-## What is this?
-
-Carebot reports data insights from [tracked metrics](http://github.com/theCarebot/carebot-tracker) in the form of notifications. This slackbot implementation allows you to push those notifications into [Slack](http://slack.com) channels for your team.
 
 ## Using Carebot
 
@@ -46,7 +48,9 @@ Carebot will automatically track stories (see "Running Carebot", below). Sometim
 
 > @carebot track story-slug-here http://example.com/story
 
-## Assumptions for developing
+## Installing Carebot
+
+### Assumptions
 
 The following things are assumed to be true in this documentation.
 
@@ -60,7 +64,8 @@ and associated access keys.
 
 If you need assistance setting up a development environment to work with this for the first time, we recommend [NPR Visuals' Setup](http://blog.apps.npr.org/2013/06/06/how-to-setup-a-developers-environment.html).
 
-## Bootstrap the project
+
+### First steps
 
 Clone this repository and create a virtual environment:
 ```
@@ -103,7 +108,7 @@ You'll need to add a slackbot integration to get a `SLACKBOT_API_TOKEN`:
 5. Select "Add integration"
 6. Copy the API token to your `.env`
 
-After adding the bot, add it to a slack channel. You might want to set up
+After adding the bot, invite it to your Slack channels. You might want to set up
 a private channel for testing. (Note that you can't make a channel private
 channel public later.)
 
@@ -197,7 +202,6 @@ belongs to. There currently are two supported sources:
 * `spreadsheet` pulls from a google doc using its `doc_key`
 * `rss` pulls from an RSS feed via a `url`. It recognizes many typical feeds.
 
-
 ### Load new stories
 
 This is usually run via a cronjob, but you can fire it manually to test it out:
@@ -216,12 +220,6 @@ fab carebot.get_story_stats
 ```
 
 ## Carebot in production
-
-To deploy carebot to production:
-
-```
-fab production deploy
-```
 
 ### Server setup
 
@@ -252,13 +250,15 @@ Then, run:
 fab production setup
 ```
 
-### Later depoy
+### Deploying
+
+To deploy carebot to production:
 
 ```
 fab production deploy
 ```
 
-### Debugging deploy
+### Debugging deploys
 
 We use `upstart` to keep carebot running on deploys. Sometimes carebot doesn't
 start. The debug process is fairly annoying, but here are some things that might
