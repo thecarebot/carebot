@@ -24,6 +24,15 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+# Fix sys.path :-/
+# It doesn't include the project dir by default
+# http://stackoverflow.com/questions/714063/importing-modules-from-parent-folder
+import os,sys,inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0,parentdir)
+
+
 """
 Data tasks
 """
