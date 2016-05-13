@@ -258,6 +258,13 @@ To deploy carebot to production:
 fab production deploy
 ```
 
+### Starting and stoppping
+
+You may occasionally need to stop and start a remote carebot instance:
+
+* `fab staging stop_service:bot`
+* `fab staging start_service:bot`
+
 ### Debugging deploys
 
 We use `upstart` to keep carebot running on deploys. Sometimes carebot doesn't
