@@ -39,8 +39,8 @@ def response_dispatcher(message, text=None):
     for listener in listeners:
         match = listener[1].findall(text)
         if match:
-            logger.info("Recognized message: {0}".format(message.body['text']))
-            logger.info("Dispatching to message: {0}".format(listener[0]))
+            logger.info("Recognized message: %s", message.body['text'])
+            logger.info("Dispatching to message: %s", listener[0])
             any_match = True
 
             # Some listeners have a first message that says "hold tight, stats
