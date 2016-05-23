@@ -83,7 +83,7 @@ class NPROverview(CarebotPlugin):
         for story in stories:
             fields.append({
                 "title": story.name.strip(),
-                "value": '<' + story.url + '|' + story.slug.strip() + '>',
+                "value": "<{0}|{1}>".format(story.url, story.slug.strip()),
                 "short": True
             })
 
