@@ -23,9 +23,12 @@ class NPRPocky(CarebotPlugin):
     POCKY_REGEX = re.compile(ur'pocky', re.IGNORECASE)
 
     def __init__(self, *args, **kwargs):
-        get_document(POCKY_TRACKER, DATA_PATH)
-        spreadsheet = copytext.Copy(DATA_PATH)
-        self.data = data = spreadsheet['reviews']
+        try:
+            get_document(POCKY_TRACKER, DATA_PATH)
+            spreadsheet = copytext.Copy(DATA_PATH)
+            self.data = data = spreadsheet['reviews']
+        except KeyError:
+            pass
 
         super(NPRPocky, self).__init__(*args, **kwargs)
 
@@ -138,6 +141,9 @@ class NPRPocky(CarebotPlugin):
         """
         Handle periodic checks on the pocky
         """
+
+        if not self.data:
+            return
 
         if story.last_bucket:
             # Really, let's just send one update
