@@ -58,7 +58,11 @@ class NPROverview(CarebotPlugin):
             for slug in story_slugs:
                 slugs.add(slug)
 
-        team = self.config.get_team_for_story(stories[0])
+        try:
+            team = self.config.get_team_for_story(stories[0])
+        except:
+            team = self.config.get_default_team()
+
         total_users = self.get_user_data(team=team, start_date='7daysAgo')
         total_users = int(total_users['rows'][0][0])
         total_users = "{:,}".format(total_users)
