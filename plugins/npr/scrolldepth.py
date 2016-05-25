@@ -44,7 +44,7 @@ class NPRScrollDepth(CarebotPlugin):
         Given a slug, get parameters needed to query google analytics for the
         scroll depth
         """
-        filters = 'ga:eventCategory==%s;ga:eventAction==scroll-depth' % slug
+        filters = 'ga:eventLabel==10,ga:eventLabel==20,ga:eventLabel==30,ga:eventLabel==40,ga:eventLabel==50,ga:eventLabel==60,ga:eventLabel==70,ga:eventLabel==80,ga:eventLabel==90,ga:eventLabel==100;ga:eventCategory==%s;ga:eventAction==scroll-depth' % slug
 
         params = {
             'ids': 'ga:{0}'.format(team['ga_org_id']),
@@ -64,7 +64,7 @@ class NPRScrollDepth(CarebotPlugin):
     def fill_in_max(data):
         """
         Sometime people start at 20, 30, 40% of the article read because their
-        screens are lare or the article is short.
+        screens are large or the article is short.
 
         fill_in_max finds the starting bucket with the largest number of people
         and fills in all previous buckets with that count.that
@@ -99,6 +99,8 @@ class NPRScrollDepth(CarebotPlugin):
             rows.append(row)
 
         # Sort the row data from 10% => 100%
+        # Currently handled by the filter above; legacy from before, but doesn't
+        # hurt to have.
         rows.sort(key=lambda tup: tup[0])
 
         rows = NPRScrollDepth.fill_in_max(rows)
