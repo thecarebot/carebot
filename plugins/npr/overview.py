@@ -53,7 +53,7 @@ class NPROverview(CarebotPlugin):
 
         slugs = Set()
         for story in stories:
-            print story.name
+            # print story.name
             story_slugs = story.slug.split(',')
             for slug in story_slugs:
                 slugs.add(slug)
