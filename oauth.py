@@ -1,4 +1,5 @@
 import app_config
+import logging
 import os
 
 from app_config import authomatic
@@ -7,6 +8,10 @@ from exceptions import KeyError
 from flask import Blueprint, make_response, redirect, render_template, url_for
 from functools import wraps
 from render_utils import make_context
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 SPREADSHEET_URL_TEMPLATE = 'https://docs.google.com/feeds/download/spreadsheets/Export?exportFormat=xlsx&key=%s'
 
@@ -84,6 +89,8 @@ def get_credentials():
         return None
 
     credentials = authomatic.credentials(serialized_credentials)
+
+    logger.info('%s %s' %(credentials.valid, credentials))
 
     if not credentials.valid:
         credentials.refresh()
