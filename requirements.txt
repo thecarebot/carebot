@@ -7,7 +7,7 @@ cycler==0.10.0
 docutils==0.12
 dotenv==0.0.5
 et-xmlfile==1.0.1
-Fabric==1.4.3
+Fabric==1.12.0
 feedparser==5.2.1
 Flask==0.9
 funcsigs==1.0.0
