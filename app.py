@@ -8,7 +8,6 @@ from werkzeug.debug import DebuggedApplication
 from util.models import Story
 
 app = Flask(__name__)
-app.secret_key = app_config.SECRET_KEY
 
 app.debug = app_config.DEBUG
 
