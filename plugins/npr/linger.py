@@ -159,6 +159,10 @@ class NPRLingerRate(CarebotPlugin):
         """
         r = range(1, len(rows) + 1)
 
+        # To mark the median on the chart
+        bars_median_correspondence = [10, 20, 30, 40, 50,
+                                      60, 120, 180, 240, 300]
+
         labels = ['10s', '20', '30', '40', '50', '1m', '2m', '3m', '4m', '5m+',]
         colors = [
             '#ffcc00',
@@ -211,7 +215,7 @@ class NPRLingerRate(CarebotPlugin):
 
         # Add the median marker
         if median:
-            position = (median['raw_avg_seconds'] / 10) - 1
+            position = bars_median_correspondence.index(median['raw_avg_seconds'])
             bar = chart[position]
             height = bar.get_height()
             ax.text(
