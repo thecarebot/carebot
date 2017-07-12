@@ -71,7 +71,7 @@ def response_dispatcher(message, text=None):
         message.reply("Hi! I got your message, but I don't know enough yet to respond to it.")
 
 
-@listen_to('^@*[Cc]arebot[:|,]\s*(.*)', re.IGNORECASE)
+@listen_to('^@*test-[Cc]arebot[:|,]\s*(.*)', re.IGNORECASE)
 def reply(message, text):
     """
     Listen passively for any mention of Carebot: at the beginning of the line
