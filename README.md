@@ -185,7 +185,7 @@ After starting the bot, make sure to invite it to the channel you set in `.env`.
 ### Configuring Carebot to load new stories
 
 Configure Carebot to pull stores from various sources by customizing the `TEAMS`
-and `SOURCES` in `app_config.
+and `SOURCES` in `app_config.py`.
 
 Under `TEAMS`, define team names and the channel messages for that team should
 post to. Make sure you have a `default` team (it can have the same properties as
@@ -241,8 +241,7 @@ echo "backend: TkAgg" > ~/.matplotlib/matplotlibrc
 ### First deploy
 
 Make sure you have a `.env` file with your production keys (see "add
-creditials"). Also, ensure you have an `analytics.dat` file (see "Add Google
-Analytics Credentials" above).
+creditials"). Also make sure that you've run the server locally, and logged into Google through the OAuth flow. **Note: although the filename for the token is the same, you cannot use the same creds as you do for Dailygraphics or the app template.** The credential scopes for Carebot are a superset of our other applications--you can use Dailygraphics after logging into Carebot, but not vice versa.
 
 Then, run:
 
