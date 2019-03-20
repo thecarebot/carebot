@@ -43,7 +43,7 @@ class NPRPocky(CarebotPlugin):
         Attemts to parse a date from Excel into something the rest of the world
         can use.
         """
-        value = float(value)
+        value = float(value or 0)
         seconds = (value - 25569) * 86400.0
         parsed = datetime.datetime.utcfromtimestamp(seconds).date()
         return parsed
