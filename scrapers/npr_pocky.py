@@ -34,6 +34,8 @@ class PockyScraper:
         Attemts to parse a date from Excel into something the rest of the world
         can use.
         """
+        if not value:
+            return None
         value = float(value)
         seconds = (value - 25569) * 86400.0
         parsed = datetime.datetime.utcfromtimestamp(seconds)

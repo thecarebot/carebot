@@ -43,7 +43,9 @@ class NPRPocky(CarebotPlugin):
         Attemts to parse a date from Excel into something the rest of the world
         can use.
         """
-        value = float(value or 0)
+        if not value:
+            return None
+        value = float(value)
         seconds = (value - 25569) * 86400.0
         parsed = datetime.datetime.utcfromtimestamp(seconds).date()
         return parsed
@@ -116,7 +118,7 @@ class NPRPocky(CarebotPlugin):
         }
 
     def respond(self, message):
-        query = message.body['text'].strip().lstrip('pocky ').lower()
+        query = message.body['text'].strip().replace('pocky ', '').lower()
 
         results = []
         for row in self.data:
@@ -141,6 +143,9 @@ class NPRPocky(CarebotPlugin):
         """
         Handle periodic checks on the pocky
         """
+
+        if not hasattr(self, "data"):
+            return
 
         if not self.data:
             return
